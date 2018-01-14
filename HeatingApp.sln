@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareAccess", "HardwareA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareAccess.Tests", "HardwareAccess.Tests\HardwareAccess.Tests.csproj", "{E909F025-6CF8-4CF9-B726-0C2C8913C771}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

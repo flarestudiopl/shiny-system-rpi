@@ -40,7 +40,7 @@ namespace HardwareAccess
                         CrcOk = rawData.Contains("YES")
                     };
 
-                    if (int.TryParse(rawData.Substring(indexOfTemp + 2, 5), out int temp))
+                    if (int.TryParse(rawData.Substring(indexOfTemp + 2, rawData.Length - (indexOfTemp + 3)), out int temp))
                     {
                         result.Value = temp / 1000f;
                     }
@@ -52,8 +52,10 @@ namespace HardwareAccess
                     Logger.Warning("No data.");
                 }
             }
-
-            Logger.Warning("Unsupported device.");
+            else
+            {
+                Logger.Warning("Unsupported device.");
+            }
 
             return new TemperatureSensorData();
         }

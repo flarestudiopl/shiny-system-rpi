@@ -20,9 +20,9 @@ namespace HeatingApi
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureServices(services => services.AddAutofac())
-                .UseUrls("http://*:8000")
-                .UseStartup<Startup>()
-                .Build();
+                   .ConfigureServices(services => services.AddAutofac())
+                   .UseUrls("http://*:8000")
+                   .UseStartup<Startup>()
+                   .Build();
     }
 }
