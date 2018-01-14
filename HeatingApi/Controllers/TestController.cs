@@ -10,11 +10,13 @@ namespace HeatingApi.Controllers
     {
         private readonly IOneWire _oneWire;
         private readonly ITemperatureSensor _temperatureSensor;
+        private readonly II2c _i2C;
 
-        public TestController(IOneWire oneWire, ITemperatureSensor temperatureSensor)
+        public TestController(IOneWire oneWire, ITemperatureSensor temperatureSensor, II2c i2c)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
+            _i2C = i2c;
         }
 
         [Route("/api/test/devices")]
@@ -33,6 +35,18 @@ namespace HeatingApi.Controllers
         public async Task<TemperatureSensorData> Temperature(string deviceId)
         {
             return await _temperatureSensor.Read(deviceId);
+        }
+
+        [Route("/api/test/pcf/{value}")]
+        public void SetPcf(byte value)
+        {
+            _i2C.WriteToDevice(0x38, value);
+        }
+
+        [Route("/api/test/i2c")]
+        public string GetI2c(byte value)
+        {
+            return _i2C.GetI2cDetectResult();
         }
     }
 }

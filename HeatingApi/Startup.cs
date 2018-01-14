@@ -28,6 +28,7 @@ namespace HeatingApi
 
             builder.RegisterType<OneWire>().As<IOneWire>().InstancePerLifetimeScope();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().InstancePerLifetimeScope();
+            builder.RegisterType<I2c>().As<II2c>().InstancePerLifetimeScope();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

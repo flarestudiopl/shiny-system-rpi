@@ -31,16 +31,16 @@ namespace HardwareAccess
             if (SupportedDevicesPrefix.Any(x => deviceId.StartsWith(x)))
             {
                 var rawData = await _oneWire.GetDeviceData(deviceId);
-                var indexOfTemp = rawData.IndexOf("t=");
+                var indexOfTemp = rawData.IndexOf("t=") + 2;
 
-                if (indexOfTemp > 0)
+                if (indexOfTemp > 2)
                 {
                     var result = new TemperatureSensorData
                     {
                         CrcOk = rawData.Contains("YES")
                     };
 
-                    if (int.TryParse(rawData.Substring(indexOfTemp + 2, rawData.Length - (indexOfTemp + 3)), out int temp))
+                    if (int.TryParse(rawData.Substring(indexOfTemp, rawData.Length - (indexOfTemp + 1)), out int temp))
                     {
                         result.Value = temp / 1000f;
                     }
