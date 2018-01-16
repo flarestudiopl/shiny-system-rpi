@@ -1,8 +1,9 @@
 ﻿using Commons;
+using HardwareAccess.Buses;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HardwareAccess
+namespace HardwareAccess.Devices
 {
     public interface ITemperatureSensor
     {

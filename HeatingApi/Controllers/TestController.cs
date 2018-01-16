@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using HardwareAccess;
 using System.Threading.Tasks;
+using HardwareAccess.Buses;
+using HardwareAccess.Devices;
 
 namespace HeatingApi.Controllers
 {

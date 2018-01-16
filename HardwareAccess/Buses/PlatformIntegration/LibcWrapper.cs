@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HardwareAccess
+namespace HardwareAccess.Buses.PlatformIntegration
 {
-    public class LibcWrapper
+    internal class LibcWrapper
     {
         [DllImport("libc.so.6", EntryPoint = "open")]
         public static extern int Open(string fileName, int mode);

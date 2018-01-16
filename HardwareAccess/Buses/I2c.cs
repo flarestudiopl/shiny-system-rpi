@@ -1,11 +1,11 @@
 ﻿using Commons;
+using HardwareAccess.Buses.PlatformIntegration;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HardwareAccess
+namespace HardwareAccess.Buses
 {
     public interface II2c
     {
@@ -18,16 +18,18 @@ namespace HardwareAccess
         private const int OPEN_READ_WRITE_MODE = 2;
         private const int I2C_SLAVE_REQUEST = 0x0703;
 
+        private readonly IProcessRunner _processRunner;
         private readonly int _i2cBusHandle;
 
-        public I2c()
+        public I2c(IProcessRunner processRunner)
         {
+            _processRunner = processRunner;
             _i2cBusHandle = LibcWrapper.Open("/dev/i2c-1", OPEN_READ_WRITE_MODE);
         }
 
         public async Task<IList<int>> GetI2cDevices()
         {
-            var detectResult = await GetI2cDetectResult();
+            var detectResult = await _processRunner.Run("i2cdetect", "-y 1");
 
             var addresses = detectResult.Split('\n')
                                         .Where(x => x.Contains(':'))
@@ -38,25 +40,6 @@ namespace HardwareAccess
                                         .ToList();
 
             return addresses;
-        }
-
-        private static async Task<string> GetI2cDetectResult()
-        {
-            var proc = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "i2cdetect",
-                    Arguments = "-y 1",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            proc.Start();
-
-            return await proc.StandardOutput.ReadToEndAsync();
         }
 
         public void WriteToDevice(int i2cDevice, byte value)

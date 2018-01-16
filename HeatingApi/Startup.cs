@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Autofac;
-using HardwareAccess;
+using HeatingApi.DependencyResolution;
 
 namespace HeatingApi
 {
@@ -24,11 +24,7 @@ namespace HeatingApi
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            // TODO: move outside
-
-            builder.RegisterType<OneWire>().As<IOneWire>().InstancePerLifetimeScope();
-            builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().InstancePerLifetimeScope();
-            builder.RegisterType<I2c>().As<II2c>().InstancePerLifetimeScope();
+            Modules.Register(builder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
