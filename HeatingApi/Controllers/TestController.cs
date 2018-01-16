@@ -37,16 +37,16 @@ namespace HeatingApi.Controllers
             return await _temperatureSensor.Read(deviceId);
         }
 
-        [Route("/api/test/pcf/{value}")]
-        public void SetPcf(byte value)
+        [Route("/api/test/pcf/{device}/{value}")]
+        public void SetPcf(byte device, byte value)
         {
-            _i2C.WriteToDevice(0x38, value);
+            _i2C.WriteToDevice(device, value);
         }
 
         [Route("/api/test/i2c")]
-        public string GetI2c(byte value)
+        public async Task<IList<int>> GetI2c()
         {
-            return _i2C.GetI2cDetectResult();
+            return await _i2C.GetI2cDevices();
         }
     }
 }
