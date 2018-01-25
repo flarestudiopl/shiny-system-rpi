@@ -2,18 +2,42 @@
 
 namespace HardwareAccess.Buses.PlatformIntegration
 {
-    internal class LibcWrapper
+    public interface ILibcWrapper
+    {
+        int OpenReadWrite(string fileName);
+        int SendControl(int handle, int request, int data);
+        int Write(int handle, byte[] data);
+    }
+
+    public class LibcWrapper : ILibcWrapper
     {
         [DllImport("libc.so.6", EntryPoint = "open")]
-        public static extern int Open(string fileName, int mode);
+        private static extern int Open(string fileName, int mode);
 
         [DllImport("libc.so.6", EntryPoint = "ioctl", SetLastError = true)]
-        public static extern int Ioctl(int fd, int request, int data);
+        private static extern int Ioctl(int fd, int request, int data);
 
         [DllImport("libc.so.6", EntryPoint = "read", SetLastError = true)]
-        public static extern int Read(int handle, byte[] data, int length);
+        private static extern int Read(int handle, byte[] data, int length);
 
         [DllImport("libc.so.6", EntryPoint = "write", SetLastError = true)]
-        public static extern int Write(int handle, byte[] data, int length);
+        private static extern int Write(int handle, byte[] data, int length);
+
+        private const int READ_WRITE_MODE = 2;
+
+        public int OpenReadWrite(string fileName)
+        {
+            return Open(fileName, READ_WRITE_MODE);
+        }
+
+        public int SendControl(int handle, int request, int data)
+        {
+            return Ioctl(handle, request, data);
+        }
+
+        public int Write(int handle, byte[] data)
+        {
+            return Write(handle, data, data.Length);
+        }
     }
 }

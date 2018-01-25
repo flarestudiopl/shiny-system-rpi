@@ -15,16 +15,17 @@ namespace HardwareAccess.Buses
 
     public class I2c : II2c
     {
-        private const int OPEN_READ_WRITE_MODE = 2;
         private const int I2C_SLAVE_REQUEST = 0x0703;
 
         private readonly IProcessRunner _processRunner;
+        private readonly ILibcWrapper _libcWrapper;
         private readonly int _i2cBusHandle;
 
-        public I2c(IProcessRunner processRunner)
+        public I2c(IProcessRunner processRunner, ILibcWrapper libcWrapper)
         {
             _processRunner = processRunner;
-            _i2cBusHandle = LibcWrapper.Open("/dev/i2c-1", OPEN_READ_WRITE_MODE);
+            _libcWrapper = libcWrapper;
+            _i2cBusHandle = _libcWrapper.OpenReadWrite("/dev/i2c-1");
         }
 
         public async Task<IList<int>> GetI2cDevices()
@@ -44,9 +45,9 @@ namespace HardwareAccess.Buses
 
         public void WriteToDevice(int i2cDevice, byte value)
         {
-            if (LibcWrapper.Ioctl(_i2cBusHandle, I2C_SLAVE_REQUEST, i2cDevice) >= 0)
+            if (_libcWrapper.SendControl(_i2cBusHandle, I2C_SLAVE_REQUEST, i2cDevice) >= 0)
             {
-                LibcWrapper.Write(_i2cBusHandle, new[] { value }, 1);
+                _libcWrapper.Write(_i2cBusHandle, new[] { value });
             }
             else
             {

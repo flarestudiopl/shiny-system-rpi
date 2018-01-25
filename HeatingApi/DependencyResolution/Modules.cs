@@ -11,6 +11,7 @@ namespace HeatingApi.DependencyResolution
         {
             // PlatformIntegration
             builder.RegisterType<ProcessRunner>().As<IProcessRunner>().InstancePerLifetimeScope();
+            builder.RegisterType<LibcWrapper>().As<ILibcWrapper>().InstancePerLifetimeScope();
 
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().InstancePerLifetimeScope();
