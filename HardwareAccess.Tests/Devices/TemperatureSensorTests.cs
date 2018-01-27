@@ -1,8 +1,9 @@
 using HardwareAccess.Buses;
+using HardwareAccess.Devices;
 using NSubstitute;
 using Xunit;
 
-namespace HardwareAccess.Devices.Tests
+namespace HardwareAccess.Tests.Devices
 {
     public class TemperatureSensorTests
     {
