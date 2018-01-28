@@ -5,11 +5,25 @@ VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingApi", "HeatingApi\HeatingApi.csproj", "{797F4858-5A3C-4210-95BA-C01FFC3D238D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareAccess", "HardwareAccess\HardwareAccess.csproj", "{24372CEB-350C-4C31-841A-720852C5DA5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HardwareAccess", "HardwareAccess\HardwareAccess.csproj", "{24372CEB-350C-4C31-841A-720852C5DA5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commons", "Commons\Commons.csproj", "{98EB775B-DCD8-4C6C-8D95-5AEB919CF160}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareAccess.Tests", "HardwareAccess.Tests\HardwareAccess.Tests.csproj", "{E909F025-6CF8-4CF9-B726-0C2C8913C771}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HardwareAccess.Tests", "HardwareAccess.Tests\HardwareAccess.Tests.csproj", "{E909F025-6CF8-4CF9-B726-0C2C8913C771}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Persistence", "1. Persistence", "{0FD84C5D-B7C9-4079-8044-89AA34691F0C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Hardware", "2. Hardware", "{05D0DEEA-D2A1-4E0C-BDA9-AAF965639885}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Control", "3. Control", "{0FCC155B-8043-49F6-AC88-D9C5946201ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Presentation", "4. Presentation", "{BA916D96-16EB-4C0A-8DA1-EAEF90A23CF3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Shared", "0. Shared", "{CDFC38AB-CC92-449C-8C60-D7C7BF750989}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatingControl", "HeatingControl\HeatingControl.csproj", "{7E6C1099-2D01-43F2-837E-6F61DCB4E37E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatingControl.Domain", "HeatingControl.Domain\HeatingControl.Domain.csproj", "{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +47,25 @@ Global
 		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E909F025-6CF8-4CF9-B726-0C2C8913C771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{797F4858-5A3C-4210-95BA-C01FFC3D238D} = {BA916D96-16EB-4C0A-8DA1-EAEF90A23CF3}
+		{24372CEB-350C-4C31-841A-720852C5DA5D} = {05D0DEEA-D2A1-4E0C-BDA9-AAF965639885}
+		{98EB775B-DCD8-4C6C-8D95-5AEB919CF160} = {CDFC38AB-CC92-449C-8C60-D7C7BF750989}
+		{E909F025-6CF8-4CF9-B726-0C2C8913C771} = {05D0DEEA-D2A1-4E0C-BDA9-AAF965639885}
+		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E} = {0FCC155B-8043-49F6-AC88-D9C5946201ED}
+		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF} = {0FCC155B-8043-49F6-AC88-D9C5946201ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {753ECF9A-6077-40FA-A1B6-25F66AE5C57A}
