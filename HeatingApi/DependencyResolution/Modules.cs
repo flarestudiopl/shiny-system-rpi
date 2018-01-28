@@ -18,6 +18,7 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<I2c>().As<II2c>().InstancePerLifetimeScope();
 
             // Devices
+            builder.RegisterType<PowerOutput>().As<IPowerOutput>().InstancePerLifetimeScope();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().InstancePerLifetimeScope();
         }
     }

@@ -7,6 +7,7 @@ using HardwareAccess.Devices;
 namespace HeatingApi.Controllers
 {
     [Produces("application/json")]
+    [Route("/api/[controller]")]
     public class TestController : Controller
     {
         private readonly IOneWire _oneWire;
@@ -20,39 +21,34 @@ namespace HeatingApi.Controllers
             _i2C = i2c;
         }
 
-        [HttpGet]
-        [Route("/api/test/devices")]
+        [HttpGet("1w/devices")]
         public IList<string> WireDevices()
         {
             return _oneWire.GetDevicesList();
         }
 
-        [HttpGet]
-        [Route("/api/test/data/{deviceId}")]
+        [HttpGet("1w/{deviceId}/raw")]
         public async Task<string> WireData(string deviceId)
         {
             return await _oneWire.GetDeviceData(deviceId);
         }
 
-        [HttpGet]
-        [Route("/api/test/temp/{deviceId}")]
+        [HttpGet("1w/{deviceId}/temp")]
         public async Task<TemperatureSensorData> Temperature(string deviceId)
         {
             return await _temperatureSensor.Read(deviceId);
         }
 
-        [HttpGet]
-        [Route("/api/test/pcf/{device}/{value}")]
-        public void SetPcf(byte device, byte value)
-        {
-            _i2C.WriteToDevice(device, value);
-        }
-
-        [HttpGet]
-        [Route("/api/test/i2c")]
+        [HttpGet("i2c/devices")]
         public async Task<IList<int>> GetI2c()
         {
             return await _i2C.GetI2cDevices();
+        }
+
+        [HttpPost("i2c")]
+        public void SetPcf(byte device, byte value)
+        {
+            _i2C.WriteToDevice(device, value);
         }
     }
 }
