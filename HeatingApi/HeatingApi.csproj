@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HardwareAccess\HardwareAccess.csproj" />
+    <ProjectReference Include="..\HeatingControl\HeatingControl.csproj" />
   </ItemGroup>
 
 </Project>

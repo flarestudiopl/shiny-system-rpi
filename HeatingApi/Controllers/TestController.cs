@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using HardwareAccess.Buses;
 using HardwareAccess.Devices;
+using HeatingControl;
 
 namespace HeatingApi.Controllers
 {
@@ -13,12 +14,17 @@ namespace HeatingApi.Controllers
         private readonly IOneWire _oneWire;
         private readonly ITemperatureSensor _temperatureSensor;
         private readonly II2c _i2C;
+        private readonly IHeatingControl _heatingControl;
 
-        public TestController(IOneWire oneWire, ITemperatureSensor temperatureSensor, II2c i2c)
+        public TestController(IOneWire oneWire, 
+                              ITemperatureSensor temperatureSensor, 
+                              II2c i2c,
+                              IHeatingControl heatingControl)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
             _i2C = i2c;
+            _heatingControl = heatingControl;
         }
 
         [HttpGet("1w/devices")]
@@ -49,6 +55,20 @@ namespace HeatingApi.Controllers
         public void SetPcf(byte device, byte value)
         {
             _i2C.WriteToDevice(device, value);
+        }
+
+        [HttpGet("control/start")]
+        public void ControlStart()
+        {
+            _heatingControl.Start();
+        }
+
+        [HttpGet("control/temp/{deviceId}")]
+        public TemperatureData ControlTemp(string deviceId)
+        {
+            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
+
+            return tempData;
         }
     }
 }

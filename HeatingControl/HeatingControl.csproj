@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HardwareAccess\HardwareAccess.csproj" />
+    <ProjectReference Include="..\HeatingControl.Domain\HeatingControl.Domain.csproj" />
   </ItemGroup>
 
 </Project>

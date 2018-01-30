@@ -10,24 +10,21 @@ namespace HeatingControl
 {
     public interface ITemperatureReadingLoop
     {
-        void Start(int intervalMilliseconds, CancellationToken cancellationToken);
+        void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken);
     }
 
     public class TemperatureReadingLoop : ITemperatureReadingLoop
     {
         private const int TEMP_AVG_QUEUE_LENGTH = 5;
 
-        private readonly ControllerState _controllerState;
-        private readonly TemperatureSensor _temperatureSensor;
+        private readonly ITemperatureSensor _temperatureSensor;
 
-        public TemperatureReadingLoop(ControllerState controllerState,
-                                      TemperatureSensor temperatureSensor)
+        public TemperatureReadingLoop(ITemperatureSensor temperatureSensor)
         {
-            _controllerState = controllerState;
             _temperatureSensor = temperatureSensor;
         }
 
-        public void Start(int intervalMilliseconds, CancellationToken cancellationToken)
+        public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
         {
             Task.Run(
                 () =>
@@ -38,7 +35,7 @@ namespace HeatingControl
 
                         var stopwatch = Stopwatch.StartNew();
 
-                        ProcessReads();
+                        ProcessReads(controllerState);
 
                         Logger.Trace("Temperature processing loop took {0} ms.", new object[] { stopwatch.ElapsedMilliseconds });
 
@@ -48,17 +45,18 @@ namespace HeatingControl
                 cancellationToken);
         }
 
-        private async void ProcessReads()
+        private void ProcessReads(ControllerState controllerState)
         {
-            foreach (var zone in _controllerState.DeviceIdToTemperatureData)
+            foreach (var zone in controllerState.DeviceIdToTemperatureData)
             {
-                var currentReadout = await _temperatureSensor.Read(zone.Key);
+                var sensorRead = _temperatureSensor.Read(zone.Key);
+                sensorRead.Wait();
 
-                if (currentReadout.CrcOk)
+                if (sensorRead.Result.CrcOk)
                 {
                     var temperatureData = zone.Value;
 
-                    temperatureData.Readouts.Enqueue(currentReadout);
+                    temperatureData.Readouts.Enqueue(sensorRead.Result);
                     temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x.Value);
                     temperatureData.LastRead = DateTime.Now;
 
@@ -69,7 +67,7 @@ namespace HeatingControl
                 }
                 else
                 {
-                    Logger.Warning($"Sensor {zone} CRC error. Skipping readout.");
+                    Logger.Warning($"Sensor {zone.Key} CRC error. Skipping readout.");
                 }
             }
         }

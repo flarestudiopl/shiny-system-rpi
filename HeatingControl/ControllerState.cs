@@ -8,7 +8,7 @@ namespace HeatingControl
 {
     public class ControllerState
     {
-        public ConcurrentDictionary<string, TemperatureData> DeviceIdToTemperatureData { get; set; }
+        public ConcurrentDictionary<string, TemperatureData> DeviceIdToTemperatureData { get; set; } = new ConcurrentDictionary<string, TemperatureData>();
     }
 
     public class TemperatureData
