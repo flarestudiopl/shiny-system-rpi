@@ -10,6 +10,6 @@ namespace HeatingControl.Domain
 
         public DateTime EndTime { get; set; }
 
-        public float SetPoint { get; set; }
+        public float? SetPoint { get; set; }
     }
 }

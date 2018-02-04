@@ -14,6 +14,6 @@ namespace HeatingControl.Models
 
         public IList<PowerZoneState> PowerZoneNameToState { get; set; } = new List<PowerZoneState>();
 
-        public ConcurrentDictionary<PowerOutputDescriptor, bool> PowerOutputToState { get; set; } = new ConcurrentDictionary<PowerOutputDescriptor, bool>();
+        public IDictionary<PowerOutputDescriptor, bool> PowerOutputToState { get; set; } = new Dictionary<PowerOutputDescriptor, bool>();
     }
 }

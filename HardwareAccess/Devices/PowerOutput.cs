@@ -8,6 +8,8 @@ namespace HardwareAccess.Devices
     public interface IPowerOutput
     {
         void SetState(int deviceId, int channel, bool state);
+
+        bool GetState(int deviceId, int channel);
     }
 
     public class PowerOutput : IPowerOutput
@@ -50,6 +52,13 @@ namespace HardwareAccess.Devices
 
                 _i2c.WriteToDevice(deviceId, (byte)currentState);
             }
+        }
+
+        public bool GetState(int deviceId, int channel)
+        {
+            var bitToCheck = 1 << (channel - 1);
+
+            return (_deviceToOutputState[deviceId] & bitToCheck) == bitToCheck;
         }
     }
 }

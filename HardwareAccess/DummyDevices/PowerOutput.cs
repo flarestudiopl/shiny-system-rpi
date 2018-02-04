@@ -1,6 +1,5 @@
 ﻿using Commons;
 using HardwareAccess.Devices;
-using System;
 using System.Collections.Generic;
 
 namespace HardwareAccess.DummyDevices
@@ -34,5 +33,13 @@ namespace HardwareAccess.DummyDevices
                 Logger.Trace("Device {0} has now state = {1}.", new object[] { deviceId, currentState });
             }
         }
+
+        public bool GetState(int deviceId, int channel)
+        {
+            var bitToCheck = 1 << (channel - 1);
+
+            return (_deviceToOutputState[deviceId] & bitToCheck) == bitToCheck;
+        }
+
     }
 }
