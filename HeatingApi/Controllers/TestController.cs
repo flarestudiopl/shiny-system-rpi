@@ -14,16 +14,19 @@ namespace HeatingApi.Controllers
         private readonly IOneWire _oneWire;
         private readonly ITemperatureSensor _temperatureSensor;
         private readonly II2c _i2C;
+        private readonly IPowerOutput _powerOutput;
         private readonly IHeatingControl _heatingControl;
 
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
                               II2c i2c,
+                              IPowerOutput powerOutput,
                               IHeatingControl heatingControl)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
             _i2C = i2c;
+            _powerOutput = powerOutput;
             _heatingControl = heatingControl;
         }
 
@@ -55,6 +58,12 @@ namespace HeatingApi.Controllers
         public void SetPcf(byte device, byte value)
         {
             _i2C.WriteToDevice(device, value);
+        }
+
+        [HttpPost("i2c/power")]
+        public void SetPowerOutput(int deviceId, int channel, bool state)
+        {
+            _powerOutput.SetState(deviceId, channel, state);
         }
 
         [HttpGet("control/start")]

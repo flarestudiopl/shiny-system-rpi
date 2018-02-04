@@ -56,8 +56,8 @@ namespace HeatingControl
                 {
                     var temperatureData = zone.Value;
 
-                    temperatureData.Readouts.Enqueue(sensorRead.Result);
-                    temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x.Value);
+                    temperatureData.Readouts.Enqueue(sensorRead.Result.Value);
+                    temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x);
                     temperatureData.LastRead = DateTime.Now;
 
                     if (temperatureData.Readouts.Count > TEMP_AVG_QUEUE_LENGTH)

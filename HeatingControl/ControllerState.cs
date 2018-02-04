@@ -1,8 +1,6 @@
-﻿using HardwareAccess.Devices;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 
 namespace HeatingControl
 {
@@ -15,7 +13,7 @@ namespace HeatingControl
     {
         public float AverageTemperature { get; set; }
 
-        public Queue<TemperatureSensorData> Readouts { get; set; } = new Queue<TemperatureSensorData>();
+        public Queue<float> Readouts { get; set; } = new Queue<float>();
 
         public DateTime LastRead { get; set; }
     }

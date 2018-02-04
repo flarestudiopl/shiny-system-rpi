@@ -10,6 +10,17 @@ namespace HeatingApi.DependencyResolution
     {
         public static void Register(ContainerBuilder builder)
         {
+            RegisterHardwareAccess(builder);
+
+            // HeatingControl
+            builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
+            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
+            builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
+            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+        }
+
+        private static void RegisterHardwareAccess(ContainerBuilder builder)
+        {
             // PlatformIntegration
             builder.RegisterType<ProcessRunner>().As<IProcessRunner>().SingleInstance();
             builder.RegisterType<LibcWrapper>().As<ILibcWrapper>().SingleInstance();
@@ -19,14 +30,13 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<I2c>().As<II2c>().SingleInstance();
 
             // Devices
+#if DEBUG
+            builder.RegisterType<HardwareAccess.DummyDevices.PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<HardwareAccess.DummyDevices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+#else
             builder.RegisterType<PowerOutput>().As<IPowerOutput>().SingleInstance();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
-
-            // HeatingControl
-            builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
-            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
-            builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
-            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+#endif
         }
     }
 }
