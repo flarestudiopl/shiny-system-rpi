@@ -1,12 +1,13 @@
 ﻿using Commons;
 using HardwareAccess.Devices;
+using HeatingControl.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HeatingControl
+namespace HeatingControl.Application
 {
     public interface ITemperatureReadingLoop
     {

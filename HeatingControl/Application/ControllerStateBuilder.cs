@@ -1,6 +1,7 @@
 ﻿using HeatingControl.Domain;
+using HeatingControl.Models;
 
-namespace HeatingControl
+namespace HeatingControl.Application
 {
     public interface IControllerStateBuilder
     {
@@ -15,7 +16,7 @@ namespace HeatingControl
 
             foreach(var zone in buildingModel.TemperatureZones)
             {
-                state.DeviceIdToTemperatureData.AddOrUpdate(zone.TemperatureSensorDeviceId, new ControllerState.TemperatureData(), (key, value) => value);
+                state.DeviceIdToTemperatureData.AddOrUpdate(zone.TemperatureSensorDeviceId, new TemperatureData(), (key, value) => value);
             }
 
             return state;

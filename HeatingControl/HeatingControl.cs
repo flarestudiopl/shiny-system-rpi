@@ -1,4 +1,7 @@
-﻿using System;
+﻿using HeatingControl.Application;
+using HeatingControl.DataAccess;
+using HeatingControl.Models;
+using System;
 using System.Threading;
 
 namespace HeatingControl

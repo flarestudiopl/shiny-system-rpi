@@ -3,6 +3,8 @@ using HardwareAccess.Buses;
 using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
 using HeatingControl;
+using HeatingControl.Application;
+using HeatingControl.DataAccess;
 
 namespace HeatingApi.DependencyResolution
 {

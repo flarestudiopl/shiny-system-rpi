@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl;
+using HeatingControl.Models;
 
 namespace HeatingApi.Controllers
 {
@@ -73,9 +74,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("control/temp/{deviceId}")]
-        public ControllerState.TemperatureData ControlTemp(string deviceId)
+        public TemperatureData ControlTemp(string deviceId)
         {
-            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out ControllerState.TemperatureData tempData);
+            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
 
             return tempData;
         }

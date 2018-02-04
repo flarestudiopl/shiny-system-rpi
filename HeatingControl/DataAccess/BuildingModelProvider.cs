@@ -1,7 +1,7 @@
 ﻿using HeatingControl.Domain;
 using System.Collections.Generic;
 
-namespace HeatingControl
+namespace HeatingControl.DataAccess
 {
     public interface IBuildingModelProvider
     {
