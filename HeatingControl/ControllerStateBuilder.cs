@@ -13,9 +13,9 @@ namespace HeatingControl
         {
             var state = new ControllerState();
 
-            foreach(var zone in buildingModel.Zones)
+            foreach(var zone in buildingModel.TemperatureZones)
             {
-                state.DeviceIdToTemperatureData.AddOrUpdate(zone.TemperatureSensorDeviceId, new TemperatureData(), (key, value) => value);
+                state.DeviceIdToTemperatureData.AddOrUpdate(zone.TemperatureSensorDeviceId, new ControllerState.TemperatureData(), (key, value) => value);
             }
 
             return state;

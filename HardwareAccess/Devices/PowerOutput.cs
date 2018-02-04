@@ -29,7 +29,7 @@ namespace HardwareAccess.Devices
                 throw new ArgumentOutOfRangeException(nameof(channel));
             }
 
-            var bitToFlip = (int)Math.Pow(2, channel - 1);
+            var bitToFlip = 1 << (channel - 1);
 
             lock (_lock)
             {

@@ -73,9 +73,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("control/temp/{deviceId}")]
-        public TemperatureData ControlTemp(string deviceId)
+        public ControllerState.TemperatureData ControlTemp(string deviceId)
         {
-            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
+            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out ControllerState.TemperatureData tempData);
 
             return tempData;
         }

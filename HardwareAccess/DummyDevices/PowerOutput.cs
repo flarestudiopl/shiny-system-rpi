@@ -12,7 +12,7 @@ namespace HardwareAccess.DummyDevices
 
         public void SetState(int deviceId, int channel, bool state)
         {
-            var bitToFlip = (int)Math.Pow(2, channel - 1);
+            var bitToFlip = 1 << (channel - 1);
 
             lock (_lock)
             {

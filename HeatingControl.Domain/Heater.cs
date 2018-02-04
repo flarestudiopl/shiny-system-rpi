@@ -4,9 +4,7 @@
     {
         public string Name { get; set; }
 
-        public int PowerOutputDeviceId { get; set; }
-
-        public int PowerOutputChannel { get; set; }
+        public PowerOutputDescriptor PowerOutput { get; set; }
 
         public UsageUnit UsageUnit { get; set; }
 

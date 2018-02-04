@@ -6,7 +6,9 @@ namespace HeatingControl.Domain
     {
         public string Name { get; set; }
 
-        public IList<Zone> Zones { get; set; }
+        public IList<TemperatureZone> TemperatureZones { get; set; }
+
+        public IList<PowerZone> PowerZones { get; set; }
 
         public int ControlLoopIntervalSeconds { get; set; }
     }

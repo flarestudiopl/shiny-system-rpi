@@ -14,11 +14,11 @@ namespace HeatingControl
         {
             return new Building
             {
-                Zones = new List<Zone>
+                TemperatureZones = new List<TemperatureZone>
                 {
-                    new Zone{ TemperatureSensorDeviceId = "10-0008019e9d54" },
-                    new Zone{ TemperatureSensorDeviceId = "28-000005964edc" },
-                    new Zone{ TemperatureSensorDeviceId = "28-00000595d87e" }
+                    new TemperatureZone{ TemperatureSensorDeviceId = "10-0008019e9d54" },
+                    new TemperatureZone{ TemperatureSensorDeviceId = "28-000005964edc" },
+                    new TemperatureZone{ TemperatureSensorDeviceId = "28-00000595d87e" }
                 }
             };
         }

@@ -2,7 +2,7 @@
 
 namespace HeatingControl.Domain
 {
-    public class Zone
+    public class TemperatureZone
     {
         public string Name { get; set; }
 
