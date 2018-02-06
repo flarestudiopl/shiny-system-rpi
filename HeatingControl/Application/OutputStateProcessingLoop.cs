@@ -1,4 +1,5 @@
 ﻿using Commons;
+using HardwareAccess.Devices;
 using HeatingControl.Domain;
 using HeatingControl.Models;
 using System;
@@ -16,6 +17,13 @@ namespace HeatingControl.Application
 
     public class OutputStateProcessingLoop : IOutputStateProcessingLoop
     {
+        private readonly IPowerOutput _powerOutput;
+
+        public OutputStateProcessingLoop(IPowerOutput powerOutput)
+        {
+            _powerOutput = powerOutput;
+        }
+
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
         {
             Task.Run(
@@ -59,10 +67,10 @@ namespace HeatingControl.Application
                         break;
                     case ControlType.ScheduleTemperatureControl:
                         temperatureZone.SetPoint = scheduleItem.SetPoint.Value;
-                        outputState = ProcessHisteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone.SetPoint);
+                        outputState = ProcessHysteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone) ?? outputState;
                         break;
                     case ControlType.ManualTemperatureControl:
-                        outputState = ProcessHisteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone.SetPoint);
+                        outputState = ProcessHysteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone) ?? outputState;
                         break;
                 }
             }
@@ -83,25 +91,55 @@ namespace HeatingControl.Application
             return null;
         }
 
-        private bool ProcessHisteresis(TemperatureData temperatureData, float value)
+        private bool? ProcessHysteresis(TemperatureData currentTemperature, TemperatureZoneState zoneState)
         {
-            throw new NotImplementedException();
+            // TODO: can handle both heating and cooling approach
+
+            float halfOfHysteresis = zoneState.TemperatureZone.Hysteresis / 2f;
+
+            if (currentTemperature.AverageTemperature >= zoneState.SetPoint + halfOfHysteresis)
+            {
+                return false;
+            }
+
+            if (currentTemperature.AverageTemperature <= zoneState.SetPoint - halfOfHysteresis)
+            {
+                return true;
+            }
+
+            return null;
         }
 
         private void ProcessHeaters(ControllerState controllerState)
         {
-            throw new NotImplementedException();
+            foreach (var zone in controllerState.TemperatureZoneNameToState.Values)
+            {
+                foreach (var heater in zone.TemperatureZone.Heaters)
+                {
+                    controllerState.HeaterNameToState[heater.Name].OutputState = zone.EnableOutputs;
+                }
+            }
         }
 
         private void ProcessPowerZones(ControllerState controllerState)
         {
-            throw new NotImplementedException();
+            // TODO: apply power limits
         }
 
         private void WriteOutputs(ControllerState controllerState)
         {
-            throw new NotImplementedException();
-        }
+            var now = DateTime.Now;
 
+            foreach (var heater in controllerState.HeaterNameToState.Values)
+            {
+                var powerOutput = heater.Heater.PowerOutput;
+
+                if ((now - heater.LastStateChange).TotalSeconds > heater.Heater.MinimumStateChangeIntervalSeconds &&
+                    heater.OutputState != _powerOutput.GetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel))
+                {
+                    _powerOutput.SetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel, heater.OutputState);
+                }
+            }
+        }
     }
 }
