@@ -3,6 +3,7 @@ using HeatingControl.Domain;
 using HeatingControl.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ namespace HeatingControl.Application
             {
                 var temperatureZone = zone.Value;
                 var outputState = temperatureZone.EnableOutputs;
-                ScheduleItem scheduleItem = null; // TODO
+                var scheduleItem = TryGetScheduleItem(zone.Value);
 
                 switch (temperatureZone.CurrentControlType)
                 {
@@ -65,6 +66,21 @@ namespace HeatingControl.Application
                         break;
                 }
             }
+        }
+
+        private ScheduleItem TryGetScheduleItem(TemperatureZoneState zoneState)
+        {
+            var schedule = zoneState.TemperatureZone.Schedule;
+            var now = DateTime.Now;
+
+            if (schedule != null && schedule.Any())
+            {
+                return schedule.FirstOrDefault(x => x.DayOfWeek == now.DayOfWeek &&
+                                               x.BeginTime.TimeOfDay > now.TimeOfDay &&
+                                               x.EndTime.TimeOfDay <= now.TimeOfDay);
+            }
+
+            return null;
         }
 
         private bool ProcessHisteresis(TemperatureData temperatureData, float value)
