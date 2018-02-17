@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HardwareAccess\HardwareAccess.csproj" />
     <ProjectReference Include="..\HeatingControl\HeatingControl.csproj" />
+    <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
 
 </Project>

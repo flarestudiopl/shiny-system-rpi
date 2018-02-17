@@ -26,6 +26,8 @@ namespace HeatingApi
             {
                 c.SwaggerDoc("v1", new Info { Title = "HeatingAPI", Version = "v1" });
             });
+
+            services.AddSingleton(Configuration);
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

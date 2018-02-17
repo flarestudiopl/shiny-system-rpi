@@ -4,7 +4,7 @@ using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
 using HeatingControl;
 using HeatingControl.Application;
-using HeatingControl.DataAccess;
+using Storage.BuildingModel;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -15,6 +15,7 @@ namespace HeatingApi.DependencyResolution
             RegisterHardwareAccess(builder);
 
             // HeatingControl
+            builder.RegisterType<BuildingModelSaver>().As<IBuildingModelSaver>().SingleInstance();
             builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
             builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();

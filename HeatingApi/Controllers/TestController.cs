@@ -5,6 +5,7 @@ using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl;
 using HeatingControl.Models;
+using Storage.BuildingModel;
 
 namespace HeatingApi.Controllers
 {
@@ -17,18 +18,24 @@ namespace HeatingApi.Controllers
         private readonly II2c _i2C;
         private readonly IPowerOutput _powerOutput;
         private readonly IHeatingControl _heatingControl;
+        private readonly IBuildingModelProvider _buildingModelProvider;
+        private readonly IBuildingModelSaver _buildingModelSaver;
 
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
                               II2c i2c,
                               IPowerOutput powerOutput,
-                              IHeatingControl heatingControl)
+                              IHeatingControl heatingControl,
+                              IBuildingModelProvider buildingModelProvider,
+                              IBuildingModelSaver buildingModelSaver)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
             _i2C = i2c;
             _powerOutput = powerOutput;
             _heatingControl = heatingControl;
+            _buildingModelProvider = buildingModelProvider;
+            _buildingModelSaver = buildingModelSaver;
         }
 
         [HttpGet("1w/devices")]
@@ -79,6 +86,13 @@ namespace HeatingApi.Controllers
             _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
 
             return tempData;
+        }
+
+        [HttpGet("config/write")]
+        public void WriteConfig()
+        {
+            var model = _buildingModelProvider.Provide();
+            _buildingModelSaver.Save(model);
         }
     }
 }
