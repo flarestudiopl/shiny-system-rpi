@@ -1,0 +1,48 @@
+{
+  "Name": "Budynek testowy",
+  "TemperatureZones": [
+    {
+      "Name": "Strefa 1",
+      "TemperatureSensorDeviceId": "10-0008019e9d54",
+      "Heaters": [
+        {
+          "Name": "Grzejnik",
+          "PowerOutput": {
+            "PowerOutputDeviceId": 60,
+            "PowerOutputChannel": 1
+          },
+          "UsageUnit": 0,
+          "UsagePerHour": 0.0,
+          "MinimumStateChangeIntervalSeconds": 1
+        }
+      ],
+      "AllowedControlTypes": 12,
+      "DefaultSetPoint": 20.0,
+      "ManualSetPoint": 22.0,
+      "Hysteresis": 0.5,
+      "Schedule": null
+    },
+    {
+      "Name": null,
+      "TemperatureSensorDeviceId": "28-000005964edc",
+      "Heaters": null,
+      "AllowedControlTypes": 0,
+      "DefaultSetPoint": 0.0,
+      "ManualSetPoint": 0.0,
+      "Hysteresis": 0.0,
+      "Schedule": null
+    },
+    {
+      "Name": null,
+      "TemperatureSensorDeviceId": "28-00000595d87e",
+      "Heaters": null,
+      "AllowedControlTypes": 0,
+      "DefaultSetPoint": 0.0,
+      "ManualSetPoint": 0.0,
+      "Hysteresis": 0.0,
+      "Schedule": null
+    }
+  ],
+  "PowerZones": null,
+  "ControlLoopIntervalSeconds": 2
+}

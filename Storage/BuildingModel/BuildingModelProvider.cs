@@ -36,9 +36,28 @@ namespace Storage.BuildingModel
         {
             return new Building
             {
+                ControlLoopIntervalSeconds = 2,
+                Name = "Budynek testowy",
                 TemperatureZones = new List<TemperatureZone>
                 {
-                    new TemperatureZone{ TemperatureSensorDeviceId = "10-0008019e9d54" },
+                    new TemperatureZone
+                    {
+                        TemperatureSensorDeviceId = "10-0008019e9d54",
+                        Name = "Strefa 1",
+                        AllowedControlTypes = ControlType.ScheduleTemperatureControl | ControlType.ManualTemperatureControl,
+                        Heaters = new List<Heater>
+                        {
+                            new Heater
+                            {
+                                Name = "Grzejnik",
+                                MinimumStateChangeIntervalSeconds = 1,
+                                PowerOutput = new PowerOutputDescriptor{ PowerOutputDeviceId = 60, PowerOutputChannel = 1}
+                            }
+                        },
+                        DefaultSetPoint = 20f,
+                        Hysteresis = 0.5f,
+                        ManualSetPoint = 22f
+                    },
                     new TemperatureZone{ TemperatureSensorDeviceId = "28-000005964edc" },
                     new TemperatureZone{ TemperatureSensorDeviceId = "28-00000595d87e" }
                 }
