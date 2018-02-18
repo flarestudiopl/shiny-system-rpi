@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingApi", "HeatingApi\HeatingApi.csproj", "{797F4858-5A3C-4210-95BA-C01FFC3D238D}"
 EndProject
@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingControl", "HeatingCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingControl.Domain", "HeatingControl.Domain\HeatingControl.Domain.csproj", "{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "Storage\Storage.csproj", "{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatingControl.Tests", "HeatingControl.Tests\HeatingControl.Tests.csproj", "{E7057B7D-6ADA-4646-B131-B85004E552F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7057B7D-6ADA-4646-B131-B85004E552F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7057B7D-6ADA-4646-B131-B85004E552F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7057B7D-6ADA-4646-B131-B85004E552F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7057B7D-6ADA-4646-B131-B85004E552F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{7E6C1099-2D01-43F2-837E-6F61DCB4E37E} = {0FCC155B-8043-49F6-AC88-D9C5946201ED}
 		{24784DCF-E6BB-4EAD-AC78-9392D2D8B8EF} = {0FCC155B-8043-49F6-AC88-D9C5946201ED}
 		{6B9F2E2D-95E7-463D-BD16-FAA8468B008D} = {0FD84C5D-B7C9-4079-8044-89AA34691F0C}
+		{E7057B7D-6ADA-4646-B131-B85004E552F3} = {0FCC155B-8043-49F6-AC88-D9C5946201ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {753ECF9A-6077-40FA-A1B6-25F66AE5C57A}

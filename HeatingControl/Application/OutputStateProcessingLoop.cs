@@ -18,10 +18,12 @@ namespace HeatingControl.Application
     public class OutputStateProcessingLoop : IOutputStateProcessingLoop
     {
         private readonly IPowerOutput _powerOutput;
+        private readonly HysteresisProcessor _hysteresisProcessor;
 
-        public OutputStateProcessingLoop(IPowerOutput powerOutput)
+        public OutputStateProcessingLoop(IPowerOutput powerOutput, HysteresisProcessor hysteresisProcessor)
         {
             _powerOutput = powerOutput;
+            _hysteresisProcessor = hysteresisProcessor;
         }
 
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
@@ -67,10 +69,10 @@ namespace HeatingControl.Application
                         break;
                     case ControlType.ScheduleTemperatureControl:
                         temperatureZone.SetPoint = scheduleItem.SetPoint.Value;
-                        outputState = ProcessHysteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone) ?? outputState;
+                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature, outputState, temperatureZone.SetPoint, temperatureZone.TemperatureZone.Hysteresis);
                         break;
                     case ControlType.ManualTemperatureControl:
-                        outputState = ProcessHysteresis(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId], temperatureZone) ?? outputState;
+                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature, outputState, temperatureZone.SetPoint, temperatureZone.TemperatureZone.Hysteresis);
                         break;
                 }
             }
@@ -86,25 +88,6 @@ namespace HeatingControl.Application
                 return schedule.FirstOrDefault(x => x.DayOfWeek == now.DayOfWeek &&
                                                x.BeginTime.TimeOfDay > now.TimeOfDay &&
                                                x.EndTime.TimeOfDay <= now.TimeOfDay);
-            }
-
-            return null;
-        }
-
-        private bool? ProcessHysteresis(TemperatureData currentTemperature, TemperatureZoneState zoneState)
-        {
-            // TODO: can handle both heating and cooling approach
-
-            float halfOfHysteresis = zoneState.TemperatureZone.Hysteresis / 2f;
-
-            if (currentTemperature.AverageTemperature >= zoneState.SetPoint + halfOfHysteresis)
-            {
-                return false;
-            }
-
-            if (currentTemperature.AverageTemperature <= zoneState.SetPoint - halfOfHysteresis)
-            {
-                return true;
             }
 
             return null;
