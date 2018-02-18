@@ -12,14 +12,16 @@ namespace HeatingApi.DependencyResolution
     {
         public static void Register(ContainerBuilder builder)
         {
+            RegisterPersistence(builder);
             RegisterHardwareAccess(builder);
+            RegisterControl(builder);
+        }
 
-            // HeatingControl
-            builder.RegisterType<BuildingModelSaver>().As<IBuildingModelSaver>().SingleInstance();
+        private static void RegisterPersistence(ContainerBuilder builder)
+        {
+            // BuildingModel
             builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
-            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
-            builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
-            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+            builder.RegisterType<BuildingModelSaver>().As<IBuildingModelSaver>().SingleInstance();
         }
 
         private static void RegisterHardwareAccess(ContainerBuilder builder)
@@ -40,6 +42,17 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<PowerOutput>().As<IPowerOutput>().SingleInstance();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
 #endif
+        }
+
+        private static void RegisterControl(ContainerBuilder builder)
+        {
+            builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
+
+            // Application
+            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
+            builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
+            builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
+            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
         }
     }
 }

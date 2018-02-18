@@ -18,9 +18,10 @@ namespace HeatingControl.Application
     public class OutputStateProcessingLoop : IOutputStateProcessingLoop
     {
         private readonly IPowerOutput _powerOutput;
-        private readonly HysteresisProcessor _hysteresisProcessor;
+        private readonly IHysteresisProcessor _hysteresisProcessor;
 
-        public OutputStateProcessingLoop(IPowerOutput powerOutput, HysteresisProcessor hysteresisProcessor)
+        public OutputStateProcessingLoop(IPowerOutput powerOutput,
+                                         IHysteresisProcessor hysteresisProcessor)
         {
             _powerOutput = powerOutput;
             _hysteresisProcessor = hysteresisProcessor;
@@ -61,20 +62,27 @@ namespace HeatingControl.Application
 
                 switch (temperatureZone.CurrentControlType)
                 {
-                    case ControlType.None:
-                    case ControlType.ManualOnOff:
-                        break;
                     case ControlType.ScheduleOnOff:
                         outputState = scheduleItem != null;
                         break;
                     case ControlType.ScheduleTemperatureControl:
                         temperatureZone.SetPoint = scheduleItem.SetPoint.Value;
-                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature, outputState, temperatureZone.SetPoint, temperatureZone.TemperatureZone.Hysteresis);
+                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature,
+                                                                   outputState,
+                                                                   temperatureZone.SetPoint,
+                                                                   temperatureZone.TemperatureZone.Hysteresis);
                         break;
                     case ControlType.ManualTemperatureControl:
-                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature, outputState, temperatureZone.SetPoint, temperatureZone.TemperatureZone.Hysteresis);
+                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature,
+                                                                   outputState,
+                                                                   temperatureZone.SetPoint,
+                                                                   temperatureZone.TemperatureZone.Hysteresis);
+                        break;
+                    default:
                         break;
                 }
+
+                temperatureZone.EnableOutputs = outputState;
             }
         }
 

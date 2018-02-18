@@ -1,6 +1,4 @@
-﻿using HeatingControl.Models;
-
-namespace HeatingControl.Application
+﻿namespace HeatingControl.Application
 {
     public interface IHysteresisProcessor
     {
