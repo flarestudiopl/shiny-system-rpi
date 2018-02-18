@@ -58,8 +58,14 @@ namespace Storage.BuildingModel
                         Hysteresis = 0.5f,
                         ManualSetPoint = 22f
                     },
-                    new TemperatureZone{ TemperatureSensorDeviceId = "28-000005964edc" },
-                    new TemperatureZone{ TemperatureSensorDeviceId = "28-00000595d87e" }
+                    new TemperatureZone{
+                        TemperatureSensorDeviceId = "28-000005964edc",
+                        Name = "Strefa 2"
+                    },
+                    new TemperatureZone{
+                        TemperatureSensorDeviceId = "28-00000595d87e",
+                        Name = "Strefa 3"
+                    }
                 }
             };
         }

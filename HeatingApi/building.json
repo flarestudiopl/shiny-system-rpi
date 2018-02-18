@@ -20,27 +20,27 @@
       "DefaultSetPoint": 20.0,
       "ManualSetPoint": 22.0,
       "Hysteresis": 0.5,
-      "Schedule": null
+      "Schedule": []
     },
     {
-      "Name": null,
+      "Name": "Strefa 2",
       "TemperatureSensorDeviceId": "28-000005964edc",
-      "Heaters": null,
+      "Heaters": [],
       "AllowedControlTypes": 0,
       "DefaultSetPoint": 0.0,
       "ManualSetPoint": 0.0,
       "Hysteresis": 0.0,
-      "Schedule": null
+      "Schedule": []
     },
     {
-      "Name": null,
+      "Name": "Strefa 3",
       "TemperatureSensorDeviceId": "28-00000595d87e",
-      "Heaters": null,
+      "Heaters": [],
       "AllowedControlTypes": 0,
       "DefaultSetPoint": 0.0,
       "ManualSetPoint": 0.0,
       "Hysteresis": 0.0,
-      "Schedule": null
+      "Schedule": []
     }
   ],
   "PowerZones": null,

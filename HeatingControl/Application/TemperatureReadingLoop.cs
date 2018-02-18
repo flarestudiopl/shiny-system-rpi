@@ -48,7 +48,7 @@ namespace HeatingControl.Application
 
         private void ProcessReads(ControllerState controllerState)
         {
-            foreach (var zone in controllerState.DeviceIdToTemperatureData)
+            Parallel.ForEach(controllerState.DeviceIdToTemperatureData, zone =>
             {
                 var sensorRead = _temperatureSensor.Read(zone.Key);
                 sensorRead.Wait();
@@ -70,7 +70,7 @@ namespace HeatingControl.Application
                 {
                     Logger.Warning($"Sensor {zone.Key} CRC error. Skipping readout.");
                 }
-            }
+            });
         }
     }
 }

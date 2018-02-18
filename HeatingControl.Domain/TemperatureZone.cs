@@ -8,7 +8,7 @@ namespace HeatingControl.Domain
 
         public string TemperatureSensorDeviceId { get; set; }
 
-        public IList<Heater> Heaters { get; set; }
+        public IList<Heater> Heaters { get; set; } = new List<Heater>();
 
         public ControlType AllowedControlTypes { get; set; }
 
@@ -18,6 +18,6 @@ namespace HeatingControl.Domain
 
         public float Hysteresis { get; set; }
 
-        public IList<ScheduleItem> Schedule { get; set; }
+        public IList<ScheduleItem> Schedule { get; set; } = new List<ScheduleItem>();
     }
 }
