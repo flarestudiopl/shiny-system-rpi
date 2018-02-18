@@ -20,13 +20,13 @@ namespace HardwareAccess.Tests.Devices
             var powerOutput = new PowerOutput(i2c);
 
             // Act
-            powerOutput.SetState(1, 1, true);  // 0000 0001
-            powerOutput.SetState(1, 3, true);  // 0000 0101
-            powerOutput.SetState(1, 6, true);  // 0010 0101
-            powerOutput.SetState(1, 3, false); // 0010 0001 => 33
+            powerOutput.SetState(1, 1, true);  // 1111 1110
+            powerOutput.SetState(1, 3, true);  // 1111 1010
+            powerOutput.SetState(1, 6, true);  // 1101 1010
+            powerOutput.SetState(1, 3, false); // 1101 1110 => 222
 
             // Assert
-            Assert.Equal(33, deviceState);
+            Assert.Equal(222, deviceState);
         }
 
         [Fact]

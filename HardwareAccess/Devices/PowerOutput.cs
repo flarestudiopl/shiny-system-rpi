@@ -50,7 +50,7 @@ namespace HardwareAccess.Devices
 
                 _deviceToOutputState[deviceId] = currentState;
 
-                _i2c.WriteToDevice(deviceId, (byte)currentState);
+                _i2c.WriteToDevice(deviceId, (byte)~currentState);
             }
         }
 
