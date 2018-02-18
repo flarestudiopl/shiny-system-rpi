@@ -38,6 +38,11 @@ namespace HardwareAccess.DummyDevices
         {
             var bitToCheck = 1 << (channel - 1);
 
+            if (!_deviceToOutputState.ContainsKey(deviceId))
+            {
+                _deviceToOutputState[deviceId] = 0;
+            }
+
             return (_deviceToOutputState[deviceId] & bitToCheck) == bitToCheck;
         }
 

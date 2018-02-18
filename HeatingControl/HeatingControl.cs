@@ -15,22 +15,32 @@ namespace HeatingControl
     public class HeatingControl : IHeatingControl
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly ITemperatureReadingLoop _temperatureReadingLoop;
 
-        public ControllerState State { get; }
+        private readonly IBuildingModelProvider _buildingModelProvider;
+        private readonly IControllerStateBuilder _controllerStateBuilder;
+        private readonly ITemperatureReadingLoop _temperatureReadingLoop;
+        private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
+
+        public ControllerState State { get; private set; }
 
         public HeatingControl(IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
-                              ITemperatureReadingLoop temperatureReadingLoop)
+                              ITemperatureReadingLoop temperatureReadingLoop,
+                              IOutputStateProcessingLoop outputStateProcessingLoop)
         {
-            var buildingModel = buildingModelProvider.Provide();
-            State = controllerStateBuilder.Build(buildingModel);
+            _buildingModelProvider = buildingModelProvider;
+            _controllerStateBuilder = controllerStateBuilder;
             _temperatureReadingLoop = temperatureReadingLoop;
+            _outputStateProcessingLoop = outputStateProcessingLoop;
         }
 
         public void Start()
         {
-            _temperatureReadingLoop.Start(1000, State, _cancellationTokenSource.Token);
+            var buildingModel = _buildingModelProvider.Provide();
+            State = _controllerStateBuilder.Build(buildingModel);
+
+            _temperatureReadingLoop.Start(buildingModel.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
+            _outputStateProcessingLoop.Start(buildingModel.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
         }
 
         public void Dispose()

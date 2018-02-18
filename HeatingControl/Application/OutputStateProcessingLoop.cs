@@ -66,7 +66,7 @@ namespace HeatingControl.Application
                         outputState = scheduleItem != null;
                         break;
                     case ControlType.ScheduleTemperatureControl:
-                        temperatureZone.SetPoint = scheduleItem.SetPoint.Value;
+                        temperatureZone.SetPoint = scheduleItem?.SetPoint.Value ?? temperatureZone.TemperatureZone.DefaultSetPoint;
                         outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature,
                                                                    outputState,
                                                                    temperatureZone.SetPoint,

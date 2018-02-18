@@ -10,6 +10,6 @@ namespace HeatingControl.Domain
 
         public IList<PowerZone> PowerZones { get; set; }
 
-        public int ControlLoopIntervalSeconds { get; set; }
+        public int ControlLoopIntervalSecondsMilliseconds { get; set; }
     }
 }

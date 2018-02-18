@@ -6,7 +6,7 @@
       "TemperatureSensorDeviceId": "10-0008019e9d54",
       "Heaters": [
         {
-          "Name": "Grzejnik",
+          "Name": "Grzejnik A",
           "PowerOutput": {
             "PowerOutputDeviceId": 60,
             "PowerOutputChannel": 1
@@ -44,5 +44,5 @@
     }
   ],
   "PowerZones": null,
-  "ControlLoopIntervalSeconds": 2
+  "ControlLoopIntervalSecondsMilliseconds": 1500
 }

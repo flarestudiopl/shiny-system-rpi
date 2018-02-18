@@ -6,5 +6,7 @@
         {
             return string.Format(stringToFormat, values);
         }
+
+        public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
     }
 }

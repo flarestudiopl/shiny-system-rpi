@@ -36,7 +36,7 @@ namespace Storage.BuildingModel
         {
             return new Building
             {
-                ControlLoopIntervalSeconds = 2,
+                ControlLoopIntervalSecondsMilliseconds = 1500,
                 Name = "Budynek testowy",
                 TemperatureZones = new List<TemperatureZone>
                 {
@@ -49,7 +49,7 @@ namespace Storage.BuildingModel
                         {
                             new Heater
                             {
-                                Name = "Grzejnik",
+                                Name = "Grzejnik A",
                                 MinimumStateChangeIntervalSeconds = 1,
                                 PowerOutput = new PowerOutputDescriptor{ PowerOutputDeviceId = 60, PowerOutputChannel = 1}
                             }

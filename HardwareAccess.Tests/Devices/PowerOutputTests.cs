@@ -30,6 +30,19 @@ namespace HardwareAccess.Tests.Devices
         }
 
         [Fact]
+        public void can_get_state()
+        {
+            // Arrange
+            var powerOutput = new PowerOutput(null);
+
+            // Act
+            var state = powerOutput.GetState(1, 1);
+
+            // Assert
+            Assert.Equal(false, state);
+        }
+
+        [Fact]
         public void can_set_and_read_state()
         {
             // Arrange
