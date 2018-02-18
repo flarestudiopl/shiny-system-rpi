@@ -67,16 +67,10 @@ namespace HeatingControl.Application
                         break;
                     case ControlType.ScheduleTemperatureControl:
                         temperatureZone.SetPoint = scheduleItem?.SetPoint.Value ?? temperatureZone.TemperatureZone.DefaultSetPoint;
-                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature,
-                                                                   outputState,
-                                                                   temperatureZone.SetPoint,
-                                                                   temperatureZone.TemperatureZone.Hysteresis);
+                        outputState = ProcessTemperatureBasedOutput(controllerState, temperatureZone, outputState);
                         break;
                     case ControlType.ManualTemperatureControl:
-                        outputState = _hysteresisProcessor.Process(controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId].AverageTemperature,
-                                                                   outputState,
-                                                                   temperatureZone.SetPoint,
-                                                                   temperatureZone.TemperatureZone.Hysteresis);
+                        outputState = ProcessTemperatureBasedOutput(controllerState, temperatureZone, outputState);
                         break;
                     default:
                         break;
@@ -84,6 +78,26 @@ namespace HeatingControl.Application
 
                 temperatureZone.EnableOutputs = outputState;
             }
+        }
+
+        private bool ProcessTemperatureBasedOutput(ControllerState controllerState, TemperatureZoneState temperatureZone, bool outputState)
+        {
+            var temperatureData = controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId];
+
+            if (DateTime.Now - temperatureData.LastRead < TimeSpan.FromMinutes(5))
+            {
+                outputState = _hysteresisProcessor.Process(temperatureData.AverageTemperature,
+                                                           outputState,
+                                                           temperatureZone.SetPoint,
+                                                           temperatureZone.TemperatureZone.Hysteresis);
+            }
+            else
+            {
+                outputState = false;
+                Logger.Trace("Temperature value for zone {0} is too old. Proactive power cutoff.", new[] { temperatureZone.TemperatureZone.Name });
+            }
+
+            return outputState;
         }
 
         private ScheduleItem TryGetScheduleItem(TemperatureZoneState zoneState)
@@ -129,6 +143,7 @@ namespace HeatingControl.Application
                     heater.OutputState != _powerOutput.GetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel))
                 {
                     _powerOutput.SetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel, heater.OutputState);
+                    heater.LastStateChange = now;
                 }
             }
         }

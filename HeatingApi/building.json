@@ -13,7 +13,7 @@
           },
           "UsageUnit": 0,
           "UsagePerHour": 0.0,
-          "MinimumStateChangeIntervalSeconds": 1
+          "MinimumStateChangeIntervalSeconds": 15
         }
       ],
       "AllowedControlTypes": 12,
