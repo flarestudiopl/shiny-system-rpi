@@ -47,5 +47,18 @@ namespace HardwareAccess.Tests.Devices
             Assert.Equal(21.375f, result.Value);
             Assert.False(result.CrcOk);
         }
+
+        [Fact]
+        public void detects_empty_response_as_crc_error()
+        {
+            // Arrange
+            var rawData = "00 00 00 00 00 00 00 00 00 : crc=00 YES\n00 00 00 00 00 00 00 00 00 t=0\n";
+
+            // Act
+            var result = Act(rawData);
+
+            // Assert
+            Assert.False(result.CrcOk);
+        }
     }
 }

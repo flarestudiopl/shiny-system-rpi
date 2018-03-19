@@ -38,7 +38,7 @@ namespace HardwareAccess.Devices
                 {
                     var result = new TemperatureSensorData
                     {
-                        CrcOk = rawData.Contains("YES")
+                        CrcOk = rawData.Contains("YES") && !rawData.Contains("00 00 00 00 00 00 00 00 00")
                     };
 
                     if (int.TryParse(rawData.Substring(indexOfTemp, rawData.Length - (indexOfTemp + 1)), out int temp))
