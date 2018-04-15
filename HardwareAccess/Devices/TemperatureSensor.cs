@@ -1,5 +1,6 @@
 ﻿using Commons;
 using HardwareAccess.Buses;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace HardwareAccess.Devices
 {
     public interface ITemperatureSensor
     {
+        ICollection<string> GetAvailableSensors();
         Task<TemperatureSensorData> Read(string deviceId);
     }
 
@@ -25,6 +27,13 @@ namespace HardwareAccess.Devices
         public TemperatureSensor(IOneWire oneWire)
         {
             _oneWire = oneWire;
+        }
+
+        public ICollection<string> GetAvailableSensors()
+        {
+            return _oneWire.GetDevicesList()
+                           .Where(x => x.Length > 2 && SupportedDevicesPrefix.Contains(x.Substring(0, 2)))
+                           .ToList();
         }
 
         public async Task<TemperatureSensorData> Read(string deviceId)

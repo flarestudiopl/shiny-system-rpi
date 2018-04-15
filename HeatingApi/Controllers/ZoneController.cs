@@ -16,10 +16,10 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("{name}")]
-        public TemperatureZoneState GetState(string name)
+        public ZoneState GetState(string name)
         {
             // TODO wrap state, don't let HC.Models to show up here
-            return _heatingControl.State.TemperatureZoneNameToState[name];
+            return _heatingControl.State.ZoneNameToState[name];
         }
     }
 }

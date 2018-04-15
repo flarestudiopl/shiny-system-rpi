@@ -8,7 +8,7 @@ namespace HeatingControl.Models
     {
         public PowerZone PowerZone { get; set; }
 
-        public IDictionary<PowerOutputDescriptor, bool> AffectedOutputToState { get; set; }
+        public IDictionary<PowerOutput, bool> AffectedOutputToState { get; set; }
 
         public DateTime NextRoundDateTime { get; set; }
     }

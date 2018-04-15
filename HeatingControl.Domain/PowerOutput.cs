@@ -1,6 +1,6 @@
 ﻿namespace HeatingControl.Domain
 {
-    public struct PowerOutputDescriptor
+    public struct PowerOutput
     {
         public int PowerOutputDeviceId { get; set; }
 

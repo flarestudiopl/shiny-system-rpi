@@ -54,55 +54,81 @@ namespace HeatingControl.Application
 
         private void ProcessTemperatureZones(ControllerState controllerState)
         {
-            foreach (var zone in controllerState.TemperatureZoneNameToState)
+            foreach (var zoneState in controllerState.ZoneNameToState.Values)
             {
-                var temperatureZone = zone.Value;
-                var outputState = temperatureZone.EnableOutputs;
-                var scheduleItem = TryGetScheduleItem(zone.Value);
-
-                switch (temperatureZone.CurrentControlType)
+                if (zoneState.Zone.TemperatureControlledZone != null)
                 {
-                    case ControlType.ScheduleOnOff:
-                        outputState = scheduleItem != null;
-                        break;
-                    case ControlType.ScheduleTemperatureControl:
-                        temperatureZone.SetPoint = scheduleItem?.SetPoint.Value ?? temperatureZone.TemperatureZone.DefaultSetPoint;
-                        outputState = ProcessTemperatureBasedOutput(controllerState, temperatureZone, outputState);
-                        break;
-                    case ControlType.ManualTemperatureControl:
-                        outputState = ProcessTemperatureBasedOutput(controllerState, temperatureZone, outputState);
-                        break;
-                    default:
-                        break;
+                    zoneState.EnableOutputs = ProcessTemperatureBasedOutput(controllerState, zoneState);
                 }
-
-                temperatureZone.EnableOutputs = outputState;
+                else
+                {
+                    zoneState.EnableOutputs = ProcessOnOffBasedOutput(controllerState, zoneState);
+                }
             }
         }
 
-        private bool ProcessTemperatureBasedOutput(ControllerState controllerState, TemperatureZoneState temperatureZone, bool outputState)
+        private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState)
         {
-            var temperatureData = controllerState.DeviceIdToTemperatureData[temperatureZone.TemperatureZone.TemperatureSensorDeviceId];
+            var temperatureSensorDeviceId = controllerState.TemperatureSensorNameToDeviceId[zoneState.Zone.TemperatureControlledZone.TemperatureSensorName];
+            var temperatureData = controllerState.DeviceIdToTemperatureData[temperatureSensorDeviceId];
+
+            var outputState = zoneState.EnableOutputs;
 
             if (DateTime.Now - temperatureData.LastRead < TimeSpan.FromMinutes(5))
             {
+                var setPoint = 0f;
+
+                switch (zoneState.ControlMode)
+                {
+                    case ZoneControlMode.LowOrDisabled:
+                        setPoint = zoneState.Zone.TemperatureControlledZone.LowSetPoint;
+                        break;
+                    case ZoneControlMode.HighOrEnabled:
+                        setPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint;
+                        break;
+                    case ZoneControlMode.Schedule:
+                        var scheduleItem = TryGetScheduleItem(zoneState);
+                        setPoint = scheduleItem != null ? scheduleItem.SetPoint.Value : zoneState.Zone.TemperatureControlledZone.ScheduleDefaultSetPoint;
+                        break;
+                }
+
                 outputState = _hysteresisProcessor.Process(temperatureData.AverageTemperature,
                                                            outputState,
-                                                           temperatureZone.SetPoint,
-                                                           temperatureZone.TemperatureZone.Hysteresis);
+                                                           setPoint,
+                                                           zoneState.Zone.TemperatureControlledZone.Hysteresis);
             }
             else
             {
                 outputState = false;
-                Logger.Trace("Temperature value for zone {0} is too old. Proactive power cutoff.", new[] { temperatureZone.TemperatureZone.Name });
+                Logger.Trace("Temperature value for zone {0} is too old. Proactive power cutoff.", new[] { zoneState.Zone.Name });
             }
 
             return outputState;
         }
 
-        private ScheduleItem TryGetScheduleItem(TemperatureZoneState zoneState)
+        private bool ProcessOnOffBasedOutput(ControllerState controllerState, ZoneState zoneState)
         {
-            var schedule = zoneState.TemperatureZone.Schedule;
+            var outputState = zoneState.EnableOutputs;
+
+            switch (zoneState.ControlMode)
+            {
+                case ZoneControlMode.LowOrDisabled:
+                    outputState = false;
+                    break;
+                case ZoneControlMode.HighOrEnabled:
+                    outputState = true;
+                    break;
+                case ZoneControlMode.Schedule:
+                    outputState = TryGetScheduleItem(zoneState) != null;
+                    break;
+            }
+
+            return outputState;
+        }
+
+        private ScheduleItem TryGetScheduleItem(ZoneState zoneState)
+        {
+            var schedule = zoneState.Zone.Schedule;
             var now = DateTime.Now;
 
             if (schedule != null && schedule.Any())
@@ -117,11 +143,11 @@ namespace HeatingControl.Application
 
         private void ProcessHeaters(ControllerState controllerState)
         {
-            foreach (var zone in controllerState.TemperatureZoneNameToState.Values)
+            foreach (var zone in controllerState.ZoneNameToState.Values)
             {
-                foreach (var heater in zone.TemperatureZone.Heaters)
+                foreach (var heater in zone.Zone.HeatersNames)
                 {
-                    controllerState.HeaterNameToState[heater.Name].OutputState = zone.EnableOutputs;
+                    controllerState.HeaterNameToState[heater].OutputState = zone.EnableOutputs;
                 }
             }
         }

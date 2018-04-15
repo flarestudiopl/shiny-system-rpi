@@ -6,7 +6,7 @@ namespace HeatingControl.Domain
     {
         public string Name { get; set; }
         
-        public IList<PowerOutputDescriptor> PowerOutputs { get; set; }
+        public IList<PowerOutput> PowerOutputs { get; set; }
 
         public int RoundRobinIntervalMinutes { get; set; }
     }

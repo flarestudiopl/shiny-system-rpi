@@ -38,34 +38,64 @@ namespace Storage.BuildingModel
             {
                 ControlLoopIntervalSecondsMilliseconds = 1500,
                 Name = "Budynek testowy",
-                TemperatureZones = new List<TemperatureZone>
+                Zones = new List<Zone>
                 {
-                    new TemperatureZone
+                    new Zone
                     {
-                        TemperatureSensorDeviceId = "10-0008019e9d54",
                         Name = "Strefa 1",
-                        AllowedControlTypes = ControlType.ScheduleTemperatureControl | ControlType.ManualTemperatureControl,
-                        Heaters = new List<Heater>
+                        HeatersNames = new List<string> { "Grzejnik A" },
+                        TemperatureControlledZone = new TemperatureControlledZone
                         {
-                            new Heater
-                            {
-                                Name = "Grzejnik A",
-                                MinimumStateChangeIntervalSeconds = 1,
-                                PowerOutput = new PowerOutputDescriptor{ PowerOutputDeviceId = 60, PowerOutputChannel = 1}
-                            }
-                        },
-                        DefaultSetPoint = 20f,
-                        Hysteresis = 0.5f,
-                        ManualSetPoint = 22f
+                            TemperatureSensorName = "Czujnik 1",
+                            LowSetPoint = 20f,
+                            Hysteresis = 0.5f,
+                            HighSetPoint = 22f,
+                            ScheduleDefaultSetPoint = 15f
+                        }
                     },
-                    new TemperatureZone{
-                        TemperatureSensorDeviceId = "28-000005964edc",
-                        Name = "Strefa 2"
+                    new Zone{
+                        Name = "Strefa 2",
+                        TemperatureControlledZone = new TemperatureControlledZone
+                        {
+                            TemperatureSensorName = "Czujnik 2"
+                        }
                     },
-                    new TemperatureZone{
-                        TemperatureSensorDeviceId = "28-00000595d87e",
+                    new Zone{
+                         TemperatureControlledZone = new TemperatureControlledZone
+                         {
+                            TemperatureSensorName = "Czujnik 3"
+                         },
                         Name = "Strefa 3"
                     }
+                },
+                Heaters = new List<Heater>
+                {
+                     new Heater
+                     {
+                         Name = "Grzejnik A",
+                         MinimumStateChangeIntervalSeconds = 1,
+                         PowerOutput = new PowerOutput{ PowerOutputDeviceId = 60, PowerOutputChannel = 1},
+                         UsagePerHour = 2,
+                         UsageUnit = UsageUnit.kW
+                     }
+                },
+                TemperatureSensors = new List<TemperatureSensor>
+                {
+                    new TemperatureSensor
+                    {
+                        Name = "Czujnik 1",
+                        DeviceId = "10-0008019e9d54"
+                    },
+                    new TemperatureSensor
+                    {
+                        Name = "Czujnik 2",
+                        DeviceId = "28-000005964edc"
+                    },
+                    new TemperatureSensor
+                    {
+                        Name = "Czujnik 3",
+                        DeviceId = "28-00000595d87e"
+                    },
                 }
             };
         }

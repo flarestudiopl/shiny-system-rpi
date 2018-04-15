@@ -1,5 +1,6 @@
 ﻿using Commons;
 using Commons.Extensions;
+using HardwareAccess.Devices;
 using HeatingControl.Domain;
 using HeatingControl.Models;
 
@@ -12,11 +13,52 @@ namespace HeatingControl.Application
 
     public class ControllerStateBuilder : IControllerStateBuilder
     {
+        private readonly ITemperatureSensor _temperatureSensor;
+
+        public ControllerStateBuilder(ITemperatureSensor temperatureSensor)
+        {
+            _temperatureSensor = temperatureSensor;
+        }
+
         public ControllerState Build(Building buildingModel)
         {
             var state = new ControllerState();
 
-            foreach (var zone in buildingModel.TemperatureZones) // TODO model validation
+            foreach (var sensor in _temperatureSensor.GetAvailableSensors())
+            {
+                state.DeviceIdToTemperatureData.AddOrUpdate(sensor, new TemperatureData(), (key, value) => value);
+            }
+
+            foreach (var heater in buildingModel.Heaters)
+            {
+                if (heater.Name.IsNullOrEmpty())
+                {
+                    Logger.Warning("Skipping heater without name.");
+
+                    continue;
+                }
+
+                state.HeaterNameToState.Add(heater.Name, new HeaterState
+                {
+                    Heater = heater,
+                });
+
+                state.PowerOutputToState.Add(heater.PowerOutput, false);
+            }
+
+            foreach(var sensor in buildingModel.TemperatureSensors)
+            {
+                if (sensor.Name.IsNullOrEmpty())
+                {
+                    Logger.Warning("Skipping sensor without name.");
+
+                    continue;
+                }
+
+                state.TemperatureSensorNameToDeviceId.Add(sensor.Name, sensor.DeviceId);
+            }
+
+            foreach (var zone in buildingModel.Zones) // TODO model validation
             {
                 if (zone.Name.IsNullOrEmpty())
                 {
@@ -25,51 +67,20 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                if (!string.IsNullOrEmpty(zone.TemperatureSensorDeviceId))
+                state.ZoneNameToState.AddOrUpdate(zone.Name, new ZoneState
                 {
-                    state.DeviceIdToTemperatureData.AddOrUpdate(zone.TemperatureSensorDeviceId, new TemperatureData(), (key, value) => value);
-                }
-
-                state.TemperatureZoneNameToState.AddOrUpdate(zone.Name, new TemperatureZoneState
-                {
-                    CurrentControlType = GetInitialControlType(zone),
-                    TemperatureZone = zone
+                    Zone = zone,
+                    ControlMode = GetInitialControlMode(zone),
+                    EnableOutputs = false
                 }, (key, value) => value);
-
-                foreach (var heater in zone.Heaters)
-                {
-                    if (heater.Name.IsNullOrEmpty())
-                    {
-                        Logger.Warning("Skipping heater without name.");
-
-                        continue;
-                    }
-
-                    state.HeaterNameToState.Add(heater.Name, new HeaterState
-                    {
-                        Heater = heater,
-                    });
-
-                    state.PowerOutputToState.Add(heater.PowerOutput, false);
-                }
             }
 
             return state;
         }
 
-        private ControlType GetInitialControlType(TemperatureZone zone)
+        private ZoneControlMode GetInitialControlMode(Zone zone)
         {
-            if (zone.AllowedControlTypes.HasFlag(ControlType.ScheduleOnOff))
-            {
-                return ControlType.ScheduleOnOff;
-            }
-
-            if (zone.AllowedControlTypes.HasFlag(ControlType.ScheduleTemperatureControl))
-            {
-                return ControlType.ScheduleTemperatureControl;
-            }
-
-            return ControlType.None;
+            return zone.Schedule.Count > 0 ? ZoneControlMode.Schedule : ZoneControlMode.LowOrDisabled;
         }
     }
 }

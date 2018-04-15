@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
 
-        public PowerOutputDescriptor PowerOutput { get; set; }
+        public PowerOutput PowerOutput { get; set; }
 
         public UsageUnit UsageUnit { get; set; }
 
