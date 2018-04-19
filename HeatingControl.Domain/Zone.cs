@@ -4,9 +4,11 @@ namespace HeatingControl.Domain
 {
     public class Zone
     {
+        public int ZoneId { get; set; }
+
         public string Name { get; set; }
 
-        public IList<string> HeatersNames { get; set; } = new List<string>();
+        public IList<int> HeaterIds { get; set; } = new List<int>();
 
         public IList<ScheduleItem> Schedule { get; set; } = new List<ScheduleItem>();
 

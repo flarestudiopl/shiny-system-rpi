@@ -1,5 +1,4 @@
-﻿using HeatingControl.Domain;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace HeatingControl.Models
@@ -8,15 +7,13 @@ namespace HeatingControl.Models
     {
         public ConcurrentDictionary<string, TemperatureData> DeviceIdToTemperatureData { get; set; } = new ConcurrentDictionary<string, TemperatureData>();
 
-        public IDictionary<string, string> TemperatureSensorNameToDeviceId { get; set; } = new Dictionary<string, string>();
+        public IDictionary<int, string> TemperatureSensorIdToDeviceId { get; set; } = new Dictionary<int, string>();
 
-        public ConcurrentDictionary<string, ZoneState> ZoneNameToState { get; set; } = new ConcurrentDictionary<string, ZoneState>();
+        public ConcurrentDictionary<int, ZoneState> ZoneIdToState { get; set; } = new ConcurrentDictionary<int, ZoneState>();
 
-        public IDictionary<string, HeaterState> HeaterNameToState { get; set; } = new Dictionary<string, HeaterState>();
+        public IDictionary<int, HeaterState> HeaterIdToState { get; set; } = new Dictionary<int, HeaterState>();
 
         // TODO: power limits
         //public IList<PowerZoneState> PowerZoneNameToState { get; set; } = new List<PowerZoneState>();
-
-        public IDictionary<PowerOutput, bool> PowerOutputToState { get; set; } = new Dictionary<PowerOutput, bool>();
     }
 }

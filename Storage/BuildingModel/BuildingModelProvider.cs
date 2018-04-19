@@ -42,11 +42,12 @@ namespace Storage.BuildingModel
                 {
                     new Zone
                     {
+                        ZoneId = 1,
                         Name = "Strefa 1",
-                        HeatersNames = new List<string> { "Grzejnik A" },
+                        HeaterIds = new List<int> { 11 },
                         TemperatureControlledZone = new TemperatureControlledZone
                         {
-                            TemperatureSensorName = "Czujnik 1",
+                            TemperatureSensorId = 21,
                             LowSetPoint = 20f,
                             Hysteresis = 0.5f,
                             HighSetPoint = 22f,
@@ -54,16 +55,18 @@ namespace Storage.BuildingModel
                         }
                     },
                     new Zone{
+                        ZoneId = 2,
                         Name = "Strefa 2",
                         TemperatureControlledZone = new TemperatureControlledZone
                         {
-                            TemperatureSensorName = "Czujnik 2"
+                            TemperatureSensorId = 22,
                         }
                     },
                     new Zone{
+                        ZoneId = 3,
                          TemperatureControlledZone = new TemperatureControlledZone
                          {
-                            TemperatureSensorName = "Czujnik 3"
+                            TemperatureSensorId = 23,
                          },
                         Name = "Strefa 3"
                     }
@@ -72,6 +75,7 @@ namespace Storage.BuildingModel
                 {
                      new Heater
                      {
+                         HeaterId = 11,
                          Name = "Grzejnik A",
                          MinimumStateChangeIntervalSeconds = 1,
                          PowerOutput = new PowerOutput{ PowerOutputDeviceId = 60, PowerOutputChannel = 1},
@@ -83,16 +87,19 @@ namespace Storage.BuildingModel
                 {
                     new TemperatureSensor
                     {
+                        TemperatureSensorId = 21,
                         Name = "Czujnik 1",
                         DeviceId = "10-0008019e9d54"
                     },
                     new TemperatureSensor
                     {
+                        TemperatureSensorId = 22,
                         Name = "Czujnik 2",
                         DeviceId = "28-000005964edc"
                     },
                     new TemperatureSensor
                     {
+                        TemperatureSensorId = 23,
                         Name = "Czujnik 3",
                         DeviceId = "28-00000595d87e"
                     },

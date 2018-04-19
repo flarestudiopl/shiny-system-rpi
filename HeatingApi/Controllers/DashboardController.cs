@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HeatingControl.Application;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
 {
@@ -10,10 +7,17 @@ namespace HeatingApi.Controllers
     [Route("/api/dashboard")]
     public class DashboardController : Controller
     {
-        [HttpGet]
-        public void GetSnapshot()
-        {
+        private readonly IDashboardSnapshotProvider _dashboardSnapshotProvider;
 
+        public DashboardController(IDashboardSnapshotProvider dashboardSnapshotProvider)
+        {
+            _dashboardSnapshotProvider = dashboardSnapshotProvider;
+        }
+
+        [HttpGet]
+        public DashboardSnapshotProviderOutput GetSnapshot()
+        {
+            return _dashboardSnapshotProvider.Provide();
         }
     }
 }

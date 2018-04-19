@@ -49,7 +49,9 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
 
             // Application
+            builder.RegisterType<ActualScheduleItemProvider>().As<IActualScheduleItemProvider>().SingleInstance();
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
+            builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
             builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();

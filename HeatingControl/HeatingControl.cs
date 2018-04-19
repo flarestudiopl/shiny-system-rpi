@@ -3,13 +3,15 @@ using HeatingControl.Models;
 using Storage.BuildingModel;
 using System;
 using System.Threading;
+using HeatingControl.Domain;
 
 namespace HeatingControl
 {
     public interface IHeatingControl : IDisposable
     {
         void Start();
-        ControllerState State { get; } // TODO keep state other way
+        Building Model { get; }
+        ControllerState State { get; }
     }
 
     public class HeatingControl : IHeatingControl
@@ -21,6 +23,7 @@ namespace HeatingControl
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
 
+        public Building Model { get; private set; }
         public ControllerState State { get; private set; }
 
         public HeatingControl(IBuildingModelProvider buildingModelProvider,
@@ -36,11 +39,11 @@ namespace HeatingControl
 
         public void Start()
         {
-            var buildingModel = _buildingModelProvider.Provide();
-            State = _controllerStateBuilder.Build(buildingModel);
+            Model = _buildingModelProvider.Provide();
+            State = _controllerStateBuilder.Build(Model);
 
-            _temperatureReadingLoop.Start(buildingModel.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
-            _outputStateProcessingLoop.Start(buildingModel.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
+            _temperatureReadingLoop.Start(Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
+            _outputStateProcessingLoop.Start(Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
         }
 
         public void Dispose()

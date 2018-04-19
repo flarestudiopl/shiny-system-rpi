@@ -38,15 +38,14 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.HeaterNameToState.Add(heater.Name, new HeaterState
+                state.HeaterIdToState.Add(heater.HeaterId, new HeaterState
                 {
                     Heater = heater,
+                    OutputState = false
                 });
-
-                state.PowerOutputToState.Add(heater.PowerOutput, false);
             }
 
-            foreach(var sensor in buildingModel.TemperatureSensors)
+            foreach (var sensor in buildingModel.TemperatureSensors)
             {
                 if (sensor.Name.IsNullOrEmpty())
                 {
@@ -55,7 +54,7 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.TemperatureSensorNameToDeviceId.Add(sensor.Name, sensor.DeviceId);
+                state.TemperatureSensorIdToDeviceId.Add(sensor.TemperatureSensorId, sensor.DeviceId);
             }
 
             foreach (var zone in buildingModel.Zones) // TODO model validation
@@ -67,7 +66,7 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.ZoneNameToState.AddOrUpdate(zone.Name, new ZoneState
+                state.ZoneIdToState.AddOrUpdate(zone.ZoneId, new ZoneState
                 {
                     Zone = zone,
                     ControlMode = GetInitialControlMode(zone),

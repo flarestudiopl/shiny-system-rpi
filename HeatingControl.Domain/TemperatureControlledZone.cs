@@ -2,7 +2,7 @@
 {
     public class TemperatureControlledZone
     {
-        public string TemperatureSensorName { get; set; }
+        public int TemperatureSensorId { get; set; }
 
         public float LowSetPoint { get; set; }
 

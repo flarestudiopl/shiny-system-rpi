@@ -3,6 +3,7 @@ using HardwareAccess.Devices;
 using HeatingControl.Domain;
 using HeatingControl.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -19,12 +20,15 @@ namespace HeatingControl.Application
     {
         private readonly IPowerOutput _powerOutput;
         private readonly IHysteresisProcessor _hysteresisProcessor;
+        private readonly IActualScheduleItemProvider _actualScheduleItemProvider;
 
         public OutputStateProcessingLoop(IPowerOutput powerOutput,
-                                         IHysteresisProcessor hysteresisProcessor)
+                                         IHysteresisProcessor hysteresisProcessor,
+                                         IActualScheduleItemProvider actualScheduleItemProvider)
         {
             _powerOutput = powerOutput;
             _hysteresisProcessor = hysteresisProcessor;
+            _actualScheduleItemProvider = actualScheduleItemProvider;
         }
 
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
@@ -54,7 +58,7 @@ namespace HeatingControl.Application
 
         private void ProcessTemperatureZones(ControllerState controllerState)
         {
-            foreach (var zoneState in controllerState.ZoneNameToState.Values)
+            foreach (var zoneState in controllerState.ZoneIdToState.Values)
             {
                 if (zoneState.Zone.TemperatureControlledZone != null)
                 {
@@ -69,7 +73,14 @@ namespace HeatingControl.Application
 
         private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState)
         {
-            var temperatureSensorDeviceId = controllerState.TemperatureSensorNameToDeviceId[zoneState.Zone.TemperatureControlledZone.TemperatureSensorName];
+            var temperatureSensorDeviceId = controllerState.TemperatureSensorIdToDeviceId[zoneState.Zone.TemperatureControlledZone.TemperatureSensorId];
+
+            if (!controllerState.DeviceIdToTemperatureData.ContainsKey(temperatureSensorDeviceId))
+            {
+                Logger.Trace("No temperature data for sensor {0} in zone {1}. Proactive power cutoff.", new[] { temperatureSensorDeviceId, zoneState.Zone.Name });
+                return false;
+            }
+
             var temperatureData = controllerState.DeviceIdToTemperatureData[temperatureSensorDeviceId];
 
             var outputState = zoneState.EnableOutputs;
@@ -87,7 +98,7 @@ namespace HeatingControl.Application
                         setPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint;
                         break;
                     case ZoneControlMode.Schedule:
-                        var scheduleItem = TryGetScheduleItem(zoneState);
+                        var scheduleItem = _actualScheduleItemProvider.TryProvide(zoneState.Zone.Schedule);
                         setPoint = scheduleItem != null ? scheduleItem.SetPoint.Value : zoneState.Zone.TemperatureControlledZone.ScheduleDefaultSetPoint;
                         break;
                 }
@@ -119,35 +130,20 @@ namespace HeatingControl.Application
                     outputState = true;
                     break;
                 case ZoneControlMode.Schedule:
-                    outputState = TryGetScheduleItem(zoneState) != null;
+                    outputState = _actualScheduleItemProvider.TryProvide(zoneState.Zone.Schedule) != null;
                     break;
             }
 
             return outputState;
         }
 
-        private ScheduleItem TryGetScheduleItem(ZoneState zoneState)
-        {
-            var schedule = zoneState.Zone.Schedule;
-            var now = DateTime.Now;
-
-            if (schedule != null && schedule.Any())
-            {
-                return schedule.FirstOrDefault(x => x.DayOfWeek == now.DayOfWeek &&
-                                               x.BeginTime.TimeOfDay > now.TimeOfDay &&
-                                               x.EndTime.TimeOfDay <= now.TimeOfDay);
-            }
-
-            return null;
-        }
-
         private void ProcessHeaters(ControllerState controllerState)
         {
-            foreach (var zone in controllerState.ZoneNameToState.Values)
+            foreach (var zone in controllerState.ZoneIdToState.Values)
             {
-                foreach (var heater in zone.Zone.HeatersNames)
+                foreach (var heater in zone.Zone.HeaterIds)
                 {
-                    controllerState.HeaterNameToState[heater].OutputState = zone.EnableOutputs;
+                    controllerState.HeaterIdToState[heater].OutputState = zone.EnableOutputs;
                 }
             }
         }
@@ -161,7 +157,7 @@ namespace HeatingControl.Application
         {
             var now = DateTime.Now;
 
-            foreach (var heater in controllerState.HeaterNameToState.Values)
+            foreach (var heater in controllerState.HeaterIdToState.Values)
             {
                 var powerOutput = heater.Heater.PowerOutput;
 
