@@ -9,5 +9,14 @@ namespace HeatingControl.Models
         public ZoneControlMode ControlMode { get; set; }
 
         public bool EnableOutputs { get; set; }
+
+        public ScheduleState ScheduleState { get; set; } = new ScheduleState();
     }
+
+    public class ScheduleState
+    {
+        public bool? HeatingEnabled { get; set; }
+
+        public float? DesiredTemperature { get; set; }
+    } 
 }

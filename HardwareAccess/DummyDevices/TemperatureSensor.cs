@@ -11,7 +11,7 @@ namespace HardwareAccess.DummyDevices
 
         public ICollection<string> GetAvailableSensors()
         {
-            return new List<string> { "dummy-1", "dummy-2" };
+            return new List<string> { "10-0008019e9d54", "28-000005964edc" };
         }
 
         public Task<TemperatureSensorData> Read(string deviceId)

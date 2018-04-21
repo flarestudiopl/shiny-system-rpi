@@ -74,16 +74,10 @@ namespace HeatingApi.Controllers
             _powerOutput.SetState(deviceId, channel, state);
         }
 
-        [HttpGet("control/start")]
-        public void ControlStart()
-        {
-            _heatingControl.Start();
-        }
-
         [HttpGet("control/temp/{deviceId}")]
         public TemperatureData ControlTemp(string deviceId)
         {
-            _heatingControl.State.DeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
+            _heatingControl.State.TemperatureDeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
 
             return tempData;
         }

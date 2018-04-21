@@ -5,7 +5,7 @@ namespace HeatingControl.Models
 {
     public class ControllerState
     {
-        public ConcurrentDictionary<string, TemperatureData> DeviceIdToTemperatureData { get; set; } = new ConcurrentDictionary<string, TemperatureData>();
+        public ConcurrentDictionary<string, TemperatureData> TemperatureDeviceIdToTemperatureData { get; set; } = new ConcurrentDictionary<string, TemperatureData>();
 
         public IDictionary<int, string> TemperatureSensorIdToDeviceId { get; set; } = new Dictionary<int, string>();
 

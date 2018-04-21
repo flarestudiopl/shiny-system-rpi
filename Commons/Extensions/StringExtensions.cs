@@ -4,7 +4,9 @@
     {
         public static string FormatWith(this string stringToFormat, params object[] values)
         {
-            return string.Format(stringToFormat, values);
+            return values == null
+                       ? stringToFormat
+                       : string.Format(stringToFormat, values);
         }
 
         public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);

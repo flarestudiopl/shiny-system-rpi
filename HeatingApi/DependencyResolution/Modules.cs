@@ -2,8 +2,9 @@
 using HardwareAccess.Buses;
 using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
-using HeatingControl;
 using HeatingControl.Application;
+using HeatingControl.Application.Loops;
+using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
 
 namespace HeatingApi.DependencyResolution
@@ -46,15 +47,20 @@ namespace HeatingApi.DependencyResolution
 
         private static void RegisterControl(ContainerBuilder builder)
         {
-            builder.RegisterType<HeatingControl.HeatingControl>().As<IHeatingControl>().SingleInstance();
+            builder.RegisterType<HeatingControl>()
+                   .As<IHeatingControl>()
+                   .As<IHostedService>()
+                   .SingleInstance();
 
             // Application
-            builder.RegisterType<ActualScheduleItemProvider>().As<IActualScheduleItemProvider>().SingleInstance();
+            builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
+            builder.RegisterType<ScheduleDeterminationLoop>().As<IScheduleDeterminationLoop>().SingleInstance();
+            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
             builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
-            builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
-            builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+            builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();
         }
     }
 }

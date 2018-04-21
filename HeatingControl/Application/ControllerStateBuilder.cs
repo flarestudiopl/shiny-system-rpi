@@ -26,7 +26,7 @@ namespace HeatingControl.Application
 
             foreach (var sensor in _temperatureSensor.GetAvailableSensors())
             {
-                state.DeviceIdToTemperatureData.AddOrUpdate(sensor, new TemperatureData(), (key, value) => value);
+                state.TemperatureDeviceIdToTemperatureData.AddOrUpdate(sensor, new TemperatureData(), (key, value) => value);
             }
 
             foreach (var heater in buildingModel.Heaters)

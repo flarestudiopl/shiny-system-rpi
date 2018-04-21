@@ -7,12 +7,17 @@ namespace Commons
 {
     public class Logger
     {
+        public static void Error(string message, Exception exception, [CallerMemberName]string callerMember = null, [CallerFilePath]string callerFilePath = null, [CallerLineNumber]int callerLineNumber = 0)
+        {
+            Console.WriteLine($"{GetLineBeginning(callerMember, callerFilePath, callerLineNumber)} ERROR: {message}, EXCEPTION: {exception}");
+        }
+
         public static void Warning(string message, [CallerMemberName]string callerMember = null, [CallerFilePath]string callerFilePath = null, [CallerLineNumber]int callerLineNumber = 0)
         {
             Console.WriteLine($"{GetLineBeginning(callerMember, callerFilePath, callerLineNumber)} WARNING: {message}");
         }
 
-        public static void Trace(string format, object[] values, [CallerMemberName]string callerMember = null, [CallerFilePath]string callerFilePath = null, [CallerLineNumber]int callerLineNumber = 0)
+        public static void Trace(string format, object[] values = null, [CallerMemberName]string callerMember = null, [CallerFilePath]string callerFilePath = null, [CallerLineNumber]int callerLineNumber = 0)
         {
             var message = format.FormatWith(values);
 
