@@ -6,7 +6,7 @@ using Commons;
 
 namespace HeatingControl.Application.Loops
 {
-    public static class LoopHelper
+    public static class Loop
     {
         private const int FailureStopTimeoutMilliseconds = 6000;
 

@@ -1,12 +1,13 @@
-﻿using HeatingControl.Domain;
-using HeatingControl.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Commons;
+using HeatingControl.Application.Loops.Processing;
+using HeatingControl.Domain;
 using HeatingControl.Extensions;
+using HeatingControl.Models;
 
-namespace HeatingControl.Application
+namespace HeatingControl.Application.Queries
 {
     public interface IDashboardSnapshotProvider
     {
@@ -15,7 +16,7 @@ namespace HeatingControl.Application
 
     public class DashboardSnapshotProviderOutput
     {
-        public DateTime ControllerTime { get; set; }
+        public DateTime Time { get; set; }
         public string BuildingName { get; set; }
         public IDictionary<UsageUnit, float> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
@@ -59,7 +60,7 @@ namespace HeatingControl.Application
             var output = new DashboardSnapshotProviderOutput
                          {
                              BuildingName = model.Name,
-                             ControllerTime = DateTime.Now,
+                             Time = DateTime.Now,
                              Notifications = Logger.LastMessages.ToArray(),
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()

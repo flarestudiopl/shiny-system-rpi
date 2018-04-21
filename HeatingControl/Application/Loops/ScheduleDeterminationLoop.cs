@@ -17,10 +17,10 @@ namespace HeatingControl.Application.Loops
     {
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
         {
-            LoopHelper.Start("Schedule determination",
-                             intervalMilliseconds,
-                             () => ProcessSchedule(controllerState),
-                             cancellationToken);
+            Loop.Start("Schedule determination",
+                       intervalMilliseconds,
+                       () => ProcessSchedule(controllerState),
+                       cancellationToken);
         }
 
         private static void ProcessSchedule(ControllerState controllerState)

@@ -2,6 +2,7 @@
 using System.Threading;
 using Commons;
 using HardwareAccess.Devices;
+using HeatingControl.Application.Loops.Processing;
 using HeatingControl.Domain;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
@@ -18,29 +19,32 @@ namespace HeatingControl.Application.Loops
         private readonly IPowerOutput _powerOutput;
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
         private readonly IHysteresisProcessor _hysteresisProcessor;
+        private readonly IUsageCollector _usageCollector;
 
         public OutputStateProcessingLoop(IPowerOutput powerOutput,
                                          IZoneTemperatureProvider zoneTemperatureProvider,
-                                         IHysteresisProcessor hysteresisProcessor)
+                                         IHysteresisProcessor hysteresisProcessor,
+                                         IUsageCollector usageCollector)
         {
             _powerOutput = powerOutput;
             _zoneTemperatureProvider = zoneTemperatureProvider;
             _hysteresisProcessor = hysteresisProcessor;
+            _usageCollector = usageCollector;
         }
 
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
         {
-            LoopHelper.Start("Output state",
-                             intervalMilliseconds,
-                             () =>
-                             {
-                                 ProcessZones(controllerState);
-                                 ProcessHeaters(controllerState);
-                                 ProcessPowerZones(controllerState);
+            Loop.Start("Output state",
+                       intervalMilliseconds,
+                       () =>
+                       {
+                           ProcessZones(controllerState);
+                           ProcessHeaters(controllerState);
+                           ProcessPowerZones(controllerState);
 
-                                 WriteOutputs(controllerState);
-                             },
-                             cancellationToken);
+                           WriteOutputs(controllerState);
+                       },
+                       cancellationToken);
         }
 
         private void ProcessZones(ControllerState controllerState)
@@ -147,16 +151,9 @@ namespace HeatingControl.Application.Loops
                     heater.OutputState != _powerOutput.GetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel))
                 {
                     _powerOutput.SetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel, heater.OutputState);
+                    _usageCollector.Collect(heater, controllerState);
+
                     heater.LastStateChange = now;
-                    
-                    if (heater.OutputState) // TODO - move out and add no key in dict handling
-                    {
-                        controllerState.InstantUsage[heater.Heater.UsageUnit] += heater.Heater.UsagePerHour;
-                    }
-                    else
-                    {
-                        controllerState.InstantUsage[heater.Heater.UsageUnit] -= heater.Heater.UsagePerHour;
-                    }
                 }
             }
         }

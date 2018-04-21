@@ -1,7 +1,8 @@
 using HeatingControl.Application;
+using HeatingControl.Application.Loops.Processing;
 using Xunit;
 
-namespace HeatingControl.Tests.Application
+namespace HeatingControl.Tests.Application.Loops.Processing
 {
     public class HysteresisProcessorTests
     {

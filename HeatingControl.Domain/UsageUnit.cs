@@ -1,6 +1,6 @@
 ﻿namespace HeatingControl.Domain
 {
-    public enum UsageUnit
+    public enum UsageUnit : byte
     {
         l,
         kg,

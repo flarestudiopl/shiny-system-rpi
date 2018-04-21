@@ -26,10 +26,10 @@ namespace HeatingControl.Application.Loops
 
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
         {
-            LoopHelper.Start("Temperature processing",
-                             intervalMilliseconds,
-                             () => ProcessReads(controllerState),
-                             cancellationToken);
+            Loop.Start("Temperature processing",
+                       intervalMilliseconds,
+                       () => ProcessReads(controllerState),
+                       cancellationToken);
         }
 
         private void ProcessReads(ControllerState controllerState)

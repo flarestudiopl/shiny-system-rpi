@@ -4,6 +4,8 @@ using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
+using HeatingControl.Application.Loops.Processing;
+using HeatingControl.Application.Queries;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
 
@@ -53,14 +55,21 @@ namespace HeatingApi.DependencyResolution
                    .SingleInstance();
 
             // Application
+            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
+
+            // Application/Loops
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
             builder.RegisterType<ScheduleDeterminationLoop>().As<IScheduleDeterminationLoop>().SingleInstance();
             builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
 
-            builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
-            builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
+            // Application/Loops/Processing
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
+            builder.RegisterType<UsageCollector>().As<IUsageCollector>().SingleInstance();
             builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();
+
+            // Application/Queries
+            builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
+            builder.RegisterType<ZoneDetailsProvider>().As<IZoneDetailsProvider>().SingleInstance();
         }
     }
 }

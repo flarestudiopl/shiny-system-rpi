@@ -1,6 +1,6 @@
 ﻿using HeatingControl.Models;
 
-namespace HeatingControl.Application
+namespace HeatingControl.Application.Loops.Processing
 {
     public interface IZoneTemperatureProvider
     {

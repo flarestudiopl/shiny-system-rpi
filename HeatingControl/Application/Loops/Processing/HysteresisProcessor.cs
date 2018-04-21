@@ -1,4 +1,4 @@
-﻿namespace HeatingControl.Application
+﻿namespace HeatingControl.Application.Loops.Processing
 {
     public interface IHysteresisProcessor
     {

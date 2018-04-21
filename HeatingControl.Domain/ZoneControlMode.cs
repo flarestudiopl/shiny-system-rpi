@@ -1,6 +1,6 @@
 ﻿namespace HeatingControl.Domain
 {
-    public enum ZoneControlMode
+    public enum ZoneControlMode : byte
     {
         LowOrDisabled,
         HighOrEnabled,

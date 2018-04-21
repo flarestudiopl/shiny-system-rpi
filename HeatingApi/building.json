@@ -20,14 +20,7 @@
       "ZoneId": 2,
       "Name": "Strefa 2",
       "HeaterIds": [],
-      "Schedule": [],
-      "TemperatureControlledZone": {
-        "TemperatureSensorId": 22,
-        "LowSetPoint": 0.0,
-        "HighSetPoint": 0.0,
-        "ScheduleDefaultSetPoint": 0.0,
-        "Hysteresis": 0.0
-      }
+      "Schedule": []
     },
     {
       "ZoneId": 3,
