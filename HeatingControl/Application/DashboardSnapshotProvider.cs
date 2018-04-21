@@ -17,7 +17,7 @@ namespace HeatingControl.Application
     {
         public DateTime ControllerTime { get; set; }
         public string BuildingName { get; set; }
-        public string InstantConsumptionFormatted { get; set; }
+        public IDictionary<UsageUnit, float> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
         public ICollection<Logger.Message> Notifications { get; set; }
 
@@ -61,7 +61,7 @@ namespace HeatingControl.Application
                              BuildingName = model.Name,
                              ControllerTime = DateTime.Now,
                              Notifications = Logger.LastMessages.ToArray(),
-                             InstantConsumptionFormatted = null, // TODO
+                             InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()
                          };
 

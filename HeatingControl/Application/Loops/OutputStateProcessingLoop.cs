@@ -148,6 +148,15 @@ namespace HeatingControl.Application.Loops
                 {
                     _powerOutput.SetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel, heater.OutputState);
                     heater.LastStateChange = now;
+                    
+                    if (heater.OutputState) // TODO - move out and add no key in dict handling
+                    {
+                        controllerState.InstantUsage[heater.Heater.UsageUnit] += heater.Heater.UsagePerHour;
+                    }
+                    else
+                    {
+                        controllerState.InstantUsage[heater.Heater.UsageUnit] -= heater.Heater.UsagePerHour;
+                    }
                 }
             }
         }

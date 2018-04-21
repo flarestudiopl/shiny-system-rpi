@@ -1,0 +1,77 @@
+{
+  "Name": "Budynek testowy",
+  "Zones": [
+    {
+      "ZoneId": 1,
+      "Name": "Strefa 1",
+      "HeaterIds": [
+        11
+      ],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 21,
+        "LowSetPoint": 22.0,
+        "HighSetPoint": 25.0,
+        "ScheduleDefaultSetPoint": 15.0,
+        "Hysteresis": 0.5
+      }
+    },
+    {
+      "ZoneId": 2,
+      "Name": "Strefa 2",
+      "HeaterIds": [],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 22,
+        "LowSetPoint": 0.0,
+        "HighSetPoint": 0.0,
+        "ScheduleDefaultSetPoint": 0.0,
+        "Hysteresis": 0.0
+      }
+    },
+    {
+      "ZoneId": 3,
+      "Name": "Strefa 3",
+      "HeaterIds": [],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 23,
+        "LowSetPoint": 0.0,
+        "HighSetPoint": 0.0,
+        "ScheduleDefaultSetPoint": 0.0,
+        "Hysteresis": 0.0
+      }
+    }
+  ],
+  "Heaters": [
+    {
+      "HeaterId": 11,
+      "Name": "Grzejnik A",
+      "PowerOutput": {
+        "PowerOutputDeviceId": 60,
+        "PowerOutputChannel": 1
+      },
+      "UsageUnit": 3,
+      "UsagePerHour": 2.0,
+      "MinimumStateChangeIntervalSeconds": 1
+    }
+  ],
+  "TemperatureSensors": [
+    {
+      "TemperatureSensorId": 21,
+      "Name": "Czujnik 1",
+      "DeviceId": "10-0008019e9d54"
+    },
+    {
+      "TemperatureSensorId": 22,
+      "Name": "Czujnik 2",
+      "DeviceId": "28-000005964edc"
+    },
+    {
+      "TemperatureSensorId": 23,
+      "Name": "Czujnik 3",
+      "DeviceId": "28-00000595d87e"
+    }
+  ],
+  "ControlLoopIntervalSecondsMilliseconds": 1500
+}

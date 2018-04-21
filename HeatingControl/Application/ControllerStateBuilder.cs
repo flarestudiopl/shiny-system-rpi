@@ -38,11 +38,17 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.HeaterIdToState.Add(heater.HeaterId, new HeaterState
+                state.HeaterIdToState.Add(heater.HeaterId,
+                                          new HeaterState
+                                          {
+                                              Heater = heater,
+                                              OutputState = false
+                                          });
+
+                if (!state.InstantUsage.ContainsKey(heater.UsageUnit))
                 {
-                    Heater = heater,
-                    OutputState = false
-                });
+                    state.InstantUsage.Add(heater.UsageUnit, 0f);
+                }
             }
 
             foreach (var sensor in buildingModel.TemperatureSensors)
@@ -66,12 +72,14 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.ZoneIdToState.AddOrUpdate(zone.ZoneId, new ZoneState
-                {
-                    Zone = zone,
-                    ControlMode = GetInitialControlMode(zone),
-                    EnableOutputs = false
-                }, (key, value) => value);
+                state.ZoneIdToState.AddOrUpdate(zone.ZoneId,
+                                                new ZoneState
+                                                {
+                                                    Zone = zone,
+                                                    ControlMode = GetInitialControlMode(zone),
+                                                    EnableOutputs = false
+                                                },
+                                                (key, value) => value);
             }
 
             return state;
