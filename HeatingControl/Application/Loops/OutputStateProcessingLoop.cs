@@ -56,11 +56,11 @@ namespace HeatingControl.Application.Loops
         private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState)
         {
             var temperatureData = _zoneTemperatureProvider.Provide(zoneState.Zone.ZoneId, controllerState);
-;
+            ;
             if (temperatureData == null)
             {
-                Logger.Trace("No temperature data for sensor {0} in zone {1}. Proactive power cutoff.",
-                             new object[] { zoneState.Zone.TemperatureControlledZone.TemperatureSensorId, zoneState.Zone.Name });
+                Logger.Warning("No temperature data for sensor {0} in zone {1}. Proactive power cutoff.",
+                               new object[] { zoneState.Zone.TemperatureControlledZone.TemperatureSensorId, zoneState.Zone.Name });
 
                 return false;
             }
@@ -92,8 +92,8 @@ namespace HeatingControl.Application.Loops
             else
             {
                 outputState = false;
-                Logger.Trace("Temperature value for zone {0} is too old. Proactive power cutoff.",
-                             new object[] { zoneState.Zone.Name });
+                Logger.Warning("Temperature value for zone {0} is too old. Proactive power cutoff.",
+                               new object[] { zoneState.Zone.Name });
             }
 
             return outputState;

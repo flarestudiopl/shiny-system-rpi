@@ -49,7 +49,7 @@ namespace HeatingApi
             Model = _buildingModelProvider.Provide();
             State = _controllerStateBuilder.Build(Model);
 
-            Logger.Trace("Starting control loops...");
+            Logger.Info("Starting control loops...");
 
             // TODO - different intervals
 
@@ -62,7 +62,7 @@ namespace HeatingApi
         {
             using (_cancellationTokenSource)
             {
-                Logger.Trace("Sending cancellation to control loops...");
+                Logger.Info("Sending cancellation to control loops...");
 
                 _cancellationTokenSource.Cancel();
             }

@@ -3,6 +3,7 @@ using HeatingControl.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Commons;
 using HeatingControl.Extensions;
 
 namespace HeatingControl.Application
@@ -18,7 +19,7 @@ namespace HeatingControl.Application
         public string BuildingName { get; set; }
         public string InstantConsumptionFormatted { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
-        public ICollection<Notification> Notifications { get; set; }
+        public ICollection<Logger.Message> Notifications { get; set; }
 
         public class ZoneSnapshot
         {
@@ -42,11 +43,6 @@ namespace HeatingControl.Application
                 public bool ScheduleState { get; set; }
             }
         }
-
-        public class Notification
-        {
-            public string Message { get; set; }
-        }
     }
 
     public class DashboardSnapshotProvider : IDashboardSnapshotProvider
@@ -64,7 +60,7 @@ namespace HeatingControl.Application
                          {
                              BuildingName = model.Name,
                              ControllerTime = DateTime.Now,
-                             Notifications = null, // TODO
+                             Notifications = Logger.LastMessages.ToArray(),
                              InstantConsumptionFormatted = null, // TODO
                              Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()
                          };
