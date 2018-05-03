@@ -21,7 +21,7 @@ namespace HeatingApi.Controllers
         [HttpGet("{zoneId}")]
         public ZoneDetailsProviderResult GetDetails(int zoneId)
         {
-            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State);
+            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.Model);
         }
 
         [HttpPost("{zoneId}/{controlMode}")]

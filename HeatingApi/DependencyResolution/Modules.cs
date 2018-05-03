@@ -68,6 +68,8 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();
 
             // Application/Queries
+            builder.RegisterType<AvailableHeatersProvider>().As<IAvailableHeatersProvider>().SingleInstance();
+            builder.RegisterType<AvailableTemperatureSensorsProvider>().As<IAvailableTemperatureSensorsProvider>().SingleInstance();
             builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
             builder.RegisterType<ZoneDetailsProvider>().As<IZoneDetailsProvider>().SingleInstance();
         }
