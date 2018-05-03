@@ -3,6 +3,7 @@ using HardwareAccess.Buses;
 using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
 using HeatingControl.Application;
+using HeatingControl.Application.Commands;
 using HeatingControl.Application.Loops;
 using HeatingControl.Application.Loops.Processing;
 using HeatingControl.Application.Queries;
@@ -56,6 +57,9 @@ namespace HeatingApi.DependencyResolution
 
             // Application
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
+
+            // Application/Commands
+            builder.RegisterType<TemperatureSetPointExecutor>().As<ITemperatureSetPointExecutor>().SingleInstance();
 
             // Application/Loops
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();

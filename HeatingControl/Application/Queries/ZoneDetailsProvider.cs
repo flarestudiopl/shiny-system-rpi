@@ -16,7 +16,7 @@ namespace HeatingControl.Application.Queries
         public CountersData Counters { get; set; }
         public TemperatureSettings Temperatures { get; set; }
         public ICollection<ScheduleItem> Schedule { get; set; }
-        public ConfigurationData Configuration { get; set; }
+        public ConfigurationData Configuration { get; set; } // TODO : move to zone configuration
 
         public class CountersData
         {

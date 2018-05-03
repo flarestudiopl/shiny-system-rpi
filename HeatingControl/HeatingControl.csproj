@@ -16,8 +16,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\Commands\" />
-  </ItemGroup>
-
 </Project>

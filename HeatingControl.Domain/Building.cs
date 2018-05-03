@@ -6,6 +6,8 @@ namespace HeatingControl.Domain
     {
         public string Name { get; set; }
 
+        // TODO - make them dicts, when persistence will be moved to db
+
         public ICollection<Zone> Zones { get; set; }
 
         public ICollection<Heater> Heaters { get; set; }
