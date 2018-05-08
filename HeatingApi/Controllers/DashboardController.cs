@@ -1,5 +1,4 @@
-﻿using HeatingControl.Application;
-using HeatingControl.Application.Queries;
+﻿using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers

@@ -16,7 +16,6 @@ namespace HeatingControl.Application.Queries
         public CountersData Counters { get; set; }
         public TemperatureSettings Temperatures { get; set; }
         public ICollection<ScheduleItem> Schedule { get; set; }
-        public ConfigurationData Configuration { get; set; } // TODO : move to zone configuration
 
         public class CountersData
         {
@@ -33,29 +32,10 @@ namespace HeatingControl.Application.Queries
             public float ScheduleDefaultSetPoint { get; set; }
             public float Hysteresis { get; set; }
         }
-
-        public class ConfigurationData
-        {
-            public string Name { get; set; }
-            public int? TemperatureSensorId { get; set; }
-            public ICollection<SensorData> TemperatureSensors { get; set; }
-            public ICollection<int> HeaterIds { get; set; }
-            public ICollection<HeaterData> Heaters { get; set; }
-        }
     }
 
     public class ZoneDetailsProvider : IZoneDetailsProvider
     {
-        private readonly IAvailableTemperatureSensorsProvider _availableTemperatureSensorsProvider;
-        private readonly IAvailableHeatersProvider _availableHeatersProvider;
-
-        public ZoneDetailsProvider(IAvailableTemperatureSensorsProvider availableTemperatureSensorsProvider,
-                                   IAvailableHeatersProvider availableHeatersProvider)
-        {
-            _availableTemperatureSensorsProvider = availableTemperatureSensorsProvider;
-            _availableHeatersProvider = availableHeatersProvider;
-        }
-
         public ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState, Building building)
         {
             var zone = controllerState.ZoneIdToState.GetValueOrDefault(zoneId);
@@ -69,8 +49,7 @@ namespace HeatingControl.Application.Queries
                    {
                        Counters = GetCountersData(zone),
                        Temperatures = GetTemperatureSettings(zone),
-                       Schedule = zone.Zone.Schedule,
-                       Configuration = GetConfigurationData(zone, controllerState, building)
+                       Schedule = zone.Zone.Schedule
                    };
         }
 
@@ -94,20 +73,6 @@ namespace HeatingControl.Application.Queries
                        LowSetPoint = temperatureControlledZone.LowSetPoint,
                        ScheduleDefaultSetPoint = temperatureControlledZone.ScheduleDefaultSetPoint,
                        Hysteresis = temperatureControlledZone.Hysteresis
-                   };
-        }
-
-        private ZoneDetailsProviderResult.ConfigurationData GetConfigurationData(ZoneState zone, ControllerState controllerState, Building building)
-        {
-            var zoneConfiguration = zone.Zone;
-
-            return new ZoneDetailsProviderResult.ConfigurationData
-                   {
-                       Name = zoneConfiguration.Name,
-                       TemperatureSensorId = zoneConfiguration.TemperatureControlledZone?.TemperatureSensorId,
-                       TemperatureSensors = _availableTemperatureSensorsProvider.Provide(controllerState, building),
-                       HeaterIds = zoneConfiguration.HeaterIds,
-                       Heaters = _availableHeatersProvider.Provide(zoneConfiguration.ZoneId, controllerState)
                    };
         }
     }
