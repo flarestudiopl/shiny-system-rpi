@@ -14,16 +14,19 @@ namespace HeatingApi.Controllers
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
         private readonly IScheduleProvider _scheduleProvider;
+        private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
 
         public ZoneController(IHeatingControl heatingControl,
                               IZoneDetailsProvider zoneDetailsProvider,
                               ITemperatureSetPointExecutor temperatureSetPointExecutor,
-                              IScheduleProvider scheduleProvider)
+                              IScheduleProvider scheduleProvider,
+                              INewScheduleItemExecutor newScheduleItemExecutor)
         {
             _heatingControl = heatingControl;
             _zoneDetailsProvider = zoneDetailsProvider;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
             _scheduleProvider = scheduleProvider;
+            _newScheduleItemExecutor = newScheduleItemExecutor;
         }
 
         [HttpGet("{zoneId}")]
@@ -73,6 +76,12 @@ namespace HeatingApi.Controllers
         public ScheduleProviderResult GetSchedule(int zoneId)
         {
             return _scheduleProvider.Provide(zoneId, _heatingControl.State);
+        }
+
+        [HttpPost("schedule")]
+        public void NewScheduleItem([FromBody] NewScheduleItemExecutorInput input)
+        {
+            _newScheduleItemExecutor.Execute(input, _heatingControl.Model);
         }
 
         private void SetSetPoint(int zoneId, float value, SetPointType setPointType)
