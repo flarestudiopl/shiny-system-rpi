@@ -8,7 +8,7 @@ namespace HeatingControl.Application.Queries
 {
     public interface IZoneDetailsProvider
     {
-        ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState, Building building);
+        ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState);
     }
 
     public class ZoneDetailsProviderResult
@@ -36,7 +36,7 @@ namespace HeatingControl.Application.Queries
 
     public class ZoneDetailsProvider : IZoneDetailsProvider
     {
-        public ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState, Building building)
+        public ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState)
         {
             var zone = controllerState.ZoneIdToState.GetValueOrDefault(zoneId);
 

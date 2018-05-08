@@ -13,25 +13,29 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
+        private readonly IScheduleProvider _scheduleProvider;
 
         public ZoneController(IHeatingControl heatingControl,
                               IZoneDetailsProvider zoneDetailsProvider,
-                              ITemperatureSetPointExecutor temperatureSetPointExecutor)
+                              ITemperatureSetPointExecutor temperatureSetPointExecutor,
+                              IScheduleProvider scheduleProvider)
         {
             _heatingControl = heatingControl;
             _zoneDetailsProvider = zoneDetailsProvider;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
+            _scheduleProvider = scheduleProvider;
         }
 
         [HttpGet("{zoneId}")]
         public ZoneDetailsProviderResult GetDetails(int zoneId)
         {
-            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.Model);
+            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State);
         }
 
         [HttpPost("{zoneId}/setMode/{controlMode}")]
         public void SetControlMode(int zoneId, ZoneControlMode controlMode)
         {
+            // TODO - move to Commands
             _heatingControl.State.ZoneIdToState[zoneId].ControlMode = controlMode;
         }
 
@@ -63,6 +67,12 @@ namespace HeatingApi.Controllers
         public void SetHysteresisSetPoint(int zoneId, float value)
         {
             SetSetPoint(zoneId, value, SetPointType.Hysteresis);
+        }
+
+        [HttpGet("{zoneId}/schedule")]
+        public ScheduleProviderResult GetSchedule(int zoneId)
+        {
+            return _scheduleProvider.Provide(zoneId, _heatingControl.State);
         }
 
         private void SetSetPoint(int zoneId, float value, SetPointType setPointType)
