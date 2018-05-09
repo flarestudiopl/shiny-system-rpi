@@ -12,16 +12,19 @@ namespace HeatingApi.Controllers
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
+        private readonly IZoneControlModeExecutor _zoneControlModeExecutor;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
         private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
 
         public ZoneController(IHeatingControl heatingControl,
                               IZoneDetailsProvider zoneDetailsProvider,
+                              IZoneControlModeExecutor zoneControlModeExecutor,
                               ITemperatureSetPointExecutor temperatureSetPointExecutor,
                               INewScheduleItemExecutor newScheduleItemExecutor)
         {
             _heatingControl = heatingControl;
             _zoneDetailsProvider = zoneDetailsProvider;
+            _zoneControlModeExecutor = zoneControlModeExecutor;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
             _newScheduleItemExecutor = newScheduleItemExecutor;
         }
@@ -35,8 +38,13 @@ namespace HeatingApi.Controllers
         [HttpPost("{zoneId}/setMode/{controlMode}")]
         public void SetControlMode(int zoneId, ZoneControlMode controlMode)
         {
-            // TODO - move to Commands
-            _heatingControl.State.ZoneIdToState[zoneId].ControlMode = controlMode;
+            var input = new ZoneControlModeExecutorInput
+                        {
+                            ZoneId = zoneId,
+                            ControlMode = controlMode
+                        };
+
+            _zoneControlModeExecutor.Execute(input, _heatingControl.State);
         }
 
         [HttpDelete("{zoneId}/resetCounters")]

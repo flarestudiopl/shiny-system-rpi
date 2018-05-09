@@ -61,6 +61,7 @@ namespace HeatingApi.DependencyResolution
             // Application/Commands
             builder.RegisterType<NewScheduleItemExecutor>().As<INewScheduleItemExecutor>().SingleInstance();
             builder.RegisterType<TemperatureSetPointExecutor>().As<ITemperatureSetPointExecutor>().SingleInstance();
+            builder.RegisterType<ZoneControlModeExecutor>().As<IZoneControlModeExecutor>().SingleInstance();
 
             // Application/Loops
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
