@@ -8,9 +8,9 @@ namespace HeatingControl.Domain
 
         public DayOfWeek DayOfWeek { get; set; }
 
-        public DateTime BeginTime { get; set; }
+        public TimeSpan BeginTime { get; set; }
 
-        public DateTime EndTime { get; set; }
+        public TimeSpan EndTime { get; set; }
 
         public float? SetPoint { get; set; }
     }

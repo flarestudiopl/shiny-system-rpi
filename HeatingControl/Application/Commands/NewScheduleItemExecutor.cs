@@ -16,8 +16,8 @@ namespace HeatingControl.Application.Commands
     {
         public int ZoneId { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
-        public DateTime BeginTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public TimeSpan BeginTime { get; set; }
+        public TimeSpan EndTime { get; set; }
         public float? SetPoint { get; set; }
     }
 
@@ -53,8 +53,9 @@ namespace HeatingControl.Application.Commands
                 return;
             }
 
-            if (zone.Schedule.Any(x => (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime) ||
-                                       (input.EndTime > x.BeginTime && input.EndTime <= x.EndTime)))
+            if (zone.Schedule.Any(x => x.DayOfWeek == input.DayOfWeek &&
+                                       (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime ||
+                                        input.EndTime > x.BeginTime && input.EndTime <= x.EndTime)))
             {
                 Logger.Warning("Given schedule parameters overlaps existing item.");
 

@@ -63,8 +63,8 @@ namespace HeatingControl.Application.Loops
             if (scheduleItems != null && scheduleItems.Any())
             {
                 return scheduleItems.FirstOrDefault(x => x.DayOfWeek == now.DayOfWeek &&
-                                                         x.BeginTime.TimeOfDay < now.TimeOfDay &&
-                                                         x.EndTime.TimeOfDay >= now.TimeOfDay);
+                                                         x.BeginTime < now.TimeOfDay &&
+                                                         x.EndTime >= now.TimeOfDay);
             }
 
             return null;

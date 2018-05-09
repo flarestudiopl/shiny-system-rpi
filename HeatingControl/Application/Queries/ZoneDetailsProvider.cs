@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HeatingControl.Domain;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
@@ -49,7 +50,11 @@ namespace HeatingControl.Application.Queries
                    {
                        Counters = GetCountersData(zone),
                        Temperatures = GetTemperatureSettings(zone),
-                       Schedule = zone.Zone.Schedule
+                       Schedule = zone.Zone
+                                      .Schedule
+                                      .OrderBy(x => x.DayOfWeek)
+                                      .ThenBy(x => x.BeginTime)
+                                      .ToList()
                    };
         }
 

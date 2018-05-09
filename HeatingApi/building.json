@@ -11,15 +11,36 @@
         {
           "ScheduleItemId": 1,
           "DayOfWeek": 2,
-          "BeginTime": "2018-05-08T10:02:28.929Z",
-          "EndTime": "2018-05-08T20:02:28.929Z",
-          "SetPoint": 0.0
+          "BeginTime": "10:00:00",
+          "EndTime": "12:00:00",
+          "SetPoint": 12.0
+        },
+        {
+          "ScheduleItemId": 2,
+          "DayOfWeek": 2,
+          "BeginTime": "12:00:00",
+          "EndTime": "13:00:00",
+          "SetPoint": 15.0
+        },
+        {
+          "ScheduleItemId": 3,
+          "DayOfWeek": 3,
+          "BeginTime": "12:00:00",
+          "EndTime": "13:00:00",
+          "SetPoint": 15.0
+        },
+        {
+          "ScheduleItemId": 4,
+          "DayOfWeek": 3,
+          "BeginTime": "17:00:00",
+          "EndTime": "21:00:00",
+          "SetPoint": 28.0
         }
       ],
       "TemperatureControlledZone": {
         "TemperatureSensorId": 21,
-        "LowSetPoint": 18.0,
-        "HighSetPoint": 25.0,
+        "LowSetPoint": 20.0,
+        "HighSetPoint": 22.0,
         "ScheduleDefaultSetPoint": 15.0,
         "Hysteresis": 0.5
       }
@@ -29,7 +50,13 @@
       "Name": "Strefa 2",
       "HeaterIds": [],
       "Schedule": [],
-      "TemperatureControlledZone": null
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 22,
+        "LowSetPoint": 0.0,
+        "HighSetPoint": 0.0,
+        "ScheduleDefaultSetPoint": 0.0,
+        "Hysteresis": 0.0
+      }
     },
     {
       "ZoneId": 3,

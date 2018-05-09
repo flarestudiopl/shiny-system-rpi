@@ -13,19 +13,16 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
-        private readonly IScheduleProvider _scheduleProvider;
         private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
 
         public ZoneController(IHeatingControl heatingControl,
                               IZoneDetailsProvider zoneDetailsProvider,
                               ITemperatureSetPointExecutor temperatureSetPointExecutor,
-                              IScheduleProvider scheduleProvider,
                               INewScheduleItemExecutor newScheduleItemExecutor)
         {
             _heatingControl = heatingControl;
             _zoneDetailsProvider = zoneDetailsProvider;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
-            _scheduleProvider = scheduleProvider;
             _newScheduleItemExecutor = newScheduleItemExecutor;
         }
 
@@ -70,12 +67,6 @@ namespace HeatingApi.Controllers
         public void SetHysteresisSetPoint(int zoneId, float value)
         {
             SetSetPoint(zoneId, value, SetPointType.Hysteresis);
-        }
-
-        [HttpGet("{zoneId}/schedule")]
-        public ScheduleProviderResult GetSchedule(int zoneId)
-        {
-            return _scheduleProvider.Provide(zoneId, _heatingControl.State);
         }
 
         [HttpPost("schedule")]
