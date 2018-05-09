@@ -53,7 +53,13 @@ namespace HeatingControl.Application.Commands
                 return;
             }
 
-            // TODO - prevent overlapping items
+            if (zone.Schedule.Any(x => (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime) ||
+                                       (input.EndTime > x.BeginTime && input.EndTime <= x.EndTime)))
+            {
+                Logger.Warning("Given schedule parameters overlaps existing item.");
+
+                return;
+            }
 
             var lastScheduleItem = zone.Schedule.OrderByDescending(x => x.ScheduleItemId).FirstOrDefault();
 
