@@ -60,6 +60,7 @@ namespace HeatingApi.DependencyResolution
 
             // Application/Commands
             builder.RegisterType<NewScheduleItemExecutor>().As<INewScheduleItemExecutor>().SingleInstance();
+            builder.RegisterType<SaveZoneExecutor>().As<ISaveZoneExecutor>().SingleInstance();
             builder.RegisterType<TemperatureSetPointExecutor>().As<ITemperatureSetPointExecutor>().SingleInstance();
             builder.RegisterType<ZoneControlModeExecutor>().As<IZoneControlModeExecutor>().SingleInstance();
 
@@ -71,6 +72,7 @@ namespace HeatingApi.DependencyResolution
             // Application/Loops/Processing
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
             builder.RegisterType<UsageCollector>().As<IUsageCollector>().SingleInstance();
+            builder.RegisterType<ZonePowerProvider>().As<IZonePowerProvider>().SingleInstance();
             builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();
 
             // Application/Queries
@@ -78,6 +80,7 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<AvailableTemperatureSensorsProvider>().As<IAvailableTemperatureSensorsProvider>().SingleInstance();
             builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
             builder.RegisterType<ZoneDetailsProvider>().As<IZoneDetailsProvider>().SingleInstance();
+            builder.RegisterType<ZoneListProvider>().As<IZoneListProvider>().SingleInstance();
             builder.RegisterType<ZoneSettingsProvider>().As<IZoneSettingsProvider>().SingleInstance();
         }
     }
