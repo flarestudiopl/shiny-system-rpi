@@ -38,6 +38,10 @@ namespace HeatingApi.Controllers
             _buildingModelSaver = buildingModelSaver;
         }
 
+        /// <summary>
+        /// Test comment
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("1w/devices")]
         public IList<string> WireDevices()
         {

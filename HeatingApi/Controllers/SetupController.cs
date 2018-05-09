@@ -7,6 +7,9 @@ using Storage.BuildingModel;
 
 namespace HeatingApi.Controllers
 {
+    /// <summary>
+    /// Controller for settings views
+    /// </summary>
     [Produces("application/json")]
     [Route("/api/setup")]
     public class SetupController : Controller
@@ -49,24 +52,36 @@ namespace HeatingApi.Controllers
 
         #endregion // TODO - REMOVE
 
+        /// <summary>
+        /// Provides list of zones. To be used by zone settings grid.
+        /// </summary>
         [HttpGet("zone")]
         public ZoneListProviderOutput GetZoneList()
         {
             return _zoneListProvider.Provide(_heatingControl.State, _heatingControl.Model);
         }
 
+        /// <summary>
+        /// Provides data for zone settings editor.
+        /// </summary>
         [HttpGet("zone/{zoneId}")]
         public ZoneSettingsProviderResult GetZoneSettings(int zoneId)
         {
             return _zoneSettingsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.Model);
         }
 
+        /// <summary>
+        /// Saves new or existing zone. Zone settings editor should post data here.
+        /// </summary>
         [HttpPost("zone")]
         public void SaveZoneSettings([FromBody] SaveZoneExecutorInput input)
         {
             _saveZoneExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
         }
 
+        /// <summary>
+        /// Allows to remove zone. To be used by zone settings grid (or editor).
+        /// </summary>
         [HttpDelete("zone/{zoneId}")]
         public void RemoveZone(int zoneId)
         {
