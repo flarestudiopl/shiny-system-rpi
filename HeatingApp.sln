@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingApi", "HeatingApi\HeatingApi.csproj", "{797F4858-5A3C-4210-95BA-C01FFC3D238D}"
 EndProject
@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingControl.Domain", "He
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "Storage\Storage.csproj", "{6B9F2E2D-95E7-463D-BD16-FAA8468B008D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatingControl.Tests", "HeatingControl.Tests\HeatingControl.Tests.csproj", "{E7057B7D-6ADA-4646-B131-B85004E552F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatingControl.Tests", "HeatingControl.Tests\HeatingControl.Tests.csproj", "{E7057B7D-6ADA-4646-B131-B85004E552F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

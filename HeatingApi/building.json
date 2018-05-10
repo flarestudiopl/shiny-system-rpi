@@ -77,8 +77,8 @@
       "HeaterId": 11,
       "Name": "Grzejnik A",
       "PowerOutput": {
-        "PowerOutputDeviceId": 60,
-        "PowerOutputChannel": 1
+        "PowerOutputDeviceId": 56,
+        "PowerOutputChannel": 5
       },
       "UsageUnit": 3,
       "UsagePerHour": 2.0,

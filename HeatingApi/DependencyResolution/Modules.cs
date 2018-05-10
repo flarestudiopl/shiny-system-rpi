@@ -9,6 +9,8 @@ using HeatingControl.Application.Loops.Processing;
 using HeatingControl.Application.Queries;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
+using Storage.StorageDatabase;
+using Storage.StorageDatabase.Counter;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -26,6 +28,12 @@ namespace HeatingApi.DependencyResolution
             // BuildingModel
             builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
             builder.RegisterType<BuildingModelSaver>().As<IBuildingModelSaver>().SingleInstance();
+
+            // StorageDatabase
+            builder.RegisterType<SqlConnectionResolver>().As<ISqlConnectionResolver>().SingleInstance();
+
+            // StorageDatabase/Counter
+            builder.RegisterType<CounterAccumulator>().As<ICounterAccumulator>().SingleInstance();
         }
 
         private static void RegisterHardwareAccess(ContainerBuilder builder)

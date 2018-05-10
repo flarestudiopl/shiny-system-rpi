@@ -6,6 +6,7 @@ using HardwareAccess.Devices;
 using HeatingControl;
 using HeatingControl.Models;
 using Storage.BuildingModel;
+using Storage.StorageDatabase.Counter;
 
 namespace HeatingApi.Controllers
 {
@@ -20,6 +21,7 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly ICounterAccumulator _counterAccumulator;
 
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
@@ -27,7 +29,8 @@ namespace HeatingApi.Controllers
                               IPowerOutput powerOutput,
                               IHeatingControl heatingControl,
                               IBuildingModelProvider buildingModelProvider,
-                              IBuildingModelSaver buildingModelSaver)
+                              IBuildingModelSaver buildingModelSaver,
+                              ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
@@ -36,6 +39,7 @@ namespace HeatingApi.Controllers
             _heatingControl = heatingControl;
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
+            _counterAccumulator = counterAccumulator;
         }
 
         /// <summary>
@@ -91,6 +95,16 @@ namespace HeatingApi.Controllers
         {
             var model = _buildingModelProvider.Provide();
             _buildingModelSaver.Save(model);
+        }
+
+        [HttpPut("counter/accumulate")]
+        public void AccumulateCounter(int heaterId, int value)
+        {
+            _counterAccumulator.Accumulate(new CounterAccumulatorInput
+                                           {
+                                               HeaterId = heaterId,
+                                              SecondsToAccumulate = value
+                                           });
         }
     }
 }
