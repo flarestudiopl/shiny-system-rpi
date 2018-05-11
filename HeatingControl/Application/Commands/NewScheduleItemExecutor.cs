@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Commons;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using Storage.BuildingModel;
 

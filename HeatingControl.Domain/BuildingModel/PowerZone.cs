@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HeatingControl.Domain
+namespace Domain.BuildingModel
 {
     public  class PowerZone
     {

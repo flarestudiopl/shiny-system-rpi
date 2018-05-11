@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HeatingControl.Domain
+namespace Domain.BuildingModel
 {
     public class ScheduleItem
     {

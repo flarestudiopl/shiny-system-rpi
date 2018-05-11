@@ -29,10 +29,10 @@ namespace Storage.StorageDatabase.Counter
 INSERT OR REPLACE INTO [Counter] 
  ([CounterId], [HeaterId], [CountedSeconds], [StartDateTime]) 
 VALUES 
- ((SELECT [CounterId] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [EndDateTime] IS NULL),
+ ((SELECT [CounterId] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [ResetDateTime] IS NULL),
   @HeaterId,
-  @SecondsToAccumulate + COALESCE((SELECT [CountedSeconds] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [EndDateTime] IS NULL), 0),
-  COALESCE((SELECT [StartDateTime] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [EndDateTime] IS NULL), @StartDateTime));";
+  @SecondsToAccumulate + COALESCE((SELECT [CountedSeconds] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [ResetDateTime] IS NULL), 0),
+  COALESCE((SELECT [StartDateTime] FROM [Counter] WHERE [HeaterId] = @HeaterId AND [ResetDateTime] IS NULL), @StartDateTime));";
 
             using (var connection = _sqlConnectionResolver.Resolve())
             {

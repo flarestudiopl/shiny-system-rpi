@@ -1,7 +1,7 @@
 ﻿using System;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers

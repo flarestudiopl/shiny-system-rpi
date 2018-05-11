@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Domain.StorageDatabase;
 using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl;
@@ -22,6 +24,8 @@ namespace HeatingApi.Controllers
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
         private readonly ICounterAccumulator _counterAccumulator;
+        private readonly ICounterResetter _counterResetter;
+        private readonly ICurrentCountersByHeaterIdsProvider _currentCountersByHeaterIdsProvider;
 
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
@@ -30,7 +34,9 @@ namespace HeatingApi.Controllers
                               IHeatingControl heatingControl,
                               IBuildingModelProvider buildingModelProvider,
                               IBuildingModelSaver buildingModelSaver,
-                              ICounterAccumulator counterAccumulator)
+                              ICounterAccumulator counterAccumulator,
+                              ICounterResetter counterResetter,
+                              ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
@@ -40,6 +46,8 @@ namespace HeatingApi.Controllers
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
             _counterAccumulator = counterAccumulator;
+            _counterResetter = counterResetter;
+            _currentCountersByHeaterIdsProvider = currentCountersByHeaterIdsProvider;
         }
 
         /// <summary>
@@ -105,6 +113,22 @@ namespace HeatingApi.Controllers
                                                HeaterId = heaterId,
                                               SecondsToAccumulate = value
                                            });
+        }
+
+        [HttpDelete("counter/reset")]
+        public void ResetCounter(int heaterId)
+        {
+            _counterResetter.Reset(new CounterResetterInput
+                                   {
+                                       HeaterId = heaterId,
+                                       UserId = 1
+                                   });
+        }
+
+        [HttpGet("counter/getbyids")]
+        public ICollection<Counter> GetCounters(int[] heaterIds)
+        {
+            return _currentCountersByHeaterIdsProvider.Provide(heaterIds);
         }
     }
 }

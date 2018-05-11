@@ -3,7 +3,7 @@ using System.Threading;
 using Commons;
 using HardwareAccess.Devices;
 using HeatingControl.Application.Loops.Processing;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 

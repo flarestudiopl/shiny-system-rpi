@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HardwareAccess\HardwareAccess.csproj" />
-    <ProjectReference Include="..\HeatingControl.Domain\HeatingControl.Domain.csproj" />
+    <ProjectReference Include="..\HeatingControl.Domain\Domain.csproj" />
     <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
 

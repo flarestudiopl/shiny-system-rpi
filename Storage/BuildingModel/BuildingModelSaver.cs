@@ -1,5 +1,5 @@
 ﻿using Commons;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using Microsoft.Extensions.Configuration;
 
 namespace Storage.BuildingModel

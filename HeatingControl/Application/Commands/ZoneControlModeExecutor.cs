@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands

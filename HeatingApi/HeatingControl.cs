@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Commons;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;

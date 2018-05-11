@@ -1,7 +1,7 @@
 ﻿using Commons;
 using Commons.Extensions;
 using HardwareAccess.Devices;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application

@@ -34,6 +34,8 @@ namespace HeatingApi.DependencyResolution
 
             // StorageDatabase/Counter
             builder.RegisterType<CounterAccumulator>().As<ICounterAccumulator>().SingleInstance();
+            builder.RegisterType<CounterResetter>().As<ICounterResetter>().SingleInstance();
+            builder.RegisterType<CurrentCountersByHeaterIdsProvider>().As<ICurrentCountersByHeaterIdsProvider>().SingleInstance();
         }
 
         private static void RegisterHardwareAccess(ContainerBuilder builder)

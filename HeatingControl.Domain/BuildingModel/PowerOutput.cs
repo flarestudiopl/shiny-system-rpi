@@ -1,4 +1,4 @@
-﻿namespace HeatingControl.Domain
+﻿namespace Domain.BuildingModel
 {
     public struct PowerOutput
     {

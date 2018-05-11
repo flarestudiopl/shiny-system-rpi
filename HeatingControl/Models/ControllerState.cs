@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 
 namespace HeatingControl.Models
 {

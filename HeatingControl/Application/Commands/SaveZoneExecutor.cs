@@ -1,4 +1,4 @@
-﻿using HeatingControl.Domain;
+﻿using Domain.BuildingModel;
 using HeatingControl.Models;
 using Storage.BuildingModel;
 

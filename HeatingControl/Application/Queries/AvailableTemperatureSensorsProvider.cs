@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Commons;
 using HeatingControl.Application.Loops.Processing;
-using HeatingControl.Domain;
+using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 

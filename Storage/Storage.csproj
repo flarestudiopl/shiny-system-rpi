@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.csproj" />
-    <ProjectReference Include="..\HeatingControl.Domain\HeatingControl.Domain.csproj" />
+    <ProjectReference Include="..\HeatingControl.Domain\Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
