@@ -15,18 +15,21 @@ namespace HeatingApi.Controllers
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
+        private readonly ICounterResetExecutor _counterResetExecutor;
         private readonly IZoneControlModeExecutor _zoneControlModeExecutor;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
         private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
 
         public ZoneController(IHeatingControl heatingControl,
                               IZoneDetailsProvider zoneDetailsProvider,
+                              ICounterResetExecutor counterResetExecutor,
                               IZoneControlModeExecutor zoneControlModeExecutor,
                               ITemperatureSetPointExecutor temperatureSetPointExecutor,
                               INewScheduleItemExecutor newScheduleItemExecutor)
         {
             _heatingControl = heatingControl;
             _zoneDetailsProvider = zoneDetailsProvider;
+            _counterResetExecutor = counterResetExecutor;
             _zoneControlModeExecutor = zoneControlModeExecutor;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
             _newScheduleItemExecutor = newScheduleItemExecutor;
@@ -62,7 +65,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("{zoneId}/resetCounters")]
         public void ResetCounters(int zoneId)
         {
-            throw new NotImplementedException();
+            _counterResetExecutor.Execute(zoneId, -1, _heatingControl.State);
         }
 
         /// <summary>

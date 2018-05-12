@@ -115,16 +115,6 @@ namespace HeatingApi.Controllers
                                            });
         }
 
-        [HttpDelete("counter/reset")]
-        public void ResetCounter(int heaterId)
-        {
-            _counterResetter.Reset(new CounterResetterInput
-                                   {
-                                       HeaterId = heaterId,
-                                       UserId = 1
-                                   });
-        }
-
         [HttpGet("counter/getbyids")]
         public ICollection<Counter> GetCounters(int[] heaterIds)
         {

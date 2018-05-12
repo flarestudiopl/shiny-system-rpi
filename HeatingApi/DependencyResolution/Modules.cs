@@ -69,6 +69,7 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
 
             // Application/Commands
+            builder.RegisterType<CounterResetExecutor>().As<ICounterResetExecutor>().SingleInstance();
             builder.RegisterType<NewScheduleItemExecutor>().As<INewScheduleItemExecutor>().SingleInstance();
             builder.RegisterType<SaveZoneExecutor>().As<ISaveZoneExecutor>().SingleInstance();
             builder.RegisterType<TemperatureSetPointExecutor>().As<ITemperatureSetPointExecutor>().SingleInstance();
