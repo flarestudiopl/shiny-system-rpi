@@ -12,7 +12,7 @@ namespace Domain.StorageDatabase
 
         public string LastSeenIpAddress { get; set; }
 
-        public int? LastLogonDateTime { get; set; }
+        public long? LastLogonDateTime { get; set; }
 
         public DateTime? LastLogon => DomainModelHelpers.ParseDateTime(LastLogonDateTime);
 
@@ -23,5 +23,17 @@ namespace Domain.StorageDatabase
         public int IsBrowseableBool { get; set; }
 
         public bool IsBrowseable => DomainModelHelpers.ParseBool(IsBrowseableBool);
+
+        public int CreatedBy { get; set; }
+
+        public long CreatedDateTime { get; set; }
+
+        public DateTime Created => DomainModelHelpers.ParseDateTime(CreatedDateTime);
+
+        public int? DisabledBy { get; set; }
+
+        public long? DisabledDateTime { get; set; }
+
+        public DateTime? Disabled => DomainModelHelpers.ParseDateTime(DisabledDateTime);
     }
 }

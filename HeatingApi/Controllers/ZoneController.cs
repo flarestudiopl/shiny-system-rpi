@@ -65,7 +65,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("{zoneId}/resetCounters")]
         public void ResetCounters(int zoneId)
         {
-            _counterResetExecutor.Execute(zoneId, -1, _heatingControl.State);
+            _counterResetExecutor.Execute(zoneId, /* TODO */ -1, _heatingControl.State);
         }
 
         /// <summary>

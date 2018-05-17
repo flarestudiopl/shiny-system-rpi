@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Domain.BuildingModel;
@@ -22,6 +21,8 @@ namespace HeatingApi.Controllers
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
         private readonly IUserListProvider _userListProvider;
+        private readonly INewUserExecutor _newUserExecutor;
+        private readonly IRemoveUserExecutor _removeUserExecutor;
 
         public SetupController(IHeatingControl heatingControl,
                                IZoneListProvider zoneListProvider,
@@ -29,7 +30,9 @@ namespace HeatingApi.Controllers
                                ISaveZoneExecutor saveZoneExecutor,
                                IBuildingModelProvider buildingModelProvider,
                                IBuildingModelSaver buildingModelSaver,
-                               IUserListProvider userListProvider)
+                               IUserListProvider userListProvider,
+                               INewUserExecutor newUserExecutor,
+                               IRemoveUserExecutor removeUserExecutor)
         {
             _heatingControl = heatingControl;
             _zoneListProvider = zoneListProvider;
@@ -38,6 +41,8 @@ namespace HeatingApi.Controllers
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
             _userListProvider = userListProvider;
+            _newUserExecutor = newUserExecutor;
+            _removeUserExecutor = removeUserExecutor;
         }
 
         #region TODO - REMOVE
@@ -96,6 +101,18 @@ namespace HeatingApi.Controllers
         public UserListProviderResult GetUserList()
         {
             return _userListProvider.Provide();
+        }
+
+        [HttpPost("user")]
+        public void AddUser([FromBody] NewUserExecutorInput input)
+        {
+            _newUserExecutor.Execute(input, /* TODO */ -1);
+        }
+
+        [HttpDelete("user")]
+        public void DeleteUser(int userId)
+        {
+            _removeUserExecutor.Execute(userId, /* TODO */ -1);
         }
     }
 }
