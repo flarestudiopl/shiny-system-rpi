@@ -3,14 +3,10 @@ using HardwareAccess.Buses;
 using HardwareAccess.Buses.PlatformIntegration;
 using HardwareAccess.Devices;
 using HeatingControl.Application;
-using HeatingControl.Application.Commands;
 using HeatingControl.Application.Loops;
 using HeatingControl.Application.Loops.Processing;
-using HeatingControl.Application.Queries;
 using Microsoft.Extensions.Hosting;
-using Storage.BuildingModel;
 using Storage.StorageDatabase;
-using Storage.StorageDatabase.Counter;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -25,17 +21,11 @@ namespace HeatingApi.DependencyResolution
 
         private static void RegisterPersistence(ContainerBuilder builder)
         {
-            // BuildingModel
-            builder.RegisterType<BuildingModelProvider>().As<IBuildingModelProvider>().SingleInstance();
-            builder.RegisterType<BuildingModelSaver>().As<IBuildingModelSaver>().SingleInstance();
+            var assembly = typeof(ISqlConnectionResolver).Assembly;
 
-            // StorageDatabase
-            builder.RegisterType<SqlConnectionResolver>().As<ISqlConnectionResolver>().SingleInstance();
-
-            // StorageDatabase/Counter
-            builder.RegisterType<CounterAccumulator>().As<ICounterAccumulator>().SingleInstance();
-            builder.RegisterType<CounterResetter>().As<ICounterResetter>().SingleInstance();
-            builder.RegisterType<CurrentCountersByHeaterIdsProvider>().As<ICurrentCountersByHeaterIdsProvider>().SingleInstance();
+            builder.RegisterAssemblyTypes(assembly)
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
         }
 
         private static void RegisterHardwareAccess(ContainerBuilder builder)
@@ -60,6 +50,8 @@ namespace HeatingApi.DependencyResolution
 
         private static void RegisterControl(ContainerBuilder builder)
         {
+            var assembly = typeof(IControllerStateBuilder).Assembly;
+
             builder.RegisterType<HeatingControl>()
                    .As<IHeatingControl>()
                    .As<IHostedService>()
@@ -69,11 +61,10 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<ControllerStateBuilder>().As<IControllerStateBuilder>().SingleInstance();
 
             // Application/Commands
-            builder.RegisterType<CounterResetExecutor>().As<ICounterResetExecutor>().SingleInstance();
-            builder.RegisterType<NewScheduleItemExecutor>().As<INewScheduleItemExecutor>().SingleInstance();
-            builder.RegisterType<SaveZoneExecutor>().As<ISaveZoneExecutor>().SingleInstance();
-            builder.RegisterType<TemperatureSetPointExecutor>().As<ITemperatureSetPointExecutor>().SingleInstance();
-            builder.RegisterType<ZoneControlModeExecutor>().As<IZoneControlModeExecutor>().SingleInstance();
+            builder.RegisterAssemblyTypes(assembly)
+                   .Where(x => x.FullName.StartsWith("HeatingControl.Application.Commands."))
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
 
             // Application/Loops
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
@@ -87,12 +78,10 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();
 
             // Application/Queries
-            builder.RegisterType<AvailableHeatersProvider>().As<IAvailableHeatersProvider>().SingleInstance();
-            builder.RegisterType<AvailableTemperatureSensorsProvider>().As<IAvailableTemperatureSensorsProvider>().SingleInstance();
-            builder.RegisterType<DashboardSnapshotProvider>().As<IDashboardSnapshotProvider>().SingleInstance();
-            builder.RegisterType<ZoneDetailsProvider>().As<IZoneDetailsProvider>().SingleInstance();
-            builder.RegisterType<ZoneListProvider>().As<IZoneListProvider>().SingleInstance();
-            builder.RegisterType<ZoneSettingsProvider>().As<IZoneSettingsProvider>().SingleInstance();
+            builder.RegisterAssemblyTypes(assembly)
+                   .Where(x => x.FullName.StartsWith("HeatingControl.Application.Queries."))
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
         }
     }
 }

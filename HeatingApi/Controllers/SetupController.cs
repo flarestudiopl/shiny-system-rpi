@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Domain.BuildingModel;
@@ -20,13 +21,15 @@ namespace HeatingApi.Controllers
         private readonly ISaveZoneExecutor _saveZoneExecutor;
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IUserListProvider _userListProvider;
 
         public SetupController(IHeatingControl heatingControl,
                                IZoneListProvider zoneListProvider,
                                IZoneSettingsProvider zoneSettingsProvider,
                                ISaveZoneExecutor saveZoneExecutor,
                                IBuildingModelProvider buildingModelProvider,
-                               IBuildingModelSaver buildingModelSaver)
+                               IBuildingModelSaver buildingModelSaver,
+                               IUserListProvider userListProvider)
         {
             _heatingControl = heatingControl;
             _zoneListProvider = zoneListProvider;
@@ -34,6 +37,7 @@ namespace HeatingApi.Controllers
             _saveZoneExecutor = saveZoneExecutor;
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
+            _userListProvider = userListProvider;
         }
 
         #region TODO - REMOVE
@@ -86,6 +90,12 @@ namespace HeatingApi.Controllers
         public void RemoveZone(int zoneId)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpGet("user")]
+        public UserListProviderResult GetUserList()
+        {
+            return _userListProvider.Provide();
         }
     }
 }

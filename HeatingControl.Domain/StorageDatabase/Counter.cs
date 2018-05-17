@@ -12,11 +12,11 @@ namespace Domain.StorageDatabase
 
         public long StartDateTime { get; set; }
 
-        public DateTime Start => new DateTime(StartDateTime);
+        public DateTime Start => DomainModelHelpers.ParseDateTime(StartDateTime);
 
         public long? ResetDateTime { get; set; }
 
-        public DateTime? Reset => ResetDateTime.HasValue ? new DateTime(ResetDateTime.Value) : (DateTime?)null;
+        public DateTime? Reset => DomainModelHelpers.ParseDateTime(ResetDateTime);
 
         public int? ResettedBy { get; set; }
     }
