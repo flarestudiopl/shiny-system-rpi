@@ -11,7 +11,7 @@
         {
             // TODO: can handle both heating and cooling approach
 
-            float halfOfHysteresis = hysteresis / 2f;
+            var halfOfHysteresis = hysteresis / 2f;
 
             if (currentTemperature >= setPoint + halfOfHysteresis)
             {

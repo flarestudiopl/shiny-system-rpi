@@ -73,6 +73,7 @@ namespace HeatingApi.DependencyResolution
 
             // Application/Loops/Processing
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();
+            builder.RegisterType<PowerZoneOutputAllowanceCalculator>().As<IPowerZoneOutputAllowanceCalculator>().SingleInstance();
             builder.RegisterType<UsageCollector>().As<IUsageCollector>().SingleInstance();
             builder.RegisterType<ZonePowerProvider>().As<IZonePowerProvider>().SingleInstance();
             builder.RegisterType<ZoneTemperatureProvider>().As<IZoneTemperatureProvider>().SingleInstance();

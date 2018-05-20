@@ -8,8 +8,10 @@ namespace HeatingControl.Models
     {
         public PowerZone PowerZone { get; set; }
 
-        public IDictionary<PowerOutput, bool> AffectedOutputToState { get; set; }
+        public IDictionary<int, bool> HeaterIdToPowerOnAllowance { get; set; }
 
-        public DateTime NextRoundDateTime { get; set; }
+        public DateTime NextAllowanceRecalculationDateTime { get; set; }
+
+        public int NextAllowanceRecalculationOffset { get; set; }
     }
 }

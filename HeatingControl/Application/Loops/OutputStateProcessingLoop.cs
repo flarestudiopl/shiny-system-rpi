@@ -19,16 +19,19 @@ namespace HeatingControl.Application.Loops
         private readonly IPowerOutput _powerOutput;
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
         private readonly IHysteresisProcessor _hysteresisProcessor;
+        private readonly IPowerZoneOutputAllowanceCalculator _powerZoneOutputAllowanceCalculator;
         private readonly IUsageCollector _usageCollector;
 
         public OutputStateProcessingLoop(IPowerOutput powerOutput,
                                          IZoneTemperatureProvider zoneTemperatureProvider,
                                          IHysteresisProcessor hysteresisProcessor,
+                                         IPowerZoneOutputAllowanceCalculator powerZoneOutputAllowanceCalculator,
                                          IUsageCollector usageCollector)
         {
             _powerOutput = powerOutput;
             _zoneTemperatureProvider = zoneTemperatureProvider;
             _hysteresisProcessor = hysteresisProcessor;
+            _powerZoneOutputAllowanceCalculator = powerZoneOutputAllowanceCalculator;
             _usageCollector = usageCollector;
         }
 
@@ -96,6 +99,7 @@ namespace HeatingControl.Application.Loops
             else
             {
                 outputState = false;
+
                 Logger.Warning("Temperature value for zone {0} is too old. Proactive power cutoff.",
                                new object[] { zoneState.Zone.Name });
             }
@@ -136,7 +140,18 @@ namespace HeatingControl.Application.Loops
 
         private void ProcessPowerZones(ControllerState controllerState)
         {
-            // TODO: apply power limits
+            foreach (var powerZone in controllerState.PowerZoneIdToState.Values)
+            {
+                if (powerZone.NextAllowanceRecalculationDateTime < DateTime.Now)
+                {
+                    _powerZoneOutputAllowanceCalculator.Calculate(powerZone, controllerState);
+                }
+
+                foreach (var powerAllowance in powerZone.HeaterIdToPowerOnAllowance)
+                {
+                    controllerState.HeaterIdToState[powerAllowance.Key].OutputState &= powerAllowance.Value;
+                }
+            }
         }
 
         private void WriteOutputs(ControllerState controllerState)
@@ -145,12 +160,10 @@ namespace HeatingControl.Application.Loops
 
             foreach (var heater in controllerState.HeaterIdToState.Values)
             {
-                var powerOutput = heater.Heater.PowerOutput;
-
                 if ((now - heater.LastStateChange).TotalSeconds > heater.Heater.MinimumStateChangeIntervalSeconds &&
-                    heater.OutputState != _powerOutput.GetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel))
+                    heater.OutputState != _powerOutput.GetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel))
                 {
-                    _powerOutput.SetState(powerOutput.PowerOutputDeviceId, powerOutput.PowerOutputChannel, heater.OutputState);
+                    _powerOutput.SetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel, heater.OutputState);
                     _usageCollector.Collect(heater, controllerState);
 
                     heater.LastStateChange = now;

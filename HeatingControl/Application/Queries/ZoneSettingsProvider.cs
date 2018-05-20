@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Commons.Extensions;
 using Domain.BuildingModel;
 using HeatingControl.Models;
 

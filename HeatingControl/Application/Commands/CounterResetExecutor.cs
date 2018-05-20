@@ -1,6 +1,6 @@
 ﻿using HeatingControl.Models;
 using Storage.StorageDatabase.Counter;
-using System.Collections.Generic;
+using Commons.Extensions;
 
 namespace HeatingControl.Application.Commands
 {

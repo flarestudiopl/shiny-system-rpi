@@ -4,9 +4,15 @@ namespace Domain.BuildingModel
 {
     public  class PowerZone
     {
+        public int PowerZoneId { get; set; }
+
         public string Name { get; set; }
-        
-        public IList<PowerOutput> PowerOutputs { get; set; }
+
+        public IList<int> HeaterIds { get; set; } = new List<int>();
+
+        public float MaxUsage { get; set; }
+
+        public UsageUnit UsageUnit { get; set; }
 
         public int RoundRobinIntervalMinutes { get; set; }
     }

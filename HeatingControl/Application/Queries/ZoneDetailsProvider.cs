@@ -5,6 +5,7 @@ using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 using Storage.StorageDatabase.Counter;
+using Commons.Extensions;
 
 namespace HeatingControl.Application.Queries
 {
@@ -73,23 +74,23 @@ namespace HeatingControl.Application.Queries
                                                                                    x => x);
 
             var heaterIdToCountedSeconds = heaterIds.ToDictionary(x => x,
-                 x =>
-                 {
-                     var savedCounterValue = heatersCounters.GetValueOrDefault(x)?.CountedSeconds ?? 0;
-                     // TODO - add current, not saved yet value
-                     return savedCounterValue;
-                 });
+                                                                  x =>
+                                                                  {
+                                                                      var savedCounterValue = DictionaryExtensions.GetValueOrDefault(heatersCounters, x)?.CountedSeconds ?? 0;
+                                                                      // TODO - add current, not saved yet value
+                                                                      return savedCounterValue;
+                                                                  });
 
             var usageUnitToHeaters = building.Heaters
                                              .Where(x => heaterIds.Contains(x.HeaterId))
                                              .GroupBy(x => x.UsageUnit);
 
             return new ZoneDetailsProviderResult.CountersData
-                    {
-                        LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.Start) : (DateTime?)null,
-                        UsageUnitToValue = usageUnitToHeaters.ToDictionary(x => x.Key,
-                                                                           x => x.Sum(h => h.UsagePerHour * (float)heaterIdToCountedSeconds[h.HeaterId] / 3600f))
-                    };
+                   {
+                       LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.Start) : (DateTime?)null,
+                       UsageUnitToValue = usageUnitToHeaters.ToDictionary(x => x.Key,
+                                                                          x => x.Sum(h => h.UsagePerHour * (float)heaterIdToCountedSeconds[h.HeaterId] / 3600f))
+                   };
         }
 
         private static ZoneDetailsProviderResult.TemperatureSettings GetTemperatureSettings(ZoneState zone)

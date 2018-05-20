@@ -6,17 +6,13 @@ namespace Domain.BuildingModel
     {
         public string Name { get; set; }
 
-        // TODO - make them dicts, when persistence will be moved to db
-
         public ICollection<Zone> Zones { get; set; }
 
         public ICollection<Heater> Heaters { get; set; }
 
         public ICollection<TemperatureSensor> TemperatureSensors { get; set; }
 
-
-        // TODO: power limits 
-        //public IList<PowerZone> PowerZones { get; set; }
+        public ICollection<PowerZone> PowerZones { get; set; }
 
         public int ControlLoopIntervalSecondsMilliseconds { get; set; }
     }

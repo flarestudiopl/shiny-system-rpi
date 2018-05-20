@@ -1,4 +1,5 @@
-﻿using Commons;
+﻿using System.Linq;
+using Commons;
 using Commons.Extensions;
 using HardwareAccess.Devices;
 using Domain.BuildingModel;
@@ -24,11 +25,25 @@ namespace HeatingControl.Application
         {
             var state = new ControllerState();
 
+            CollectAvailableSensors(state);
+            MapConfiguredHeaters(buildingModel, state);
+            MapConfiguredSensors(buildingModel, state);
+            MapConfiguredZones(buildingModel, state);
+            MapConfiguredPowerZones(buildingModel, state);
+
+            return state;
+        }
+
+        private void CollectAvailableSensors(ControllerState state)
+        {
             foreach (var sensor in _temperatureSensor.GetAvailableSensors())
             {
-                state.TemperatureDeviceIdToTemperatureData.AddOrUpdate(sensor, new TemperatureData(), (key, value) => value);
+                state.TemperatureDeviceIdToTemperatureData.Add(sensor, new TemperatureData());
             }
+        }
 
+        private static void MapConfiguredHeaters(Building buildingModel, ControllerState state)
+        {
             foreach (var heater in buildingModel.Heaters)
             {
                 if (heater.Name.IsNullOrEmpty())
@@ -50,7 +65,10 @@ namespace HeatingControl.Application
                     state.InstantUsage.Add(heater.UsageUnit, 0f);
                 }
             }
+        }
 
+        private static void MapConfiguredSensors(Building buildingModel, ControllerState state)
+        {
             foreach (var sensor in buildingModel.TemperatureSensors)
             {
                 if (sensor.Name.IsNullOrEmpty())
@@ -62,8 +80,11 @@ namespace HeatingControl.Application
 
                 state.TemperatureSensorIdToDeviceId.Add(sensor.TemperatureSensorId, sensor.DeviceId);
             }
+        }
 
-            foreach (var zone in buildingModel.Zones) // TODO model validation
+        private void MapConfiguredZones(Building buildingModel, ControllerState state)
+        {
+            foreach (var zone in buildingModel.Zones)
             {
                 if (zone.Name.IsNullOrEmpty())
                 {
@@ -72,20 +93,38 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.ZoneIdToState.AddOrUpdate(zone.ZoneId,
+                state.ZoneIdToState.Add(zone.ZoneId,
                                                 new ZoneState
                                                 {
                                                     Zone = zone,
                                                     ControlMode = GetInitialControlMode(zone),
                                                     EnableOutputs = false
-                                                },
-                                                (key, value) => value);
+                                                });
             }
-
-            return state;
         }
 
-        private ZoneControlMode GetInitialControlMode(Zone zone)
+        private static void MapConfiguredPowerZones(Building buildingModel, ControllerState state)
+        {
+            foreach (var powerZone in buildingModel.PowerZones)
+            {
+                if (powerZone.Name.IsNullOrEmpty())
+                {
+                    Logger.Warning("Skipping power zone without name.");
+
+                    continue;
+                }
+
+                state.PowerZoneIdToState.Add(powerZone.PowerZoneId,
+                                             new PowerZoneState
+                                             {
+                                                 PowerZone = powerZone,
+                                                 HeaterIdToPowerOnAllowance = powerZone.HeaterIds
+                                                                                       .ToDictionary(x => x, x => false)
+                                             });
+            }
+        }
+
+        private static ZoneControlMode GetInitialControlMode(Zone zone)
         {
             return zone.Schedule.Count > 0 ? ZoneControlMode.Schedule : ZoneControlMode.LowOrDisabled;
         }
