@@ -19,19 +19,19 @@ namespace HeatingControl.Application.Loops
         private readonly IPowerOutput _powerOutput;
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
         private readonly IHysteresisProcessor _hysteresisProcessor;
-        private readonly IPowerZoneOutputAllowanceCalculator _powerZoneOutputAllowanceCalculator;
+        private readonly IPowerZoneOutputLimiter _powerZoneOutputLimiter;
         private readonly IUsageCollector _usageCollector;
 
         public OutputStateProcessingLoop(IPowerOutput powerOutput,
                                          IZoneTemperatureProvider zoneTemperatureProvider,
                                          IHysteresisProcessor hysteresisProcessor,
-                                         IPowerZoneOutputAllowanceCalculator powerZoneOutputAllowanceCalculator,
+                                         IPowerZoneOutputLimiter powerZoneOutputLimiter,
                                          IUsageCollector usageCollector)
         {
             _powerOutput = powerOutput;
             _zoneTemperatureProvider = zoneTemperatureProvider;
             _hysteresisProcessor = hysteresisProcessor;
-            _powerZoneOutputAllowanceCalculator = powerZoneOutputAllowanceCalculator;
+            _powerZoneOutputLimiter = powerZoneOutputLimiter;
             _usageCollector = usageCollector;
         }
 
@@ -142,15 +142,7 @@ namespace HeatingControl.Application.Loops
         {
             foreach (var powerZone in controllerState.PowerZoneIdToState.Values)
             {
-                if (powerZone.NextAllowanceRecalculationDateTime < DateTime.Now)
-                {
-                    _powerZoneOutputAllowanceCalculator.Calculate(powerZone, controllerState);
-                }
-
-                foreach (var powerAllowance in powerZone.HeaterIdToPowerOnAllowance)
-                {
-                    controllerState.HeaterIdToState[powerAllowance.Key].OutputState &= powerAllowance.Value;
-                }
+                _powerZoneOutputLimiter.Limit(powerZone, controllerState);
             }
         }
 

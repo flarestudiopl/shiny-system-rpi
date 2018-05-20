@@ -117,9 +117,7 @@ namespace HeatingControl.Application
                 state.PowerZoneIdToState.Add(powerZone.PowerZoneId,
                                              new PowerZoneState
                                              {
-                                                 PowerZone = powerZone,
-                                                 HeaterIdToPowerOnAllowance = powerZone.HeaterIds
-                                                                                       .ToDictionary(x => x, x => false)
+                                                 PowerZone = powerZone
                                              });
             }
         }

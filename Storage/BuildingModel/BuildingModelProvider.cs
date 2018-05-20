@@ -44,7 +44,7 @@ namespace Storage.BuildingModel
                                    {
                                        ZoneId = 1,
                                        Name = "Strefa 1",
-                                       HeaterIds = new List<int> { 11 },
+                                       HeaterIds = new HashSet<int> { 11 },
                                        TemperatureControlledZone = new TemperatureControlledZone
                                                                    {
                                                                        TemperatureSensorId = 21,
@@ -58,7 +58,7 @@ namespace Storage.BuildingModel
                                    {
                                        ZoneId = 2,
                                        Name = "Strefa 2",
-                                       HeaterIds = new List<int> { 12 },
+                                       HeaterIds = new HashSet<int> { 12 },
                                        TemperatureControlledZone = new TemperatureControlledZone
                                                                    {
                                                                        TemperatureSensorId = 22,
@@ -129,7 +129,7 @@ namespace Storage.BuildingModel
                                             Name = "Max 3kW",
                                             MaxUsage = 3f,
                                             UsageUnit = UsageUnit.kW,
-                                            HeaterIds = new List<int> { 11, 12 },
+                                            HeaterIds = new HashSet<int> { 11, 12 },
                                             PowerZoneId = 1200,
                                             RoundRobinIntervalMinutes = 1
                                         }

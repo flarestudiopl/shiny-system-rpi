@@ -14,44 +14,45 @@ namespace HeatingControl.Tests.Application.Loops.Processing
         [InlineData(2, false, false, true, true)]
         [InlineData(3, true, false, false, true)]
         [InlineData(4, true, true, false, false)]
-        public void iterates_over_available_heaters(int iteration, bool state1, bool state2, bool state3, bool state4)
+        public void iterates_over_available_heaters(byte iteration, bool state1, bool state2, bool state3, bool state4)
         {
             // Arrange
             var powerZoneState = new PowerZoneState
                                  {
-                                     HeaterIdToPowerOnAllowance = new Dictionary<int, bool>
-                                                                  {
-                                                                      [1] = false,
-                                                                      [2] = false,
-                                                                      [3] = false,
-                                                                      [4] = false
-                                                                  },
-                                     NextAllowanceRecalculationOffset = iteration,
-                                     PowerZone = new PowerZone { MaxUsage = 2.1f }
+                                     NextIntervalOffset = iteration,
+                                     PowerZone = new PowerZone
+                                                 {
+                                                     MaxUsage = 2.1f,
+                                                     HeaterIds = new HashSet<int> { 1, 2, 3, 4 }
+                                                 }
                                  };
 
-            var heaterState = new HeaterState { Heater = new Heater { UsagePerHour = 0.9f } };
+            var heater = new Heater { UsagePerHour = 0.9f };
+            var heaterState1 = new HeaterState { Heater = heater, OutputState = true };
+            var heaterState2 = new HeaterState { Heater = heater, OutputState = true };
+            var heaterState3 = new HeaterState { Heater = heater, OutputState = true };
+            var heaterState4 = new HeaterState { Heater = heater, OutputState = true };
 
             var controllerState = new ControllerState
                                   {
                                       HeaterIdToState = new Dictionary<int, HeaterState>
                                                         {
-                                                            [1] = heaterState,
-                                                            [2] = heaterState,
-                                                            [3] = heaterState,
-                                                            [4] = heaterState
+                                                            [1] = heaterState1,
+                                                            [2] = heaterState2,
+                                                            [3] = heaterState3,
+                                                            [4] = heaterState4
                                                         }
                                   };
 
             // Act
-            var powerZoneOutputAllowanceCalculator = new PowerZoneOutputAllowanceCalculator();
-            powerZoneOutputAllowanceCalculator.Calculate(powerZoneState, controllerState);
+            var powerZoneOutputAllowanceCalculator = new PowerZoneOutputLimiter();
+            powerZoneOutputAllowanceCalculator.Limit(powerZoneState, controllerState);
 
             // Assert
-            Assert.Equal(state1, powerZoneState.HeaterIdToPowerOnAllowance[1]);
-            Assert.Equal(state2, powerZoneState.HeaterIdToPowerOnAllowance[2]);
-            Assert.Equal(state3, powerZoneState.HeaterIdToPowerOnAllowance[3]);
-            Assert.Equal(state4, powerZoneState.HeaterIdToPowerOnAllowance[4]);
+            Assert.Equal(state1, heaterState1.OutputState);
+            Assert.Equal(state2, heaterState2.OutputState);
+            Assert.Equal(state3, heaterState3.OutputState);
+            Assert.Equal(state4, heaterState4.OutputState);
         }
     }
 }

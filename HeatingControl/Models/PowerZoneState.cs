@@ -1,6 +1,5 @@
 ﻿using Domain.BuildingModel;
 using System;
-using System.Collections.Generic;
 
 namespace HeatingControl.Models
 {
@@ -8,10 +7,8 @@ namespace HeatingControl.Models
     {
         public PowerZone PowerZone { get; set; }
 
-        public IDictionary<int, bool> HeaterIdToPowerOnAllowance { get; set; }
+        public DateTime NextIntervalIncrementationDateTime { get; set; }
 
-        public DateTime NextAllowanceRecalculationDateTime { get; set; }
-
-        public int NextAllowanceRecalculationOffset { get; set; }
+        public byte NextIntervalOffset { get; set; }
     }
 }

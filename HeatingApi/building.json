@@ -1,0 +1,99 @@
+{
+  "Name": "Budynek testowy",
+  "Zones": [
+    {
+      "ZoneId": 1,
+      "Name": "Strefa 1",
+      "HeaterIds": [
+        11
+      ],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 21,
+        "LowSetPoint": 20.0,
+        "HighSetPoint": 22.0,
+        "ScheduleDefaultSetPoint": 15.0,
+        "Hysteresis": 0.5
+      }
+    },
+    {
+      "ZoneId": 2,
+      "Name": "Strefa 2",
+      "HeaterIds": [
+        12
+      ],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 22,
+        "LowSetPoint": 20.0,
+        "HighSetPoint": 22.0,
+        "ScheduleDefaultSetPoint": 15.0,
+        "Hysteresis": 0.5
+      }
+    },
+    {
+      "ZoneId": 3,
+      "Name": "Strefa 3",
+      "HeaterIds": [],
+      "Schedule": [],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 23,
+        "LowSetPoint": 0.0,
+        "HighSetPoint": 0.0,
+        "ScheduleDefaultSetPoint": 0.0,
+        "Hysteresis": 0.0
+      }
+    }
+  ],
+  "Heaters": [
+    {
+      "HeaterId": 11,
+      "Name": "Grzejnik A",
+      "PowerOutputDeviceId": 56,
+      "PowerOutputChannel": 5,
+      "UsageUnit": 3,
+      "UsagePerHour": 2.0,
+      "MinimumStateChangeIntervalSeconds": 1
+    },
+    {
+      "HeaterId": 12,
+      "Name": "Grzejnik B",
+      "PowerOutputDeviceId": 56,
+      "PowerOutputChannel": 6,
+      "UsageUnit": 3,
+      "UsagePerHour": 2.0,
+      "MinimumStateChangeIntervalSeconds": 1
+    }
+  ],
+  "TemperatureSensors": [
+    {
+      "TemperatureSensorId": 21,
+      "Name": "Czujnik 1",
+      "DeviceId": "10-0008019e9d54"
+    },
+    {
+      "TemperatureSensorId": 22,
+      "Name": "Czujnik 2",
+      "DeviceId": "28-000005964edc"
+    },
+    {
+      "TemperatureSensorId": 23,
+      "Name": "Czujnik 3",
+      "DeviceId": "28-00000595d87e"
+    }
+  ],
+  "PowerZones": [
+    {
+      "PowerZoneId": 1200,
+      "Name": "Max 3kW",
+      "HeaterIds": [
+        11,
+        12
+      ],
+      "MaxUsage": 3.0,
+      "UsageUnit": 3,
+      "RoundRobinIntervalMinutes": 1
+    }
+  ],
+  "ControlLoopIntervalSecondsMilliseconds": 1500
+}

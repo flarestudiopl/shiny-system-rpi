@@ -8,7 +8,7 @@ namespace Domain.BuildingModel
 
         public string Name { get; set; }
 
-        public IList<int> HeaterIds { get; set; } = new List<int>();
+        public HashSet<int> HeaterIds { get; set; } = new HashSet<int>();
 
         public float MaxUsage { get; set; }
 
