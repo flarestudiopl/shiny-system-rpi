@@ -1,4 +1,6 @@
-﻿using HeatingControl.Models;
+﻿using System;
+using HeatingControl.Models;
+using Storage.StorageDatabase.Counter;
 
 namespace HeatingControl.Application.Loops.Processing
 {
@@ -9,6 +11,13 @@ namespace HeatingControl.Application.Loops.Processing
 
     public class UsageCollector : IUsageCollector
     {
+        private readonly ICounterAccumulator _counterAccumulator;
+
+        public UsageCollector(ICounterAccumulator counterAccumulator)
+        {
+            _counterAccumulator = counterAccumulator;
+        }
+
         public void Collect(HeaterState heaterState, ControllerState controllerState)
         {
             var heater = heaterState.Heater;
@@ -34,6 +43,12 @@ namespace HeatingControl.Application.Loops.Processing
                 {
                     controllerState.InstantUsage[heater.UsageUnit] -= heater.UsagePerHour;
                 }
+
+                _counterAccumulator.Accumulate(new CounterAccumulatorInput
+                                               {
+                                                   HeaterId = heater.HeaterId,
+                                                   SecondsToAccumulate = (int)(DateTime.Now - heaterState.LastStateChange).TotalSeconds
+                                               });
             }
         }
     }

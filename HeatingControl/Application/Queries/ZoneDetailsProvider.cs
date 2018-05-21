@@ -56,7 +56,7 @@ namespace HeatingControl.Application.Queries
 
             return new ZoneDetailsProviderResult
                    {
-                       Counters = GetCountersData(zone, building),
+                       Counters = GetCountersData(zone, controllerState, building),
                        Temperatures = GetTemperatureSettings(zone),
                        Schedule = zone.Zone
                                       .Schedule
@@ -66,19 +66,23 @@ namespace HeatingControl.Application.Queries
                    };
         }
 
-        private ZoneDetailsProviderResult.CountersData GetCountersData(ZoneState zone, Building building)
+        private ZoneDetailsProviderResult.CountersData GetCountersData(ZoneState zone, ControllerState state, Building building)
         {
             var heaterIds = zone.Zone.HeaterIds;
             var heatersCounters = _currentCountersByHeaterIdsProvider.Provide(heaterIds)
                                                                      .ToDictionary(x => x.HeaterId,
                                                                                    x => x);
 
+            var now = DateTime.Now;
+
             var heaterIdToCountedSeconds = heaterIds.ToDictionary(x => x,
                                                                   x =>
                                                                   {
                                                                       var savedCounterValue = DictionaryExtensions.GetValueOrDefault(heatersCounters, x)?.CountedSeconds ?? 0;
-                                                                      // TODO - add current, not saved yet value
-                                                                      return savedCounterValue;
+                                                                      var heaterState = state.HeaterIdToState[x];
+                                                                      var currentCounterValue = heaterState.OutputState ? (int)(now - heaterState.LastStateChange).TotalSeconds : 0;
+
+                                                                      return savedCounterValue + currentCounterValue;
                                                                   });
 
             var usageUnitToHeaters = building.Heaters
@@ -89,7 +93,7 @@ namespace HeatingControl.Application.Queries
                    {
                        LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.Start) : (DateTime?)null,
                        UsageUnitToValue = usageUnitToHeaters.ToDictionary(x => x.Key,
-                                                                          x => x.Sum(h => h.UsagePerHour * (float)heaterIdToCountedSeconds[h.HeaterId] / 3600f))
+                                                                          x => x.Sum(h => h.UsagePerHour * heaterIdToCountedSeconds[h.HeaterId] / 3600f))
                    };
         }
 
