@@ -1,8 +1,8 @@
-﻿using Commons;
+﻿using System.Collections.Generic;
+using Commons;
 using HardwareAccess.Devices;
-using System.Collections.Generic;
 
-namespace HardwareAccess.DummyDevices
+namespace HardwareAccess.Dummy.Devices
 {
     public class PowerOutput : IPowerOutput
     {

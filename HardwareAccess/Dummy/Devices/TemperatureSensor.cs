@@ -1,9 +1,9 @@
-﻿using HardwareAccess.Devices;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using HardwareAccess.Devices;
 
-namespace HardwareAccess.DummyDevices
+namespace HardwareAccess.Dummy.Devices
 {
     public class TemperatureSensor : ITemperatureSensor
     {

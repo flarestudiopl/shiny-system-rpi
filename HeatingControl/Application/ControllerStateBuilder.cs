@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Commons;
+﻿using Commons;
 using Commons.Extensions;
 using HardwareAccess.Devices;
 using Domain.BuildingModel;

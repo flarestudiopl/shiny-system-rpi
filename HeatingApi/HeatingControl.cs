@@ -5,6 +5,7 @@ using Commons;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
 using Domain.BuildingModel;
+using HeatingControl.Application.Commands;
 using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
@@ -24,6 +25,7 @@ namespace HeatingApi
 
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IControllerStateBuilder _controllerStateBuilder;
+        private readonly IDisableAllOutputsExecutor _disableAllOutputsExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
@@ -33,12 +35,14 @@ namespace HeatingApi
 
         public HeatingControl(IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
+                              IDisableAllOutputsExecutor disableAllOutputsExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
                               IOutputStateProcessingLoop outputStateProcessingLoop)
         {
             _buildingModelProvider = buildingModelProvider;
             _controllerStateBuilder = controllerStateBuilder;
+            _disableAllOutputsExecutor = disableAllOutputsExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
@@ -48,6 +52,10 @@ namespace HeatingApi
         {
             Model = _buildingModelProvider.Provide();
             State = _controllerStateBuilder.Build(Model);
+
+            Logger.Info("Disabling all outputs...");
+
+            _disableAllOutputsExecutor.Execute(Model);
 
             Logger.Info("Starting control loops...");
 
@@ -65,6 +73,10 @@ namespace HeatingApi
                 Logger.Info("Sending cancellation to control loops...");
 
                 _cancellationTokenSource.Cancel();
+
+                Logger.Info("Disabling all outputs...");
+
+                _disableAllOutputsExecutor.Execute(Model);
             }
         }
 

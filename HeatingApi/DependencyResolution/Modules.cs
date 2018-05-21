@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using HardwareAccess.Buses;
 using HardwareAccess.Buses.PlatformIntegration;
+using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
@@ -15,7 +15,12 @@ namespace HeatingApi.DependencyResolution
         public static void Register(ContainerBuilder builder)
         {
             RegisterPersistence(builder);
+
+#if DEBUG
+            RegisterDummyHardwareAccess(builder);
+#else
             RegisterHardwareAccess(builder);
+#endif
             RegisterControl(builder);
         }
 
@@ -39,13 +44,18 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<I2c>().As<II2c>().SingleInstance();
 
             // Devices
-#if DEBUG
-            builder.RegisterType<HardwareAccess.DummyDevices.PowerOutput>().As<IPowerOutput>().SingleInstance();
-            builder.RegisterType<HardwareAccess.DummyDevices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
-#else
             builder.RegisterType<PowerOutput>().As<IPowerOutput>().SingleInstance();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
-#endif
+        }
+
+        private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
+        {
+            // Buses
+            builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
+
+            // Devices
+            builder.RegisterType<HardwareAccess.Dummy.Devices.PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)
