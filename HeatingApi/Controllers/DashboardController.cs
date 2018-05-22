@@ -1,6 +1,7 @@
 ﻿using Domain.BuildingModel;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
@@ -10,6 +11,7 @@ namespace HeatingApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("/api/dashboard")]
+    [Authorize]
     public class DashboardController : Controller
     {
         private readonly IHeatingControl _heatingControl;

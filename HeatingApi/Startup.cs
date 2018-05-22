@@ -2,13 +2,16 @@
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Autofac;
 using HeatingApi.DependencyResolution;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -36,9 +39,33 @@ namespace HeatingApi
                                        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
                                        c.IncludeXmlComments(xmlPath);
+
+                                       c.AddSecurityDefinition("Bearer",
+                                                               new ApiKeyScheme
+                                                               {
+                                                                   In = "header",
+                                                                   Name = "Authorization",
+                                                                   Type = "apiKey"
+                                                               });
                                    });
 
             services.AddSingleton(Configuration);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                                  {
+                                      options.TokenValidationParameters = new TokenValidationParameters
+                                                                          {
+                                                                              ValidateIssuer = true,
+                                                                              ValidateAudience = true,
+                                                                              RequireExpirationTime = true,
+                                                                              ValidateLifetime = true,
+                                                                              ValidateIssuerSigningKey = true,
+                                                                              ValidIssuer = Configuration["Jwt:Issuer"],
+                                                                              ValidAudience = Configuration["Jwt:Issuer"],
+                                                                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                                                                          };
+                                  });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -54,6 +81,8 @@ namespace HeatingApi
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "HeatingAPI v1"); });
 
             app.UseExceptionHandler(ExceptionHandler);
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }
