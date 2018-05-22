@@ -66,6 +66,16 @@ namespace HeatingApi
                                                                               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                                                                           };
                                   });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                .Build());
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -82,9 +92,17 @@ namespace HeatingApi
 
             app.UseExceptionHandler(ExceptionHandler);
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseAuthentication();
 
-            app.UseMvc();
+            app.UseCors("CorsPolicy");
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute("Spa", "{*url}", defaults: new { controller = "Home", action = "Spa" });
+            });
         }
 
         private static void ExceptionHandler(IApplicationBuilder options)

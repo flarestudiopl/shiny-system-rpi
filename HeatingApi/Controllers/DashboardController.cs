@@ -11,7 +11,7 @@ namespace HeatingApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("/api/dashboard")]
-    [Authorize]
+    //[Authorize]
     public class DashboardController : Controller
     {
         private readonly IHeatingControl _heatingControl;
