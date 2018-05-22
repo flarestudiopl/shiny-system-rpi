@@ -60,7 +60,7 @@ namespace HeatingControl.Application.Queries
                        Temperatures = GetTemperatureSettings(zone),
                        Schedule = zone.Zone
                                       .Schedule
-                                      .OrderBy(x => x.DayOfWeek)
+                                      .OrderBy(x => x.DaysOfWeek.First())
                                       .ThenBy(x => x.BeginTime)
                                       .ToList()
                    };

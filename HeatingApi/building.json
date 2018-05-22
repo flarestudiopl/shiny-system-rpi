@@ -7,7 +7,30 @@
       "HeaterIds": [
         11
       ],
-      "Schedule": [],
+      "Schedule": [
+        {
+          "ScheduleItemId": 1,
+          "DaysOfWeek": [
+            0,
+            1,
+            2
+          ],
+          "BeginTime": "12:00:00",
+          "EndTime": "16:00:00",
+          "SetPoint": 18.0
+        },
+        {
+          "ScheduleItemId": 2,
+          "DaysOfWeek": [
+            0,
+            1,
+            2
+          ],
+          "BeginTime": "16:00:00",
+          "EndTime": "17:00:00",
+          "SetPoint": 28.0
+        }
+      ],
       "TemperatureControlledZone": {
         "TemperatureSensorId": 21,
         "LowSetPoint": 20.0,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.BuildingModel
 {
@@ -6,7 +7,7 @@ namespace Domain.BuildingModel
     {
         public int ScheduleItemId { get; set; }
 
-        public DayOfWeek DayOfWeek { get; set; }
+        public ICollection<DayOfWeek> DaysOfWeek { get; set; }
 
         public TimeSpan BeginTime { get; set; }
 

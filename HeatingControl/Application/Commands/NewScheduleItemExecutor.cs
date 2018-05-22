@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Commons;
 using Domain.BuildingModel;
@@ -15,7 +16,7 @@ namespace HeatingControl.Application.Commands
     public class NewScheduleItemExecutorInput
     {
         public int ZoneId { get; set; }
-        public DayOfWeek DayOfWeek { get; set; }
+        public ICollection<DayOfWeek> DaysOfWeek { get; set; }
         public TimeSpan BeginTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public float? SetPoint { get; set; }
@@ -53,9 +54,9 @@ namespace HeatingControl.Application.Commands
                 return;
             }
 
-            if (zone.Schedule.Any(x => x.DayOfWeek == input.DayOfWeek &&
-                                       (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime ||
-                                        input.EndTime > x.BeginTime && input.EndTime <= x.EndTime)))
+            if (zone.Schedule.Any(x => x.DaysOfWeek.Any(d => input.DaysOfWeek.Contains(d) &&
+                                                             (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime ||
+                                                              input.EndTime > x.BeginTime && input.EndTime <= x.EndTime))))
             {
                 Logger.Warning("Given schedule parameters overlaps existing item.");
 
@@ -67,7 +68,7 @@ namespace HeatingControl.Application.Commands
             var newScheduleItem = new ScheduleItem
                                   {
                                       ScheduleItemId = (lastScheduleItem?.ScheduleItemId ?? 0) + 1,
-                                      DayOfWeek = input.DayOfWeek,
+                                      DaysOfWeek = input.DaysOfWeek,
                                       BeginTime = input.BeginTime,
                                       EndTime = input.EndTime,
                                       SetPoint = input.SetPoint
