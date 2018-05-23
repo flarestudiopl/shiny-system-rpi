@@ -1,7 +1,6 @@
 ﻿using Domain.BuildingModel;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
@@ -9,10 +8,8 @@ namespace HeatingApi.Controllers
     /// <summary>
     /// Controller for dashboard.
     /// </summary>
-    [Produces("application/json")]
     [Route("/api/dashboard")]
-    //[Authorize]
-    public class DashboardController : Controller
+    public class DashboardController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IDashboardSnapshotProvider _dashboardSnapshotProvider;
@@ -79,7 +76,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("zone/{zoneId}/resetCounters")]
         public void ResetCounters(int zoneId)
         {
-            _counterResetExecutor.Execute(zoneId, /* TODO */ -1, _heatingControl.State);
+            _counterResetExecutor.Execute(zoneId, UserId, _heatingControl.State);
         }
 
         /// <summary>

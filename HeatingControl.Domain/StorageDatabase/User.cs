@@ -12,9 +12,9 @@ namespace Domain.StorageDatabase
 
         public string LastSeenIpAddress { get; set; }
 
-        public long? LastLogonDateTime { get; set; }
+        public long LastLogonDateTime { get; set; }
 
-        public DateTime? LastLogon => DomainModelHelpers.ParseDateTime(LastLogonDateTime);
+        public DateTime LastLogon => DomainModelHelpers.ParseDateTime(LastLogonDateTime);
 
         public int IsActiveBool { get; set; }
 

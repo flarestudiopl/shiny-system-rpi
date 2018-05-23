@@ -6,9 +6,8 @@ using Storage.BuildingModel;
 namespace HeatingApi.Controllers
 {
     [Obsolete]
-    [Produces("application/json")]
     [Route("/api/setup")]
-    public class SetupController : Controller
+    public class SetupController : BaseController
     {
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;

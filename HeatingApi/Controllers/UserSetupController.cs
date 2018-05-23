@@ -7,9 +7,8 @@ namespace HeatingApi.Controllers
     /// <summary>
     /// Controller for settings views
     /// </summary>
-    [Produces("application/json")]
     [Route("/api/setup/user")]
-    public class UserSetupController : Controller
+    public class UserSetupController : BaseController
     {
         private readonly IUserListProvider _userListProvider;
         private readonly INewUserExecutor _newUserExecutor;
@@ -33,13 +32,13 @@ namespace HeatingApi.Controllers
         [HttpPost]
         public void AddUser([FromBody] NewUserExecutorInput input)
         {
-            _newUserExecutor.Execute(input, /* TODO */ -1);
+            _newUserExecutor.Execute(input, UserId);
         }
 
         [HttpDelete("{userId}")]
         public void DeleteUser(int userId)
         {
-            _removeUserExecutor.Execute(userId, /* TODO */ -1);
+            _removeUserExecutor.Execute(userId, UserId);
         }
     }
 }

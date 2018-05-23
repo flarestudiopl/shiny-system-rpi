@@ -8,9 +8,8 @@ namespace HeatingApi.Controllers
     /// <summary>
     /// Controller for settings views
     /// </summary>
-    [Produces("application/json")]
     [Route("/api/setup/zone")]
-    public class ZoneSetupController : Controller
+    public class ZoneSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneListProvider _zoneListProvider;

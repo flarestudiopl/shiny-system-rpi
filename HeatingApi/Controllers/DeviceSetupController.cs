@@ -5,9 +5,8 @@ namespace HeatingApi.Controllers
     /// <summary>
     /// Controller for settings views
     /// </summary>
-    [Produces("application/json")]
     [Route("/api/setup/device")]
-    public class DeviceSetupController : Controller
+    public class DeviceSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
 

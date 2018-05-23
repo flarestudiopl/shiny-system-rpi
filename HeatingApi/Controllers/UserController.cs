@@ -1,26 +1,30 @@
 ﻿using Commons.Extensions;
-using HeatingControl.Application.Queries;
+using HeatingControl.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
 {
-    [Produces("application/json")]
     [Route("/api/user")]
-    public class UserController : Controller
+    public class UserController : BaseController
     {
-        private readonly IJwtTokenProvider _jwtTokenProvider;
+        private readonly IAuthenticateUserExecutor _authenticateUserExecutor;
 
-        public UserController(IJwtTokenProvider jwtTokenProvider)
+        public UserController(IAuthenticateUserExecutor authenticateUserExecutor)
         {
-            _jwtTokenProvider = jwtTokenProvider;
+            _authenticateUserExecutor = authenticateUserExecutor;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult IssueToken([FromBody] JwtTokenProviderInput input)
+        public IActionResult IssueToken(string login, string password)
         {
-            var token = _jwtTokenProvider.Provide(input);
+            var token = _authenticateUserExecutor.Execute(new AuthenticateUserExecutorInput
+            {
+                Login = login,
+                Password = password,
+                IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+            });
 
             if (token.IsNullOrEmpty())
             {

@@ -21,19 +21,22 @@ namespace Storage.StorageDatabase.User
         {
             const string query = @"
 INSERT INTO [User]
-([Login], [PasswordHash], [CreatedDateTime], [CreatedBy])
+([Login], [PasswordHash], [CreatedDateTime], [CreatedBy], [LastLogonDateTime])
 VALUES
-(@Login, @PasswordHash, @CreatedDateTime, @CreatedBy)";
+(@Login, @PasswordHash, @CreatedDateTime, @CreatedBy, @LastLogonDateTime)";
 
             using (var connection = _sqlConnectionResolver.Resolve())
             {
+                var now = DateTime.Now.Ticks;
+
                 connection.Execute(query,
                                    new
                                    {
                                        Login = login,
                                        PasswordHash = passwordHash,
-                                       CreatedDateTime = DateTime.Now.Ticks,
-                                       CreatedBy = createdByUserId
+                                       CreatedDateTime = now,
+                                       CreatedBy = createdByUserId,
+                                       LastLogonDateTime = now
                                    });
             }
         }

@@ -87,16 +87,11 @@ namespace HeatingApi
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseSwagger();
-
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "HeatingAPI v1"); });
-
             app.UseExceptionHandler(ExceptionHandler);
-
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
             app.UseAuthentication();
-
             app.UseCors("CorsPolicy");
 
             app.UseMvc(routes =>
