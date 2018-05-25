@@ -68,14 +68,13 @@ namespace HeatingApi
                                   });
 
             services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials()
-                .Build());
-            });
+                             {
+                                 options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
+                                                                                   .AllowAnyMethod()
+                                                                                   .AllowAnyHeader()
+                                                                                   .AllowCredentials()
+                                                                                   .Build());
+                             });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -93,11 +92,7 @@ namespace HeatingApi
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute("Spa", "{*url}", defaults: new { controller = "Home", action = "Spa" });
-            });
+            app.UseMvc(routes => { routes.MapRoute("Spa", "{*url}", new { controller = "Home", action = "Spa" }); });
         }
 
         private static void ExceptionHandler(IApplicationBuilder options)

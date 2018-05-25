@@ -1,5 +1,4 @@
-﻿using System;
-using HeatingControl.Application.Commands;
+﻿using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,16 +14,19 @@ namespace HeatingApi.Controllers
         private readonly IZoneListProvider _zoneListProvider;
         private readonly IZoneSettingsProvider _zoneSettingsProvider;
         private readonly ISaveZoneExecutor _saveZoneExecutor;
+        private readonly IRemoveZoneExecutor _removeZoneExecutor;
 
         public ZoneSetupController(IHeatingControl heatingControl,
                                    IZoneListProvider zoneListProvider,
                                    IZoneSettingsProvider zoneSettingsProvider,
-                                   ISaveZoneExecutor saveZoneExecutor)
+                                   ISaveZoneExecutor saveZoneExecutor,
+                                   IRemoveZoneExecutor removeZoneExecutor)
         {
             _heatingControl = heatingControl;
             _zoneListProvider = zoneListProvider;
             _zoneSettingsProvider = zoneSettingsProvider;
             _saveZoneExecutor = saveZoneExecutor;
+            _removeZoneExecutor = removeZoneExecutor;
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("{zoneId}")]
         public void RemoveZone(int zoneId)
         {
-            throw new NotImplementedException();
+            _removeZoneExecutor.Execute(zoneId, _heatingControl.Model, _heatingControl.State);
         }
     }
 }

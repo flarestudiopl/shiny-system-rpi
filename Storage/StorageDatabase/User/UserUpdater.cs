@@ -37,8 +37,8 @@ WHERE [UserId] = @UserId";
                 connection.Execute(query,
                                    new
                                    {
-                                       UserId = input.UserId,
-                                       LastSeenIpAddress = input.LastSeenIpAddress,
+                                       input.UserId,
+                                       input.LastSeenIpAddress,
                                        LastLogonDateTime = input.LastLogonDate.Ticks
                                    });
             }

@@ -17,7 +17,6 @@ namespace HeatingControl.Application.Queries
         public ICollection<SensorData> TemperatureSensors { get; set; }
         public ICollection<int> HeaterIds { get; set; }
         public ICollection<HeaterData> Heaters { get; set; }
-        public int OutputRoundRobinIntervalMinutes { get; set; } // TODO
     }
 
     public class ZoneSettingsProvider : IZoneSettingsProvider

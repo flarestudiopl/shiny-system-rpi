@@ -51,6 +51,7 @@ namespace HeatingApi.DependencyResolution
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
         {
             // Buses
+            builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
 
             // Devices

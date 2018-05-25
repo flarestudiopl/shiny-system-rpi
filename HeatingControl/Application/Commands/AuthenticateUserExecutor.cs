@@ -49,11 +49,11 @@ namespace HeatingControl.Application.Commands
             }
 
             _userUpdater.Update(new UserUpdaterInput
-            {
-                UserId = user.UserId,
-                LastLogonDate = DateTime.Now,
-                LastSeenIpAddress = input.IpAddress
-            });
+                                {
+                                    UserId = user.UserId,
+                                    LastLogonDate = DateTime.Now,
+                                    LastSeenIpAddress = input.IpAddress
+                                });
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
@@ -61,7 +61,7 @@ namespace HeatingControl.Application.Commands
 
             var token = new JwtSecurityToken(issuer,
                                              issuer,
-                                             claims: new List<Claim> { new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()) },
+                                             new List<Claim> { new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()) },
                                              expires: DateTime.Now.AddMinutes(TokenLifetimeMinutes),
                                              signingCredentials: signingCredentials);
 

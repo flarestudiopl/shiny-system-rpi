@@ -20,11 +20,11 @@ namespace HeatingApi.Controllers
         public IActionResult IssueToken(string login, string password)
         {
             var token = _authenticateUserExecutor.Execute(new AuthenticateUserExecutorInput
-            {
-                Login = login,
-                Password = password,
-                IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
-            });
+                                                          {
+                                                              Login = login,
+                                                              Password = password,
+                                                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                                                          });
 
             if (token.IsNullOrEmpty())
             {

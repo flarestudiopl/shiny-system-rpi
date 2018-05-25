@@ -46,21 +46,27 @@ namespace HeatingControl.Application.Queries
                                             {
                                                 var zone = x.Zone;
 
-                                                return new ZoneListProviderOutput.ZoneListItem
-                                                       {
-                                                           Id = zone.ZoneId,
-                                                           Name = zone.Name,
-                                                           HeaterNames = zone
-                                                                        .HeaterIds
-                                                                        .Select(h => state.HeaterIdToState[h].Heater.Name)
-                                                                        .ToList(),
-                                                           TemperatureSensorName = building.TemperatureSensors
-                                                                                           .First(t => t.TemperatureSensorId == zone.TemperatureControlledZone.TemperatureSensorId)
-                                                                                           .Name,
-                                                           TotalPowerFormatted = _zonePowerProvider.Provide(zone.ZoneId, state)
-                                                                                                   .Select(h => $"{h.Value} {Enum.GetName(typeof(UsageUnit), h.Key)}")
-                                                                                                   .JoinWith(", ")
-                                                       };
+                                                var zoneListItem = new ZoneListProviderOutput.ZoneListItem
+                                                                   {
+                                                                       Id = zone.ZoneId,
+                                                                       Name = zone.Name,
+                                                                       HeaterNames = zone
+                                                                                    .HeaterIds
+                                                                                    .Select(h => state.HeaterIdToState[h].Heater.Name)
+                                                                                    .ToList(),
+                                                                       TotalPowerFormatted = _zonePowerProvider.Provide(zone.ZoneId, state)
+                                                                                                               .Select(h => $"{h.Value} {Enum.GetName(typeof(UsageUnit), h.Key)}")
+                                                                                                               .JoinWith(", ")
+                                                                   };
+
+                                                if (zone.TemperatureControlledZone != null)
+                                                {
+                                                    zoneListItem.TemperatureSensorName = building.TemperatureSensors
+                                                                                                 .First(t => t.TemperatureSensorId == zone.TemperatureControlledZone.TemperatureSensorId)
+                                                                                                 .Name;
+                                                }
+
+                                                return zoneListItem;
                                             }).ToList()
                    };
         }
