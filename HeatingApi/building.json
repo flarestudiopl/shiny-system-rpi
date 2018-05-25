@@ -79,14 +79,13 @@
   "PowerZones": [
     {
       "PowerZoneId": 1200,
-      "Name": "Max 3kW",
+      "Name": "wyedytowana mocna strefa",
       "HeaterIds": [
-        11,
-        12
+        11
       ],
-      "MaxUsage": 3.0,
+      "MaxUsage": 2.5,
       "UsageUnit": 3,
-      "RoundRobinIntervalMinutes": 1
+      "RoundRobinIntervalMinutes": 2
     }
   ],
   "ControlLoopIntervalSecondsMilliseconds": 1500

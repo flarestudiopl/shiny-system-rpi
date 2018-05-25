@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,14 +11,20 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IPowerZoneListProvider _powerZoneListProvider;
         private readonly IPowerZoneSettingsProvider _powerZoneSettingsProvider;
+        private readonly ISavePowerZoneExecutor _savePowerZoneExecutor;
+        private readonly IRemovePowerZoneExecutor _removePowerZoneExecutor;
 
         public PowerZoneSetupController(IHeatingControl heatingControl,
                                         IPowerZoneListProvider powerZoneListProvider,
-                                        IPowerZoneSettingsProvider powerZoneSettingsProvider)
+                                        IPowerZoneSettingsProvider powerZoneSettingsProvider,
+                                        ISavePowerZoneExecutor savePowerZoneExecutor,
+                                        IRemovePowerZoneExecutor removePowerZoneExecutor)
         {
             _heatingControl = heatingControl;
             _powerZoneListProvider = powerZoneListProvider;
             _powerZoneSettingsProvider = powerZoneSettingsProvider;
+            _savePowerZoneExecutor = savePowerZoneExecutor;
+            _removePowerZoneExecutor = removePowerZoneExecutor;
         }
 
         /// <summary>
@@ -33,28 +39,28 @@ namespace HeatingApi.Controllers
         /// <summary>
         /// Provides data for power zone settings editor.
         /// </summary>
-        [HttpGet("{zoneId}")]
-        public PowerZoneSettingsProviderResult GetPowerZoneSettings(int zoneId)
+        [HttpGet("{powerZoneId}")]
+        public PowerZoneSettingsProviderResult GetPowerZoneSettings(int powerZoneId)
         {
-            return _powerZoneSettingsProvider.Provide(zoneId, _heatingControl.State);
+            return _powerZoneSettingsProvider.Provide(powerZoneId, _heatingControl.State);
         }
 
         /// <summary>
         /// Saves new or existing power zone. Power zone settings editor should post data here.
         /// </summary>
         [HttpPost]
-        public void SavePowerZoneSettings()
+        public void SavePowerZoneSettings([FromBody] SavePowerZoneExecutorInput input)
         {
-            // TODO
+            _savePowerZoneExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
         }
 
         /// <summary>
         /// Allows to remove power zone. To be used by power zone settings grid (or editor).
         /// </summary>
-        [HttpDelete("{zoneId}")]
-        public void RemovePowerZone(int zoneId)
+        [HttpDelete("{powerZoneId}")]
+        public void RemovePowerZone(int powerZoneId)
         {
-            throw new NotImplementedException();
+            _removePowerZoneExecutor.Execute(powerZoneId, _heatingControl.State, _heatingControl.Model);
         }
     }
 }

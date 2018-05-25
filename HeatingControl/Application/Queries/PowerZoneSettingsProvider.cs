@@ -17,9 +17,17 @@ namespace HeatingControl.Application.Queries
         public float PowerLimitValue { get; set; }
         public UsageUnit PowerLimitUnit { get; set; }
         public IDictionary<int, string> PowerLimitUnits { get; set; }
-        public ICollection<int> AffectedHeaterIds { get; set; }
-        public ICollection<HeaterData> Heaters { get; set; }
+        public ICollection<int> AffectedHeatersIds { get; set; }
+        public ICollection<AffectedHeaterData> Heaters { get; set; }
         public int RoundRobinIntervalMinutes { get; set; }
+
+        public class AffectedHeaterData
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Assignment { get; set; }
+            public UsageUnit PowerUnit { get; set; }
+        }
     }
 
     public class PowerZoneSettingsProvider : IPowerZoneSettingsProvider
@@ -41,19 +49,19 @@ namespace HeatingControl.Application.Queries
                        PowerLimitValue = powerZoneModel.MaxUsage,
                        PowerLimitUnit = powerZoneModel.UsageUnit,
                        PowerLimitUnits = EnumExtensions.AsDictionary<UsageUnit>(),
-                       AffectedHeaterIds = powerZoneModel.HeaterIds,
+                       AffectedHeatersIds = powerZoneModel.HeaterIds,
                        Heaters = controllerState.HeaterIdToState
                                                 .Values
-                                                .Select(x => new HeaterData
+                                                .Select(x => new PowerZoneSettingsProviderResult.AffectedHeaterData
                                                              {
                                                                  Id = x.Heater.HeaterId,
                                                                  Name = x.Heater.Name,
-                                                                 OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState,
                                                                  Assignment = controllerState.PowerZoneIdToState
                                                                                              .Select(z => z.Value.PowerZone)
                                                                                              .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId) &&
                                                                                                          z.PowerZoneId != powerZoneId)
-                                                                                             .Select(z => z.Name).JoinWith(", ")
+                                                                                             .Select(z => z.Name).JoinWith(", "),
+                                                                 PowerUnit = x.Heater.UsageUnit
                                                              })
                                                 .ToList(),
                        RoundRobinIntervalMinutes = powerZoneModel.RoundRobinIntervalMinutes
