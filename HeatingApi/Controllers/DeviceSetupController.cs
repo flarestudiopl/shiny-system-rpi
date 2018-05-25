@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using HardwareAccess.Buses;
-using HardwareAccess.Devices;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -17,20 +16,25 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IBuildingDevicesProvider _buildingDevicesProvider;
         private readonly IUpdateBuildingExecutor _updateBuildingExecutor;
-        private readonly ITemperatureSensor _temperatureSensor;
+        private readonly IConnectedTemperatureSensorsProvider _connectedTemperatureSensorsProvider;
+        private readonly ISaveTemperatureSensorExecutor _saveTemperatureSensorExecutor;
+        private readonly IRemoveTemperatureSensorExecutor _removeTemperatureSensorExecutor;
         private readonly II2c _i2C;
-        private readonly IPowerOutput _powerOutput;
 
         public DeviceSetupController(IHeatingControl heatingControl,
                                      IBuildingDevicesProvider buildingDevicesProvider,
                                      IUpdateBuildingExecutor updateBuildingExecutor,
-                                     ITemperatureSensor temperatureSensor,
+                                     IConnectedTemperatureSensorsProvider connectedTemperatureSensorsProvider,
+                                     ISaveTemperatureSensorExecutor saveTemperatureSensorExecutor,
+                                     IRemoveTemperatureSensorExecutor removeTemperatureSensorExecutor,
                                      II2c i2c)
         {
             _heatingControl = heatingControl;
             _buildingDevicesProvider = buildingDevicesProvider;
             _updateBuildingExecutor = updateBuildingExecutor;
-            _temperatureSensor = temperatureSensor;
+            _connectedTemperatureSensorsProvider = connectedTemperatureSensorsProvider;
+            _saveTemperatureSensorExecutor = saveTemperatureSensorExecutor;
+            _removeTemperatureSensorExecutor = removeTemperatureSensorExecutor;
             _i2C = i2c;
         }
 
@@ -51,16 +55,22 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("connectedTemperatureSensors")]
-        public ICollection<string> GetConnectedTemperetureSensors()
+        public ICollection<ConnectedTemperatureSensor> GetConnectedTemperetureSensors()
         {
-            return _temperatureSensor.GetAvailableSensors();
+            return _connectedTemperatureSensorsProvider.Provide(_heatingControl.Model);
         }
 
         [HttpPost("temperatureSensor")]
-        public void AddTemperatureSensor(){}
+        public void AddTemperatureSensor(SaveTemperatureSensorExecutorInput input)
+        {
+            _saveTemperatureSensorExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
+        }
 
         [HttpDelete("temperatureSensor/{id}")]
-        public void RemoveTemperatureSensor(int id){}
+        public void RemoveTemperatureSensor(int id)
+        {
+            _removeTemperatureSensorExecutor.Execute(id, _heatingControl.State, _heatingControl.Model);
+        }
 
         [HttpGet("connectedHeaterModules")]
         public async Task<IList<int>> GetAvailableHeaterModules()

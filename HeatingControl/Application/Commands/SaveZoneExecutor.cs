@@ -142,7 +142,7 @@ namespace HeatingControl.Application.Commands
             }
             else
             {
-                zone.ZoneId = controllerState.ZoneIdToState.Keys.Max() + 1;
+                zone.ZoneId = (controllerState.ZoneIdToState.Keys.Any() ? controllerState.ZoneIdToState.Keys.Max() : 0) + 1;
             }
 
             return zone;
