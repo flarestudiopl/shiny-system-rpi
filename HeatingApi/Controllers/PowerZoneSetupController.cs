@@ -10,18 +10,21 @@ namespace HeatingApi.Controllers
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IPowerZoneListProvider _powerZoneListProvider;
+        private readonly INewPowerZoneOptionsProvider _newPowerZoneOptionsProvider;
         private readonly IPowerZoneSettingsProvider _powerZoneSettingsProvider;
         private readonly ISavePowerZoneExecutor _savePowerZoneExecutor;
         private readonly IRemovePowerZoneExecutor _removePowerZoneExecutor;
 
         public PowerZoneSetupController(IHeatingControl heatingControl,
                                         IPowerZoneListProvider powerZoneListProvider,
+                                        INewPowerZoneOptionsProvider newPowerZoneOptionsProvider,
                                         IPowerZoneSettingsProvider powerZoneSettingsProvider,
                                         ISavePowerZoneExecutor savePowerZoneExecutor,
                                         IRemovePowerZoneExecutor removePowerZoneExecutor)
         {
             _heatingControl = heatingControl;
             _powerZoneListProvider = powerZoneListProvider;
+            _newPowerZoneOptionsProvider = newPowerZoneOptionsProvider;
             _powerZoneSettingsProvider = powerZoneSettingsProvider;
             _savePowerZoneExecutor = savePowerZoneExecutor;
             _removePowerZoneExecutor = removePowerZoneExecutor;
@@ -34,6 +37,12 @@ namespace HeatingApi.Controllers
         public ICollection<PowerZoneListItem> GetPowerZoneList()
         {
             return _powerZoneListProvider.Provide(_heatingControl.Model, _heatingControl.State);
+        }
+
+        [HttpGet("new")]
+        public NewPowerZoneOptionsProviderResult GetAvailableDevices()
+        {
+            return _newPowerZoneOptionsProvider.Provide(_heatingControl.State, _heatingControl.Model);
         }
 
         /// <summary>
