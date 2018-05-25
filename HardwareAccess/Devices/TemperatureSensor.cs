@@ -1,4 +1,5 @@
-﻿using Commons;
+﻿using System;
+using Commons;
 using HardwareAccess.Buses;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace HardwareAccess.Devices
 
     public class TemperatureSensor : ITemperatureSensor
     {
-        private static string[] SupportedDevicesPrefix = new[] { "10", "28" };
+        private static readonly string[] SupportedDevicesPrefix = { "10", "28" };
 
         private readonly IOneWire _oneWire;
 
@@ -38,17 +39,17 @@ namespace HardwareAccess.Devices
 
         public async Task<TemperatureSensorData> Read(string deviceId)
         {
-            if (SupportedDevicesPrefix.Any(x => deviceId.StartsWith(x)))
+            if (SupportedDevicesPrefix.Any(deviceId.StartsWith))
             {
                 var rawData = await _oneWire.GetDeviceData(deviceId);
-                var indexOfTemp = rawData.IndexOf("t=") + 2;
+                var indexOfTemp = rawData.IndexOf("t=", StringComparison.Ordinal) + 2;
 
                 if (indexOfTemp > 2)
                 {
                     var result = new TemperatureSensorData
-                    {
-                        CrcOk = rawData.Contains("YES") && !rawData.Contains("00 00 00 00 00 00 00 00 00")
-                    };
+                                 {
+                                     CrcOk = rawData.Contains("YES") && !rawData.Contains("00 00 00 00 00 00 00 00 00")
+                                 };
 
                     if (int.TryParse(rawData.Substring(indexOfTemp, rawData.Length - (indexOfTemp + 1)), out int temp))
                     {
