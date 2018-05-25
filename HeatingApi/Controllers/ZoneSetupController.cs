@@ -12,18 +12,21 @@ namespace HeatingApi.Controllers
     {
         private readonly IHeatingControl _heatingControl;
         private readonly IZoneListProvider _zoneListProvider;
+        private readonly INewZoneSettingsProvider _newZoneSettingsProvider;
         private readonly IZoneSettingsProvider _zoneSettingsProvider;
         private readonly ISaveZoneExecutor _saveZoneExecutor;
         private readonly IRemoveZoneExecutor _removeZoneExecutor;
 
         public ZoneSetupController(IHeatingControl heatingControl,
                                    IZoneListProvider zoneListProvider,
+                                   INewZoneSettingsProvider newZoneSettingsProvider,
                                    IZoneSettingsProvider zoneSettingsProvider,
                                    ISaveZoneExecutor saveZoneExecutor,
                                    IRemoveZoneExecutor removeZoneExecutor)
         {
             _heatingControl = heatingControl;
             _zoneListProvider = zoneListProvider;
+            _newZoneSettingsProvider = newZoneSettingsProvider;
             _zoneSettingsProvider = zoneSettingsProvider;
             _saveZoneExecutor = saveZoneExecutor;
             _removeZoneExecutor = removeZoneExecutor;
@@ -36,6 +39,12 @@ namespace HeatingApi.Controllers
         public ZoneListProviderOutput GetZoneList()
         {
             return _zoneListProvider.Provide(_heatingControl.State, _heatingControl.Model);
+        }
+
+        [HttpGet("new")]
+        public NewZoneSettingsProviderResult GetAvailableDevices()
+        {
+            return _newZoneSettingsProvider.Provide(_heatingControl.State, _heatingControl.Model);
         }
 
         /// <summary>
