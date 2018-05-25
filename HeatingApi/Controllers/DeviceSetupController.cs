@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using HardwareAccess.Buses;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +17,7 @@ namespace HeatingApi.Controllers
         private readonly IConnectedTemperatureSensorsProvider _connectedTemperatureSensorsProvider;
         private readonly ISaveTemperatureSensorExecutor _saveTemperatureSensorExecutor;
         private readonly IRemoveTemperatureSensorExecutor _removeTemperatureSensorExecutor;
-        private readonly II2c _i2C;
+        private readonly INewHeaterOptionsProvider _newHeaterOptionsProvider;
         private readonly ISaveHeaterExecutor _saveHeaterExecutor;
         private readonly IRemoveHeaterExecutor _removeHeaterExecutor;
 
@@ -29,7 +27,7 @@ namespace HeatingApi.Controllers
                                      IConnectedTemperatureSensorsProvider connectedTemperatureSensorsProvider,
                                      ISaveTemperatureSensorExecutor saveTemperatureSensorExecutor,
                                      IRemoveTemperatureSensorExecutor removeTemperatureSensorExecutor,
-                                     II2c i2c,
+                                     INewHeaterOptionsProvider newHeaterOptionsProvider,
                                      ISaveHeaterExecutor saveHeaterExecutor,
                                      IRemoveHeaterExecutor removeHeaterExecutor)
         {
@@ -39,7 +37,7 @@ namespace HeatingApi.Controllers
             _connectedTemperatureSensorsProvider = connectedTemperatureSensorsProvider;
             _saveTemperatureSensorExecutor = saveTemperatureSensorExecutor;
             _removeTemperatureSensorExecutor = removeTemperatureSensorExecutor;
-            _i2C = i2c;
+            _newHeaterOptionsProvider = newHeaterOptionsProvider;
             _saveHeaterExecutor = saveHeaterExecutor;
             _removeHeaterExecutor = removeHeaterExecutor;
         }
@@ -78,10 +76,10 @@ namespace HeatingApi.Controllers
             _removeTemperatureSensorExecutor.Execute(temperatureSensorId, _heatingControl.State, _heatingControl.Model);
         }
 
-        [HttpGet("connectedHeaterModules")]
-        public async Task<IList<int>> GetAvailableHeaterModules()
+        [HttpGet("heater/new")]
+        public NewHeaterOptionsProviderResult GetNewHeaterOptions()
         {
-            return await _i2C.GetI2cDevices();
+            return _newHeaterOptionsProvider.Provide();
         }
 
         [HttpPost("heater")]

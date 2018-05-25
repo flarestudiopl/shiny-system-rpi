@@ -35,6 +35,7 @@ namespace HeatingControl.Application.Commands
 
             controllerState.HeaterIdToState.Remove(heaterId);
             model.Heaters.Remove(x=>x.HeaterId == heaterId);
+
             _buildingModelSaver.Save(model);
         }
     }

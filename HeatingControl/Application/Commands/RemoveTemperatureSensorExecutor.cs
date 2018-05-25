@@ -36,7 +36,7 @@ namespace HeatingControl.Application.Commands
 
             controllerState.TemperatureSensorIdToDeviceId.Remove(sensorId);
             model.TemperatureSensors.Remove(x => x.TemperatureSensorId == sensorId);
-
+            
             _buildingModelSaver.Save(model);
         }
     }

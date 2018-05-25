@@ -1,5 +1,5 @@
 ﻿using System;
-using HeatingControl.Application.Commands;
+using System.Collections.Generic;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,24 +8,35 @@ namespace HeatingApi.Controllers
     [Route("/api/setup/powerZone")]
     public class PowerZoneSetupController : BaseController
     {
-        public PowerZoneSetupController()
+        private readonly IHeatingControl _heatingControl;
+        private readonly IPowerZoneListProvider _powerZoneListProvider;
+        private readonly IPowerZoneSettingsProvider _powerZoneSettingsProvider;
+
+        public PowerZoneSetupController(IHeatingControl heatingControl,
+                                        IPowerZoneListProvider powerZoneListProvider,
+                                        IPowerZoneSettingsProvider powerZoneSettingsProvider)
         {
+            _heatingControl = heatingControl;
+            _powerZoneListProvider = powerZoneListProvider;
+            _powerZoneSettingsProvider = powerZoneSettingsProvider;
         }
 
         /// <summary>
         /// Provides list of power zones. To be used by power zone settings grid.
         /// </summary>
         [HttpGet]
-        public void GetPowerZoneList()
+        public ICollection<PowerZoneListItem> GetPowerZoneList()
         {
+            return _powerZoneListProvider.Provide(_heatingControl.Model, _heatingControl.State);
         }
 
         /// <summary>
         /// Provides data for power zone settings editor.
         /// </summary>
         [HttpGet("{zoneId}")]
-        public void GetPowerZoneSettings(int zoneId)
+        public PowerZoneSettingsProviderResult GetPowerZoneSettings(int zoneId)
         {
+            return _powerZoneSettingsProvider.Provide(zoneId, _heatingControl.State);
         }
 
         /// <summary>

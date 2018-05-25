@@ -51,7 +51,7 @@ namespace HeatingControl.Application.Queries
 
             if (zone == null)
             {
-                return new ZoneDetailsProviderResult();
+                return null;
             }
 
             return new ZoneDetailsProviderResult
