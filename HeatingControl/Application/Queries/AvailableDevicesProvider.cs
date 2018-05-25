@@ -4,32 +4,32 @@ using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
 {
-    public interface INewZoneSettingsProvider
+    public interface IAvailableDevicesProvider
     {
-        NewZoneSettingsProviderResult Provide(ControllerState controllerState, Building building);
+        AvailableDevicesProviderResult Provide(ControllerState controllerState, Building building);
     }
 
-    public class NewZoneSettingsProviderResult
+    public class AvailableDevicesProviderResult
     {
         public ICollection<SensorData> TemperatureSensors { get; set; }
         public ICollection<HeaterData> Heaters { get; set; }
     }
 
-    public class NewZoneSettingsProvider : INewZoneSettingsProvider
+    public class AvailableDevicesProvider : IAvailableDevicesProvider
     {
         private readonly IAvailableTemperatureSensorsProvider _availableTemperatureSensorsProvider;
         private readonly IAvailableHeatersProvider _availableHeatersProvider;
 
-        public NewZoneSettingsProvider(IAvailableTemperatureSensorsProvider availableTemperatureSensorsProvider,
+        public AvailableDevicesProvider(IAvailableTemperatureSensorsProvider availableTemperatureSensorsProvider,
                                        IAvailableHeatersProvider availableHeatersProvider)
         {
             _availableTemperatureSensorsProvider = availableTemperatureSensorsProvider;
             _availableHeatersProvider = availableHeatersProvider;
         }
 
-        public NewZoneSettingsProviderResult Provide(ControllerState controllerState, Building building)
+        public AvailableDevicesProviderResult Provide(ControllerState controllerState, Building building)
         {
-            return new NewZoneSettingsProviderResult
+            return new AvailableDevicesProviderResult
                    {
                        TemperatureSensors = _availableTemperatureSensorsProvider.Provide(controllerState, building),
                        Heaters = _availableHeatersProvider.Provide(controllerState)

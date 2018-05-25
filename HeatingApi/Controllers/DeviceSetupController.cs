@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HeatingControl.Application.Queries;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
 {
@@ -9,10 +10,13 @@ namespace HeatingApi.Controllers
     public class DeviceSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
+        private readonly IBuildingDevicesProvider _buildingDevicesProvider;
 
-        public DeviceSetupController(IHeatingControl heatingControl)
+        public DeviceSetupController(IHeatingControl heatingControl,
+                                     IBuildingDevicesProvider buildingDevicesProvider)
         {
             _heatingControl = heatingControl;
+            _buildingDevicesProvider = buildingDevicesProvider;
         }
 
         [HttpPost("buildingName/{name}")]
@@ -21,8 +25,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet]
-        public void GetDevices()
+        public BuildingDevicesProviderResult GetDevices()
         {
+            return _buildingDevicesProvider.Provide(_heatingControl.State, _heatingControl.Model);
         }
 
         [HttpGet("temperatureSensor")]

@@ -17,6 +17,7 @@ namespace HeatingControl.Application.Queries
         public int Id { get; set; }
         public string Name { get; set; }
         public string Assignment { get; set; }
+        public bool OutputState { get; set; }
     }
 
     public class AvailableHeatersProvider : IAvailableHeatersProvider
@@ -39,7 +40,8 @@ namespace HeatingControl.Application.Queries
                                               var heaterData = new HeaterData
                                                                {
                                                                    Id = x.Key,
-                                                                   Name = x.Value.Heater.Name
+                                                                   Name = x.Value.Heater.Name,
+                                                                   OutputState = controllerState.HeaterIdToState[x.Key].OutputState
                                                                };
 
                                               var assignedZones = controllerState.ZoneIdToState

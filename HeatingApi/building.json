@@ -30,6 +30,13 @@
         "ScheduleDefaultSetPoint": 4.0,
         "Hysteresis": 0.5
       }
+    },
+    {
+      "ZoneId": 4,
+      "Name": "pusta strefa",
+      "HeaterIds": [],
+      "Schedule": [],
+      "TemperatureControlledZone": null
     }
   ],
   "Heaters": [
