@@ -20,6 +20,8 @@ namespace HeatingApi.Controllers
         private readonly ISaveTemperatureSensorExecutor _saveTemperatureSensorExecutor;
         private readonly IRemoveTemperatureSensorExecutor _removeTemperatureSensorExecutor;
         private readonly II2c _i2C;
+        private readonly ISaveHeaterExecutor _saveHeaterExecutor;
+        private readonly IRemoveHeaterExecutor _removeHeaterExecutor;
 
         public DeviceSetupController(IHeatingControl heatingControl,
                                      IBuildingDevicesProvider buildingDevicesProvider,
@@ -27,7 +29,9 @@ namespace HeatingApi.Controllers
                                      IConnectedTemperatureSensorsProvider connectedTemperatureSensorsProvider,
                                      ISaveTemperatureSensorExecutor saveTemperatureSensorExecutor,
                                      IRemoveTemperatureSensorExecutor removeTemperatureSensorExecutor,
-                                     II2c i2c)
+                                     II2c i2c,
+                                     ISaveHeaterExecutor saveHeaterExecutor,
+                                     IRemoveHeaterExecutor removeHeaterExecutor)
         {
             _heatingControl = heatingControl;
             _buildingDevicesProvider = buildingDevicesProvider;
@@ -36,6 +40,8 @@ namespace HeatingApi.Controllers
             _saveTemperatureSensorExecutor = saveTemperatureSensorExecutor;
             _removeTemperatureSensorExecutor = removeTemperatureSensorExecutor;
             _i2C = i2c;
+            _saveHeaterExecutor = saveHeaterExecutor;
+            _removeHeaterExecutor = removeHeaterExecutor;
         }
 
         [HttpGet]
@@ -61,15 +67,15 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost("temperatureSensor")]
-        public void AddTemperatureSensor(SaveTemperatureSensorExecutorInput input)
+        public void AddTemperatureSensor([FromBody] SaveTemperatureSensorExecutorInput input)
         {
             _saveTemperatureSensorExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
         }
 
-        [HttpDelete("temperatureSensor/{id}")]
-        public void RemoveTemperatureSensor(int id)
+        [HttpDelete("temperatureSensor/{temperatureSensorId}")]
+        public void RemoveTemperatureSensor(int temperatureSensorId)
         {
-            _removeTemperatureSensorExecutor.Execute(id, _heatingControl.State, _heatingControl.Model);
+            _removeTemperatureSensorExecutor.Execute(temperatureSensorId, _heatingControl.State, _heatingControl.Model);
         }
 
         [HttpGet("connectedHeaterModules")]
@@ -79,10 +85,15 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost("heater")]
-        public void AddHeater(){}
+        public void AddHeater([FromBody] SaveHeaterExecutorInput input)
+        {
+            _saveHeaterExecutor.Execute(input, _heatingControl.State, _heatingControl.Model);
+        }
 
-        [HttpDelete("heater/{id}")]
-        public void RemoveHeater(int id) {}
-
+        [HttpDelete("heater/{heaterId}")]
+        public void RemoveHeater(int heaterId)
+        {
+            _removeHeaterExecutor.Execute(heaterId, _heatingControl.State, _heatingControl.Model);
+        }
     }
 }
