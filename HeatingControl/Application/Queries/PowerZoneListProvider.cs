@@ -13,6 +13,7 @@ namespace HeatingControl.Application.Queries
     public class PowerZoneListItem
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public ICollection<string> AffectedHeatersNames { get; set; }
         public float PowerLimitValue { get; set; }
         public UsageUnit PowerLimitUnit { get; set; }
@@ -25,6 +26,7 @@ namespace HeatingControl.Application.Queries
             return model.PowerZones.Select(x => new PowerZoneListItem
                                                 {
                                                     Id = x.PowerZoneId,
+                                                    Name = x.Name,
                                                     AffectedHeatersNames = x.HeaterIds.Select(h => controllerState.HeaterIdToState[h].Heater.Name).ToList(),
                                                     PowerLimitUnit = x.UsageUnit,
                                                     PowerLimitValue = x.MaxUsage

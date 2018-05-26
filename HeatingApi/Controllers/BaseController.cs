@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace HeatingApi.Controllers
@@ -8,6 +7,14 @@ namespace HeatingApi.Controllers
     //[Authorize]
     public class BaseController : Controller
     {
-        internal int UserId => int.Parse(Request.HttpContext.User.Claims.First(x => x.Type == @"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+        internal int UserId
+        {
+            get
+            {
+                var idFromToken = Request.HttpContext.User.Claims.FirstOrDefault(x => x.Type == @"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+
+                return idFromToken != null ? int.Parse(idFromToken.Value) : -1;
+            }
+        }
     }
 }
