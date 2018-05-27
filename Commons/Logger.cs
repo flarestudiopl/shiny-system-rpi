@@ -11,7 +11,7 @@ namespace Commons
     {
         private const int MaxLastMessages = 10;
 
-        public static Queue<Message> LastMessages { get; } = new Queue<Message>();
+        public static Queue<LoggerMessage> LastMessages { get; } = new Queue<LoggerMessage>();
 
         public static void Error(string message, Exception exception, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
         {
@@ -52,7 +52,7 @@ namespace Commons
         {
             if (severity != Severity.Trace)
             {
-                LastMessages.Enqueue(new Message
+                LastMessages.Enqueue(new LoggerMessage
                                      {
                                          Timestamp = now,
                                          Content = content,
@@ -71,7 +71,7 @@ namespace Commons
             return $"[{callerMember}@{Path.GetFileName(callerFilePath)}:{callerLineNumber}]";
         }
 
-        public class Message
+        public class LoggerMessage
         {
             public DateTime Timestamp { get; set; }
             public string Content { get; set; }

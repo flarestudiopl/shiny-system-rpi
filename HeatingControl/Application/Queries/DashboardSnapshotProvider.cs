@@ -20,7 +20,7 @@ namespace HeatingControl.Application.Queries
         public string BuildingName { get; set; }
         public IDictionary<UsageUnit, float> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
-        public ICollection<Logger.Message> Notifications { get; set; }
+        public ICollection<Logger.LoggerMessage> Notifications { get; set; }
 
         public class ZoneSnapshot
         {
@@ -49,10 +49,13 @@ namespace HeatingControl.Application.Queries
     public class DashboardSnapshotProvider : IDashboardSnapshotProvider
     {
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
+        private readonly ILoggerLastMessagesProvider _loggerLastMessagesProvider;
 
-        public DashboardSnapshotProvider(IZoneTemperatureProvider zoneTemperatureProvider)
+        public DashboardSnapshotProvider(IZoneTemperatureProvider zoneTemperatureProvider,
+                                         ILoggerLastMessagesProvider loggerLastMessagesProvider)
         {
             _zoneTemperatureProvider = zoneTemperatureProvider;
+            _loggerLastMessagesProvider = loggerLastMessagesProvider;
         }
 
         public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state)
@@ -61,7 +64,7 @@ namespace HeatingControl.Application.Queries
                          {
                              BuildingName = model.Name,
                              Time = DateTime.Now,
-                             Notifications = Logger.LastMessages.ToArray(),
+                             Notifications = _loggerLastMessagesProvider.Provide(),
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()
                          };
