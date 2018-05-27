@@ -36,7 +36,7 @@ namespace HeatingApi.Controllers
         /// Provides list of zones. To be used by zone settings grid.
         /// </summary>
         [HttpGet]
-        public ZoneListProviderOutput GetZoneList()
+        public ZoneListProviderResult GetZoneList()
         {
             return _zoneListProvider.Provide(_heatingControl.State, _heatingControl.Model);
         }

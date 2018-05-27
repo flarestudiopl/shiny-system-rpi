@@ -10,10 +10,10 @@ namespace HeatingControl.Application.Queries
 {
     public interface IZoneListProvider
     {
-        ZoneListProviderOutput Provide(ControllerState state, Building building);
+        ZoneListProviderResult Provide(ControllerState state, Building building);
     }
 
-    public class ZoneListProviderOutput
+    public class ZoneListProviderResult
     {
         public ICollection<ZoneListItem> Zones { get; set; }
 
@@ -36,9 +36,9 @@ namespace HeatingControl.Application.Queries
             _zonePowerProvider = zonePowerProvider;
         }
 
-        public ZoneListProviderOutput Provide(ControllerState state, Building building)
+        public ZoneListProviderResult Provide(ControllerState state, Building building)
         {
-            return new ZoneListProviderOutput
+            return new ZoneListProviderResult
                    {
                        Zones = state.ZoneIdToState
                                     .Values
@@ -46,7 +46,7 @@ namespace HeatingControl.Application.Queries
                                             {
                                                 var zone = x.Zone;
 
-                                                var zoneListItem = new ZoneListProviderOutput.ZoneListItem
+                                                var zoneListItem = new ZoneListProviderResult.ZoneListItem
                                                                    {
                                                                        Id = zone.ZoneId,
                                                                        Name = zone.Name,

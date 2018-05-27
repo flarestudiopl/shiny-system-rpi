@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HeatingControl.Application.Commands;
+﻿using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,7 +33,7 @@ namespace HeatingApi.Controllers
         /// Provides list of power zones. To be used by power zone settings grid.
         /// </summary>
         [HttpGet]
-        public ICollection<PowerZoneListItem> GetPowerZoneList()
+        public PowerZoneListProviderResult GetPowerZoneList()
         {
             return _powerZoneListProvider.Provide(_heatingControl.Model, _heatingControl.State);
         }
