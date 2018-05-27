@@ -28,7 +28,7 @@ namespace HeatingControl.Tests.Application.Commands
             {
                 new ScheduleItem
                 {
-                    DayOfWeek = DayOfWeek.Monday,
+                    DaysOfWeek = new List<DayOfWeek> { DayOfWeek.Monday },
                     BeginTime = new TimeSpan(10, 0, 0),
                     EndTime = new TimeSpan(17, 0, 0)
                 }
@@ -49,7 +49,7 @@ namespace HeatingControl.Tests.Application.Commands
             var input = new NewScheduleItemExecutorInput
             {
                 ZoneId = 1,
-                DayOfWeek = DayOfWeek.Monday,
+                DaysOfWeek = new List<DayOfWeek> { DayOfWeek.Monday },
                 BeginTime = new TimeSpan(startHour, 0, 0),
                 EndTime = new TimeSpan(endHour, 0, 0)
             };
