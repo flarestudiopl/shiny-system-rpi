@@ -80,7 +80,7 @@ namespace HeatingControl.Application.Queries
                                                                   {
                                                                       var savedCounterValue = DictionaryExtensions.GetValueOrDefault(heatersCounters, x)?.CountedSeconds ?? 0;
                                                                       var heaterState = state.HeaterIdToState[x];
-                                                                      var currentCounterValue = heaterState.OutputState ? (int)(now - heaterState.LastStateChange).TotalSeconds : 0;
+                                                                      var currentCounterValue = heaterState.OutputState ? (int)(now - heaterState.LastCounterStart).TotalSeconds : 0;
 
                                                                       return savedCounterValue + currentCounterValue;
                                                                   });

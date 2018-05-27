@@ -1,4 +1,5 @@
-﻿using HeatingControl.Models;
+﻿using System;
+using HeatingControl.Models;
 using Storage.StorageDatabase.Counter;
 using Commons.Extensions;
 
@@ -32,6 +33,8 @@ namespace HeatingControl.Application.Commands
 
             foreach (var heaterId in zone.Zone.HeaterIds)
             {
+                controllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.Now;
+
                 _counterResetter.Reset(new CounterResetterInput
                 {
                     HeaterId = heaterId,
