@@ -56,7 +56,8 @@ namespace HeatingControl.Application.Commands
 
             if (zone.Schedule.Any(x => x.DaysOfWeek.Any(d => input.DaysOfWeek.Contains(d) &&
                                                              (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime ||
-                                                              input.EndTime > x.BeginTime && input.EndTime <= x.EndTime))))
+                                                              input.EndTime > x.BeginTime && input.EndTime <= x.EndTime ||
+                                                              input.BeginTime < x.BeginTime && input.EndTime > x.EndTime))))
             {
                 Logger.Warning("Given schedule parameters overlaps existing item.");
 
