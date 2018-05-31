@@ -26,7 +26,19 @@ namespace HeatingControl.Application.Loops.Processing
                 return;
             }
 
+            var now = DateTime.Now;
+
+            var heatersThatCantBeDisabled = controllerState.HeaterIdToState
+                                                           .Where(x => x.Value.OutputState &&
+                                                                       (now - x.Value.LastStateChange).TotalSeconds <= x.Value.Heater.MinimumStateChangeIntervalSeconds);
+
             var totalPower = 0f;
+
+            foreach (var heater in heatersThatCantBeDisabled)
+            {
+                totalPower += heater.Value.Heater.UsagePerHour;
+                requiredHeaterIdToUsage.Remove(heater.Key);
+            }
 
             for (var i = 0; i < requiredHeaterIdToUsage.Count; i++)
             {
@@ -42,8 +54,6 @@ namespace HeatingControl.Application.Loops.Processing
                     controllerState.HeaterIdToState[heater.Key].OutputState = false;
                 }
             }
-
-            var now = DateTime.Now;
 
             if (powerZoneState.NextIntervalIncrementationDateTime < now)
             {

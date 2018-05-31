@@ -11,17 +11,17 @@ namespace HardwareAccess.Dummy.Devices
 
         public ICollection<string> GetAvailableSensors()
         {
-            return new List<string> { "10-0008019e9d54", "28-000005964edc" };
+            return new List<string> { "10-0008019e9d54", "28-000005964edc", "28-000005964aaa", "28-000005964bbb", "28-000005964ccc" };
         }
 
         public Task<TemperatureSensorData> Read(string deviceId)
         {
             return Task.Delay(750)
-                .ContinueWith(_ => new TemperatureSensorData
-                {
-                    CrcOk = _random.Next(0, 100) < 98,
-                    Value = (float)_random.NextDouble() + 20f
-                });
+                       .ContinueWith(_ => new TemperatureSensorData
+                                          {
+                                              CrcOk = _random.Next(0, 100) < 98,
+                                              Value = (float)_random.NextDouble() + 20f
+                                          });
         }
     }
 }

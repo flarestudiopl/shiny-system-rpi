@@ -8,7 +8,7 @@ namespace HardwareAccess.Dummy.Buses
     {
         public Task<IList<int>> GetI2cDevices()
         {
-            return Task.FromResult<IList<int>>(new List<int> { -1 });
+            return Task.FromResult<IList<int>>(new List<int> { 56, 57 });
         }
 
         public void WriteToDevice(int i2cDevice, byte value)

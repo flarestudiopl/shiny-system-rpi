@@ -124,6 +124,12 @@ namespace HeatingApi.Controllers
             _newScheduleItemExecutor.Execute(input, _heatingControl.Model);
         }
 
+        [HttpPost("controllerState/{state}")]
+        public void SetControllerState(bool state)
+        {
+
+        }
+
         private void SetSetPoint(int zoneId, float value, SetPointType setPointType)
         {
             var executorInput = new TemperatureSetPoinExecutorInput
