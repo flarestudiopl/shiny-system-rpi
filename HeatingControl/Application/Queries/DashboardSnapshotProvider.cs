@@ -11,13 +11,14 @@ namespace HeatingControl.Application.Queries
 {
     public interface IDashboardSnapshotProvider
     {
-        DashboardSnapshotProviderOutput Provide(Building model, ControllerState state);
+        DashboardSnapshotProviderOutput Provide(Building model, ControllerState state, bool controlEnabled);
     }
 
     public class DashboardSnapshotProviderOutput
     {
         public DateTime Time { get; set; }
         public string BuildingName { get; set; }
+        public bool ControlEnabled { get; set; }
         public IDictionary<UsageUnit, float> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
         public ICollection<Logger.LoggerMessage> Notifications { get; set; }
@@ -58,12 +59,13 @@ namespace HeatingControl.Application.Queries
             _loggerLastMessagesProvider = loggerLastMessagesProvider;
         }
 
-        public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state)
+        public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state, bool controlEnabled)
         {
             var output = new DashboardSnapshotProviderOutput
                          {
                              BuildingName = model.Name,
                              Time = DateTime.Now,
+                             ControlEnabled = controlEnabled,
                              Notifications = _loggerLastMessagesProvider.Provide(),
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()

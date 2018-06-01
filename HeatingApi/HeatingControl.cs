@@ -17,11 +17,12 @@ namespace HeatingApi
         void Start();
         Building Model { get; }
         ControllerState State { get; }
+        bool ControlEnabled { get; set; }
     }
 
     public class HeatingControl : IHeatingControl, IHostedService
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource;
 
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IControllerStateBuilder _controllerStateBuilder;
@@ -32,6 +33,26 @@ namespace HeatingApi
 
         public Building Model { get; private set; }
         public ControllerState State { get; private set; }
+
+        private bool _controlEnabled = true;
+        public bool ControlEnabled
+        {
+            get => _controlEnabled;
+            set
+            {
+                if (value && !_controlEnabled)
+                {
+                    Start();
+                }
+
+                if (!value && _controlEnabled)
+                {
+                    Dispose();
+                }
+
+                _controlEnabled = value;
+            }
+        }
 
         public HeatingControl(IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
@@ -50,6 +71,8 @@ namespace HeatingApi
 
         public void Start()
         {
+            _cancellationTokenSource = new CancellationTokenSource();
+
             Model = _buildingModelProvider.Provide();
             State = _controllerStateBuilder.Build(Model);
 
