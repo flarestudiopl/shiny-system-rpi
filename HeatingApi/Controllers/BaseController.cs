@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeatingApi.Controllers
 {
     [Produces("application/json")]
-    //[Authorize]
+    [Authorize]
     public class BaseController : Controller
     {
         internal int UserId
