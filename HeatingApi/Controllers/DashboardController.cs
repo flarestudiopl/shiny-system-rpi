@@ -18,6 +18,7 @@ namespace HeatingApi.Controllers
         private readonly IZoneControlModeExecutor _zoneControlModeExecutor;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
         private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
+        private readonly IRemoveScheduleItemExecutor _removeScheduleItemExecutor;
 
         public DashboardController(IHeatingControl heatingControl,
                                    IDashboardSnapshotProvider dashboardSnapshotProvider,
@@ -25,7 +26,8 @@ namespace HeatingApi.Controllers
                                    ICounterResetExecutor counterResetExecutor,
                                    IZoneControlModeExecutor zoneControlModeExecutor,
                                    ITemperatureSetPointExecutor temperatureSetPointExecutor,
-                                   INewScheduleItemExecutor newScheduleItemExecutor)
+                                   INewScheduleItemExecutor newScheduleItemExecutor,
+                                   IRemoveScheduleItemExecutor removeScheduleItemExecutor)
         {
             _heatingControl = heatingControl;
             _dashboardSnapshotProvider = dashboardSnapshotProvider;
@@ -34,6 +36,7 @@ namespace HeatingApi.Controllers
             _zoneControlModeExecutor = zoneControlModeExecutor;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
             _newScheduleItemExecutor = newScheduleItemExecutor;
+            _removeScheduleItemExecutor = removeScheduleItemExecutor;
         }
 
         /// <summary>
@@ -122,6 +125,12 @@ namespace HeatingApi.Controllers
         public void NewScheduleItem([FromBody] NewScheduleItemExecutorInput input)
         {
             _newScheduleItemExecutor.Execute(input, _heatingControl.Model);
+        }
+
+        [HttpDelete("zone/{zoneId}/schedule/{scheduleItemId}")]
+        public void RemoveScheduleItem(int zoneId, int scheduleItemId)
+        {
+            _removeScheduleItemExecutor.Execute(zoneId, scheduleItemId, _heatingControl.State, _heatingControl.Model);
         }
 
         [HttpPost("controllerState/{state}")]
