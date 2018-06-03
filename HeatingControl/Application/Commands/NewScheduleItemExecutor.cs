@@ -40,6 +40,13 @@ namespace HeatingControl.Application.Commands
                 return;
             }
 
+            if (input.DaysOfWeek == null || !input.DaysOfWeek.Any())
+            {
+                Logger.Warning("Please specify at least one day of week to add new schedule item.");
+
+                return;
+            }
+
             var zone = building.Zones.FirstOrDefault(x => x.ZoneId == input.ZoneId);
 
             if (zone == null)
