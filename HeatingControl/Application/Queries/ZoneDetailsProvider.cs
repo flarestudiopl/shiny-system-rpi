@@ -6,6 +6,7 @@ using HeatingControl.Extensions;
 using HeatingControl.Models;
 using Storage.StorageDatabase.Counter;
 using Commons.Extensions;
+using HeatingControl.Application.Loops.Processing;
 
 namespace HeatingControl.Application.Queries
 {
@@ -33,16 +34,20 @@ namespace HeatingControl.Application.Queries
             public float HightSetPoint { get; set; }
             public float ScheduleDefaultSetPoint { get; set; }
             public float Hysteresis { get; set; }
+            public IDictionary<DateTime, float> PlotData { get; set; }
         }
     }
 
     public class ZoneDetailsProvider : IZoneDetailsProvider
     {
         private readonly ICurrentCountersByHeaterIdsProvider _currentCountersByHeaterIdsProvider;
+        private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
 
-        public ZoneDetailsProvider(ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider)
+        public ZoneDetailsProvider(ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider,
+                                   IZoneTemperatureProvider zoneTemperatureProvider)
         {
             _currentCountersByHeaterIdsProvider = currentCountersByHeaterIdsProvider;
+            _zoneTemperatureProvider = zoneTemperatureProvider;
         }
 
         public ZoneDetailsProviderResult Provide(int zoneId, ControllerState controllerState, Building building)
@@ -57,7 +62,7 @@ namespace HeatingControl.Application.Queries
             return new ZoneDetailsProviderResult
                    {
                        Counters = GetCountersData(zone, controllerState, building),
-                       Temperatures = GetTemperatureSettings(zone),
+                       Temperatures = GetTemperatureSettings(zone, controllerState),
                        Schedule = zone.Zone
                                       .Schedule
                                       .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
@@ -100,7 +105,7 @@ namespace HeatingControl.Application.Queries
                    };
         }
 
-        private static ZoneDetailsProviderResult.TemperatureSettings GetTemperatureSettings(ZoneState zone)
+        private ZoneDetailsProviderResult.TemperatureSettings GetTemperatureSettings(ZoneState zone, ControllerState controllerState)
         {
             if (!zone.Zone.IsTemperatureControlled())
             {
@@ -114,7 +119,11 @@ namespace HeatingControl.Application.Queries
                        HightSetPoint = temperatureControlledZone.HighSetPoint,
                        LowSetPoint = temperatureControlledZone.LowSetPoint,
                        ScheduleDefaultSetPoint = temperatureControlledZone.ScheduleDefaultSetPoint,
-                       Hysteresis = temperatureControlledZone.Hysteresis
+                       Hysteresis = temperatureControlledZone.Hysteresis,
+                       PlotData = _zoneTemperatureProvider.Provide(zone.Zone.ZoneId, controllerState)
+                                                          .HistoricalReads
+                                                          .ToDictionary(x => x.Item1, 
+                                                                        x => x.Item2)
                    };
         }
     }
