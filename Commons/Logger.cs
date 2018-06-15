@@ -43,7 +43,9 @@ namespace Commons
         {
             var now = DateTime.Now;
 
+#if DEBUG
             Console.WriteLine($"[{now.ToLongTimeString()}] {source} {severity}: {content}");
+#endif
 
             EmitNonTrace(content, severity, now);
         }

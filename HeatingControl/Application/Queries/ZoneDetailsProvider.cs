@@ -24,7 +24,7 @@ namespace HeatingControl.Application.Queries
         {
             public IDictionary<UsageUnit, float> UsageUnitToValue { get; set; }
             public DateTime? LastResetDate { get; set; }
-            public IDictionary<DateTime, float> PlotPoints { get; set; }
+            public IDictionary<UsageUnit, Dictionary<string, float>> UsageUnitToHeaterNameToValue { get; set; }
         }
 
         public class TemperatureSettings
@@ -60,7 +60,7 @@ namespace HeatingControl.Application.Queries
                        Temperatures = GetTemperatureSettings(zone),
                        Schedule = zone.Zone
                                       .Schedule
-                                      .OrderBy(x => x.DaysOfWeek.First())
+                                      .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
                                       .ThenBy(x => x.BeginTime)
                                       .ToList()
                    };
@@ -85,15 +85,18 @@ namespace HeatingControl.Application.Queries
                                                                       return savedCounterValue + currentCounterValue;
                                                                   });
 
-            var usageUnitToHeaters = building.Heaters
-                                             .Where(x => heaterIds.Contains(x.HeaterId))
-                                             .GroupBy(x => x.UsageUnit);
+            var usageUnitToHeaterToValue = building.Heaters
+                                                   .Where(x => heaterIds.Contains(x.HeaterId))
+                                                   .GroupBy(x => x.UsageUnit)
+                                                   .ToDictionary(x => x.Key,
+                                                                 x => x.ToDictionary(h => h.Name, h => h.UsagePerHour * heaterIdToCountedSeconds[h.HeaterId] / 3600f));
 
             return new ZoneDetailsProviderResult.CountersData
                    {
                        LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.Start) : (DateTime?)null,
-                       UsageUnitToValue = usageUnitToHeaters.ToDictionary(x => x.Key,
-                                                                          x => x.Sum(h => h.UsagePerHour * heaterIdToCountedSeconds[h.HeaterId] / 3600f))
+                       UsageUnitToValue = usageUnitToHeaterToValue.ToDictionary(x => x.Key,
+                                                                                x => x.Value.Sum(h => h.Value)),
+                       UsageUnitToHeaterNameToValue = usageUnitToHeaterToValue
                    };
         }
 
