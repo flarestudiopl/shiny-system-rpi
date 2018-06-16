@@ -57,6 +57,7 @@ namespace HeatingControl.Application.Queries
 
                                               return heaterData;
                                           })
+                                  .OrderBy(x => x.Name)
                                   .ToList();
         }
     }

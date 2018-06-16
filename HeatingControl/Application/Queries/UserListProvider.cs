@@ -40,6 +40,7 @@ namespace HeatingControl.Application.Queries
                                                                        Login = x.Login,
                                                                        LastLogonDate = x.LastLogon
                                                                    })
+                                                      .OrderBy(x => x.Login)
                                                       .ToList();
 
             return new UserListProviderResult

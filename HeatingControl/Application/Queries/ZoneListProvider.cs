@@ -67,7 +67,9 @@ namespace HeatingControl.Application.Queries
                                                 }
 
                                                 return zoneListItem;
-                                            }).ToList()
+                                            })
+                                    .OrderBy(x => x.Name)
+                                    .ToList()
                    };
         }
     }

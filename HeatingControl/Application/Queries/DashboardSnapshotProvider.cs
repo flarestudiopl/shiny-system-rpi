@@ -68,7 +68,11 @@ namespace HeatingControl.Application.Queries
                              ControlEnabled = controlEnabled,
                              Notifications = _loggerLastMessagesProvider.Provide(),
                              InstantUsage = state.InstantUsage,
-                             Zones = state.ZoneIdToState.Values.Select(x => BuildZoneSnapshot(x, state)).ToList()
+                             Zones = state.ZoneIdToState
+                                          .Values
+                                          .Select(x => BuildZoneSnapshot(x, state))
+                                          .OrderBy(x => x.Name)
+                                          .ToList()
                          };
 
             return output;
