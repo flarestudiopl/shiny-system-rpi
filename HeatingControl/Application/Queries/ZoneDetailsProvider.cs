@@ -19,7 +19,7 @@ namespace HeatingControl.Application.Queries
     {
         public CountersData Counters { get; set; }
         public TemperatureSettings Temperatures { get; set; }
-        public ICollection<ScheduleItem> Schedule { get; set; }
+        public ScheduleSettings Schedule { get; set; }
 
         public class CountersData
         {
@@ -32,9 +32,14 @@ namespace HeatingControl.Application.Queries
         {
             public float LowSetPoint { get; set; }
             public float HightSetPoint { get; set; }
-            public float ScheduleDefaultSetPoint { get; set; }
             public float Hysteresis { get; set; }
             public IDictionary<DateTime, float> PlotData { get; set; }
+        }
+
+        public class ScheduleSettings
+        {
+            public float? DefaultSetPoint { get; set; }
+            public ICollection<ScheduleItem> Items { get; set; }
         }
     }
 
@@ -63,11 +68,7 @@ namespace HeatingControl.Application.Queries
                    {
                        Counters = GetCountersData(zone, controllerState, building),
                        Temperatures = GetTemperatureSettings(zone, controllerState),
-                       Schedule = zone.Zone
-                                      .Schedule
-                                      .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
-                                      .ThenBy(x => x.BeginTime)
-                                      .ToList()
+                       Schedule = GetScheduleSettings(zone)
                    };
         }
 
@@ -118,13 +119,31 @@ namespace HeatingControl.Application.Queries
                    {
                        HightSetPoint = temperatureControlledZone.HighSetPoint,
                        LowSetPoint = temperatureControlledZone.LowSetPoint,
-                       ScheduleDefaultSetPoint = temperatureControlledZone.ScheduleDefaultSetPoint,
                        Hysteresis = temperatureControlledZone.Hysteresis,
                        PlotData = _zoneTemperatureProvider.Provide(zone.Zone.ZoneId, controllerState)
                                                           .HistoricalReads
-                                                          .ToDictionary(x => x.Item1, 
+                                                          .ToDictionary(x => x.Item1,
                                                                         x => x.Item2)
                    };
+        }
+
+        private static ZoneDetailsProviderResult.ScheduleSettings GetScheduleSettings(ZoneState zone)
+        {
+            var scheduleSettings = new ZoneDetailsProviderResult.ScheduleSettings
+                                   {
+                                       Items = zone.Zone
+                                                   .Schedule
+                                                   .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
+                                                   .ThenBy(x => x.BeginTime)
+                                                   .ToList()
+                                   };
+
+            if (zone.Zone.IsTemperatureControlled())
+            {
+                scheduleSettings.DefaultSetPoint = zone.Zone.TemperatureControlledZone.ScheduleDefaultSetPoint;
+            }
+
+            return scheduleSettings;
         }
     }
 }
