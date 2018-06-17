@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,7 +17,12 @@ namespace Commons.Extensions
 
         public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
 
-        public static string JoinWith(this IEnumerable<string> values, string separator) => string.Join(separator, values);
+        public static string JoinWith(this IEnumerable<string> values, string separator)
+        {
+            values = values.ToList();
+
+            return values.Any() ? string.Join(separator, values) : null;
+        }
 
         public static string CalculateHash(this string value)
         {

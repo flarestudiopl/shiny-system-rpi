@@ -36,6 +36,13 @@ namespace HeatingControl.Application.Commands
                 return;
             }
 
+            if (input.Login.IsNullOrEmpty() || input.Password.IsNullOrEmpty())
+            {
+                Logger.Warning("User login and password shall not be empty.");
+
+                return;
+            }
+
             _userSaver.Save(input.Login, input.Password.CalculateHash(), createdByUserId);
         }
     }
