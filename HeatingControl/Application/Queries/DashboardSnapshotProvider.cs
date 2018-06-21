@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Commons;
 using HeatingControl.Application.Loops.Processing;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
@@ -16,12 +14,10 @@ namespace HeatingControl.Application.Queries
 
     public class DashboardSnapshotProviderOutput
     {
-        public DateTime Time { get; set; }
         public string BuildingName { get; set; }
         public bool ControlEnabled { get; set; }
         public IDictionary<UsageUnit, float> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
-        public ICollection<Logger.LoggerMessage> Notifications { get; set; }
 
         public class ZoneSnapshot
         {
@@ -50,13 +46,10 @@ namespace HeatingControl.Application.Queries
     public class DashboardSnapshotProvider : IDashboardSnapshotProvider
     {
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
-        private readonly ILoggerLastMessagesProvider _loggerLastMessagesProvider;
 
-        public DashboardSnapshotProvider(IZoneTemperatureProvider zoneTemperatureProvider,
-                                         ILoggerLastMessagesProvider loggerLastMessagesProvider)
+        public DashboardSnapshotProvider(IZoneTemperatureProvider zoneTemperatureProvider)
         {
             _zoneTemperatureProvider = zoneTemperatureProvider;
-            _loggerLastMessagesProvider = loggerLastMessagesProvider;
         }
 
         public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state, bool controlEnabled)
@@ -64,9 +57,7 @@ namespace HeatingControl.Application.Queries
             var output = new DashboardSnapshotProviderOutput
                          {
                              BuildingName = model.Name,
-                             Time = DateTime.Now,
                              ControlEnabled = controlEnabled,
-                             Notifications = _loggerLastMessagesProvider.Provide(),
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState
                                           .Values

@@ -24,8 +24,6 @@ namespace HeatingApi
     {
         private CancellationTokenSource _cancellationTokenSource;
 
-        private readonly IBuildingModelProvider _buildingModelProvider;
-        private readonly IControllerStateBuilder _controllerStateBuilder;
         private readonly IDisableAllOutputsExecutor _disableAllOutputsExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
@@ -61,24 +59,22 @@ namespace HeatingApi
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
                               IOutputStateProcessingLoop outputStateProcessingLoop)
         {
-            _buildingModelProvider = buildingModelProvider;
-            _controllerStateBuilder = controllerStateBuilder;
             _disableAllOutputsExecutor = disableAllOutputsExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
+
+            Model = buildingModelProvider.Provide();
+            State = controllerStateBuilder.Build(Model);
         }
 
         public void Start()
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
-            Model = _buildingModelProvider.Provide();
-            State = _controllerStateBuilder.Build(Model);
-
             Logger.Info("Disabling all outputs...");
 
-            _disableAllOutputsExecutor.Execute(Model);
+            _disableAllOutputsExecutor.Execute(State);
 
             Logger.Info("Starting control loops...");
 
@@ -99,7 +95,7 @@ namespace HeatingApi
 
                 Logger.Info("Disabling all outputs...");
 
-                _disableAllOutputsExecutor.Execute(Model);
+                _disableAllOutputsExecutor.Execute(State);
             }
         }
 

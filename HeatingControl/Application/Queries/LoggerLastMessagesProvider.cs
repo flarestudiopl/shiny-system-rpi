@@ -1,18 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Commons;
 
 namespace HeatingControl.Application.Queries
 {
     public interface ILoggerLastMessagesProvider
     {
-        ICollection<Logger.LoggerMessage> Provide();
+        LoggerLastMessagesProviderResult Provide();
+    }
+
+    public class LoggerLastMessagesProviderResult
+    {
+        public DateTime ControllerDateTime { get; set; }
+        public ICollection<Logger.LoggerMessage> Messages { get; set; }
     }
 
     public class LoggerLastMessagesProvider : ILoggerLastMessagesProvider
     {
-        public ICollection<Logger.LoggerMessage> Provide()
+        public LoggerLastMessagesProviderResult Provide()
         {
-            return Logger.LastMessages.ToArray();
+            return new LoggerLastMessagesProviderResult
+                   {
+                       ControllerDateTime = DateTime.Now,
+                       Messages = Logger.LastMessages.ToArray()
+                   };
         }
     }
 }

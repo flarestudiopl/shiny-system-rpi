@@ -1,29 +1,30 @@
-﻿using System.Linq;
-using Domain.BuildingModel;
-using HardwareAccess.Buses;
+﻿using HeatingControl.Application.Loops.Processing;
+using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
 {
     public interface IDisableAllOutputsExecutor
     {
-        void Execute(Building building);
+        void Execute(ControllerState controllerState);
     }
 
     public class DisableAllOutputsExecutor : IDisableAllOutputsExecutor
     {
-        private readonly II2c _i2c;
+        private readonly IOutputsWriter _outputsWriter;
 
-        public DisableAllOutputsExecutor(II2c i2c)
+        public DisableAllOutputsExecutor(IOutputsWriter outputsWriter)
         {
-            _i2c = i2c;
+            _outputsWriter = outputsWriter;
         }
 
-        public void Execute(Building building)
+        public void Execute(ControllerState controllerState)
         {
-            foreach (var device in building.Heaters.Select(x => x.PowerOutputDeviceId))
+            foreach (var heaterToState in controllerState.HeaterIdToState)
             {
-                _i2c.WriteToDevice(device, byte.MaxValue);
+                heaterToState.Value.OutputState = false;
             }
+
+            _outputsWriter.Write(controllerState, true);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Commons;
-using HardwareAccess.Devices;
 using HeatingControl.Application.Loops.Processing;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
@@ -16,23 +15,20 @@ namespace HeatingControl.Application.Loops
 
     public class OutputStateProcessingLoop : IOutputStateProcessingLoop
     {
-        private readonly IPowerOutput _powerOutput;
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
         private readonly IHysteresisProcessor _hysteresisProcessor;
         private readonly IPowerZoneOutputLimiter _powerZoneOutputLimiter;
-        private readonly IUsageCollector _usageCollector;
+        private readonly IOutputsWriter _outputsWriter;
 
-        public OutputStateProcessingLoop(IPowerOutput powerOutput,
-                                         IZoneTemperatureProvider zoneTemperatureProvider,
+        public OutputStateProcessingLoop(IZoneTemperatureProvider zoneTemperatureProvider,
                                          IHysteresisProcessor hysteresisProcessor,
                                          IPowerZoneOutputLimiter powerZoneOutputLimiter,
-                                         IUsageCollector usageCollector)
+                                         IOutputsWriter outputsWriter)
         {
-            _powerOutput = powerOutput;
             _zoneTemperatureProvider = zoneTemperatureProvider;
             _hysteresisProcessor = hysteresisProcessor;
             _powerZoneOutputLimiter = powerZoneOutputLimiter;
-            _usageCollector = usageCollector;
+            _outputsWriter = outputsWriter;
         }
 
         public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
@@ -45,7 +41,7 @@ namespace HeatingControl.Application.Loops
                            ProcessHeaters(controllerState);
                            ProcessPowerZones(controllerState);
 
-                           WriteOutputs(controllerState);
+                           _outputsWriter.Write(controllerState, false);
                        },
                        cancellationToken);
         }
@@ -143,23 +139,6 @@ namespace HeatingControl.Application.Loops
             foreach (var powerZone in controllerState.PowerZoneIdToState.Values)
             {
                 _powerZoneOutputLimiter.Limit(powerZone, controllerState);
-            }
-        }
-
-        private void WriteOutputs(ControllerState controllerState)
-        {
-            var now = DateTime.Now;
-
-            foreach (var heater in controllerState.HeaterIdToState.Values)
-            {
-                if ((now - heater.LastStateChange).TotalSeconds > heater.Heater.MinimumStateChangeIntervalSeconds &&
-                    heater.OutputState != _powerOutput.GetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel))
-                {
-                    _powerOutput.SetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel, heater.OutputState);
-                    _usageCollector.Collect(heater, controllerState);
-
-                    heater.LastStateChange = now;
-                }
             }
         }
     }

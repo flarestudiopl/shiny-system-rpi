@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Commons;
-using HeatingControl.Application.Commands;
+﻿using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +18,7 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet]
-        public ICollection<Logger.LoggerMessage> LastAlerts()
+        public LoggerLastMessagesProviderResult LastAlerts()
         {
             return _loggerLastMessagesProvider.Provide();
         }
