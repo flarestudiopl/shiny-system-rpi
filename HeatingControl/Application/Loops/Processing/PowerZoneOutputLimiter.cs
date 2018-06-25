@@ -32,7 +32,7 @@ namespace HeatingControl.Application.Loops.Processing
                                                            .Where(x => x.Value.OutputState &&
                                                                        (now - x.Value.LastStateChange).TotalSeconds <= x.Value.Heater.MinimumStateChangeIntervalSeconds);
 
-            var totalPower = 0f;
+            var totalPower = 0m;
 
             foreach (var heater in heatersThatCantBeDisabled)
             {

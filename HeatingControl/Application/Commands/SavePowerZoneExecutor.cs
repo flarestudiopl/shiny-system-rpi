@@ -19,7 +19,7 @@ namespace HeatingControl.Application.Commands
         public int? PowerZoneId { get; set; }
         public string Name { get; set; }
         public ICollection<int> AffectedHeatersIds { get; set; }
-        public float PowerLimitValue { get; set; }
+        public decimal PowerLimitValue { get; set; }
         public UsageUnit PowerLimitUnit { get; set; }
         public int RoundRobinIntervalMinutes { get; set; }
     }
@@ -83,7 +83,7 @@ namespace HeatingControl.Application.Commands
                 return false;
             }
 
-            var highestHeaterPower = 0f;
+            var highestHeaterPower = 0m;
 
             foreach (var heaterId in input.AffectedHeatersIds)
             {

@@ -13,7 +13,7 @@ namespace HeatingControl.Models
 
         public IDictionary<int, HeaterState> HeaterIdToState { get; set; } = new Dictionary<int, HeaterState>();
 
-        public IDictionary<UsageUnit, float> InstantUsage { get; set; } = new Dictionary<UsageUnit, float>();
+        public IDictionary<UsageUnit, decimal> InstantUsage { get; set; } = new Dictionary<UsageUnit, decimal>();
 
         public IDictionary<int, PowerZoneState> PowerZoneIdToState { get; set; } = new Dictionary<int, PowerZoneState>();
     }

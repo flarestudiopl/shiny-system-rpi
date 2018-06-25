@@ -16,7 +16,7 @@ namespace HeatingControl.Application.Queries
     {
         public string BuildingName { get; set; }
         public bool ControlEnabled { get; set; }
-        public IDictionary<UsageUnit, float> InstantUsage { get; set; }
+        public IDictionary<UsageUnit, decimal> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
 
         public class ZoneSnapshot

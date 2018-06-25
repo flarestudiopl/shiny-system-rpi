@@ -2,32 +2,6 @@
   "Name": "hakunamatata",
   "Zones": [
     {
-      "ZoneId": 3,
-      "Name": "Nowa зона",
-      "HeaterIds": [
-        11
-      ],
-      "Schedule": [
-        {
-          "ScheduleItemId": 1,
-          "DaysOfWeek": [
-            1,
-            2
-          ],
-          "BeginTime": "21:04:00",
-          "EndTime": "21:24:00",
-          "SetPoint": 19.9
-        }
-      ],
-      "TemperatureControlledZone": {
-        "TemperatureSensorId": 21,
-        "LowSetPoint": 4.7,
-        "HighSetPoint": 21.7,
-        "ScheduleDefaultSetPoint": 4.5,
-        "Hysteresis": 0.5
-      }
-    },
-    {
       "ZoneId": 4,
       "Name": "pusta strefa",
       "HeaterIds": [],
@@ -46,6 +20,33 @@
         "LowSetPoint": 20.0,
         "HighSetPoint": 25.0,
         "ScheduleDefaultSetPoint": 15.0,
+        "Hysteresis": 0.5
+      }
+    },
+    {
+      "ZoneId": 3,
+      "Name": "Nowa зона",
+      "HeaterIds": [
+        11,
+        13
+      ],
+      "Schedule": [
+        {
+          "ScheduleItemId": 1,
+          "DaysOfWeek": [
+            1,
+            2
+          ],
+          "BeginTime": "21:04:00",
+          "EndTime": "21:24:00",
+          "SetPoint": 19.9
+        }
+      ],
+      "TemperatureControlledZone": {
+        "TemperatureSensorId": 21,
+        "LowSetPoint": 4.7,
+        "HighSetPoint": 21.7,
+        "ScheduleDefaultSetPoint": 4.5,
         "Hysteresis": 0.5
       }
     }
@@ -68,6 +69,15 @@
       "UsageUnit": 3,
       "UsagePerHour": 2.0,
       "MinimumStateChangeIntervalSeconds": 1
+    },
+    {
+      "HeaterId": 13,
+      "Name": "Grz C",
+      "PowerOutputDeviceId": 57,
+      "PowerOutputChannel": 1,
+      "UsageUnit": 3,
+      "UsagePerHour": 0.2,
+      "MinimumStateChangeIntervalSeconds": 0
     }
   ],
   "TemperatureSensors": [
@@ -92,9 +102,10 @@
       "PowerZoneId": 1200,
       "Name": "wyedytowana mocna strefa",
       "HeaterIds": [
-        11
+        11,
+        12
       ],
-      "MaxUsage": 2.5,
+      "MaxUsage": 2.6,
       "UsageUnit": 3,
       "RoundRobinIntervalMinutes": 2
     }

@@ -22,12 +22,12 @@ namespace HeatingControl.Tests.Application.Loops.Processing
                                      NextIntervalOffset = iteration,
                                      PowerZone = new PowerZone
                                                  {
-                                                     MaxUsage = 2.1f,
+                                                     MaxUsage = 2.1m,
                                                      HeaterIds = new HashSet<int> { 1, 2, 3, 4 }
                                                  }
                                  };
 
-            var heater = new Heater { UsagePerHour = 0.9f };
+            var heater = new Heater { UsagePerHour = 0.9m };
             var heaterState1 = new HeaterState { Heater = heater, OutputState = true };
             var heaterState2 = new HeaterState { Heater = heater, OutputState = true };
             var heaterState3 = new HeaterState { Heater = heater, OutputState = true };

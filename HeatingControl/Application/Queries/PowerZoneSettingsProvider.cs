@@ -14,7 +14,7 @@ namespace HeatingControl.Application.Queries
     public class PowerZoneSettingsProviderResult
     {
         public string Name { get; set; }
-        public float PowerLimitValue { get; set; }
+        public decimal PowerLimitValue { get; set; }
         public UsageUnit PowerLimitUnit { get; set; }
         public IDictionary<int, string> PowerLimitUnits { get; set; }
         public ICollection<int> AffectedHeatersIds { get; set; }

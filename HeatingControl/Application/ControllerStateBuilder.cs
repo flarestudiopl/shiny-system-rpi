@@ -61,7 +61,7 @@ namespace HeatingControl.Application
 
                 if (!state.InstantUsage.ContainsKey(heater.UsageUnit))
                 {
-                    state.InstantUsage.Add(heater.UsageUnit, 0f);
+                    state.InstantUsage.Add(heater.UsageUnit, 0m);
                 }
             }
         }

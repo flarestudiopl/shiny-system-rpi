@@ -127,7 +127,7 @@ namespace Storage.BuildingModel
                                         new PowerZone
                                         {
                                             Name = "Max 3kW",
-                                            MaxUsage = 3f,
+                                            MaxUsage = 3m,
                                             UsageUnit = UsageUnit.kW,
                                             HeaterIds = new HashSet<int> { 11, 12 },
                                             PowerZoneId = 1200,

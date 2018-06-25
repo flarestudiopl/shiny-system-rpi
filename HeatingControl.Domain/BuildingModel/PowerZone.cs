@@ -10,7 +10,7 @@ namespace Domain.BuildingModel
 
         public HashSet<int> HeaterIds { get; set; } = new HashSet<int>();
 
-        public float MaxUsage { get; set; }
+        public decimal MaxUsage { get; set; }
 
         public UsageUnit UsageUnit { get; set; }
 

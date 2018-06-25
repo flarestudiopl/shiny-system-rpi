@@ -8,12 +8,12 @@ namespace HeatingControl.Application.Loops.Processing
 {
     public interface IZonePowerProvider
     {
-        IDictionary<UsageUnit, float> Provide(int zoneId, ControllerState controllerState);
+        IDictionary<UsageUnit, decimal> Provide(int zoneId, ControllerState controllerState);
     }
 
     public class ZonePowerProvider : IZonePowerProvider
     {
-        public IDictionary<UsageUnit, float> Provide(int zoneId, ControllerState controllerState)
+        public IDictionary<UsageUnit, decimal> Provide(int zoneId, ControllerState controllerState)
         {
             var zone = controllerState.ZoneIdToState.GetValueOrDefault(zoneId);
 

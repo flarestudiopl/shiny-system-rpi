@@ -23,9 +23,9 @@ namespace HeatingControl.Application.Queries
 
         public class CountersData
         {
-            public IDictionary<UsageUnit, float> UsageUnitToValue { get; set; }
+            public IDictionary<UsageUnit, decimal> UsageUnitToValue { get; set; }
             public DateTime? LastResetDate { get; set; }
-            public IDictionary<UsageUnit, Dictionary<string, float>> UsageUnitToHeaterNameToValue { get; set; }
+            public IDictionary<UsageUnit, Dictionary<string, decimal>> UsageUnitToHeaterNameToValue { get; set; }
         }
 
         public class TemperatureSettings
@@ -95,7 +95,7 @@ namespace HeatingControl.Application.Queries
                                                    .Where(x => heaterIds.Contains(x.HeaterId))
                                                    .GroupBy(x => x.UsageUnit)
                                                    .ToDictionary(x => x.Key,
-                                                                 x => x.ToDictionary(h => h.Name, h => h.UsagePerHour * heaterIdToCountedSeconds[h.HeaterId] / 3600f));
+                                                                 x => x.ToDictionary(h => h.Name, h => h.UsagePerHour * (decimal)(heaterIdToCountedSeconds[h.HeaterId] / 3600f)));
 
             return new ZoneDetailsProviderResult.CountersData
                    {

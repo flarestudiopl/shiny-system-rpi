@@ -39,7 +39,7 @@ namespace HeatingControl.Application.Loops.Processing
             {
                 if (!controllerState.InstantUsage.ContainsKey(heater.UsageUnit))
                 {
-                    controllerState.InstantUsage.Add(heater.UsageUnit, 0f);
+                    controllerState.InstantUsage.Add(heater.UsageUnit, 0m);
                 }
                 else
                 {

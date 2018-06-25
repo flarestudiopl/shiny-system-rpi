@@ -12,7 +12,7 @@
 
         public UsageUnit UsageUnit { get; set; }
 
-        public float UsagePerHour { get; set; }
+        public decimal UsagePerHour { get; set; }
 
         public int MinimumStateChangeIntervalSeconds { get; set; }
     }
