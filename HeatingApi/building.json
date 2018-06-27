@@ -2,13 +2,6 @@
   "Name": "hakunamatata",
   "Zones": [
     {
-      "ZoneId": 4,
-      "Name": "pusta strefa",
-      "HeaterIds": [],
-      "Schedule": [],
-      "TemperatureControlledZone": null
-    },
-    {
       "ZoneId": 2,
       "Name": "Strefa 2",
       "HeaterIds": [
@@ -27,8 +20,7 @@
       "ZoneId": 3,
       "Name": "Nowa зона",
       "HeaterIds": [
-        11,
-        13
+        11
       ],
       "Schedule": [
         {
@@ -49,6 +41,15 @@
         "ScheduleDefaultSetPoint": 4.5,
         "Hysteresis": 0.5
       }
+    },
+    {
+      "ZoneId": 4,
+      "Name": "pusta strefa",
+      "HeaterIds": [
+        13
+      ],
+      "Schedule": [],
+      "TemperatureControlledZone": null
     }
   ],
   "Heaters": [

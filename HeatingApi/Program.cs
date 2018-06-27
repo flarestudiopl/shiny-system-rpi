@@ -11,11 +11,19 @@ namespace HeatingApi
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                   .ConfigureServices(services => services.AddAutofac())
-                   .UseUrls("http://*:8000")
-                   .UseStartup<Startup>()
-                   .Build();
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            var host = WebHost.CreateDefaultBuilder(args)
+                              .ConfigureServices(services => services.AddAutofac());
+
+#if DEBUG
+            host = host.UseUrls("http://*:8000");
+#else
+            host = host.UseUrls("http://*:80");
+#endif
+
+            return host.UseStartup<Startup>()
+                       .Build();
+        }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Autofac;
 using HeatingApi.DependencyResolution;
+using HeatingControl.Application.Commands;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
@@ -64,7 +65,7 @@ namespace HeatingApi
                                                                               ValidateIssuerSigningKey = true,
                                                                               ValidIssuer = Configuration["Jwt:Issuer"],
                                                                               ValidAudience = Configuration["Jwt:Issuer"],
-                                                                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                                                                              IssuerSigningKey = AuthenticateUserExecutor.JwtSigningKey
                                                                           };
                                   });
 

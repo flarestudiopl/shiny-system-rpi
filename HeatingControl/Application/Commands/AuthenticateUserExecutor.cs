@@ -25,6 +25,8 @@ namespace HeatingControl.Application.Commands
     public class AuthenticateUserExecutor : IAuthenticateUserExecutor
     {
         private const int TokenLifetimeMinutes = 60;
+        
+        public static SecurityKey JwtSigningKey = new SymmetricSecurityKey(Guid.NewGuid().ToByteArray());
 
         private readonly IActiveUserByLoginProvider _activeUserByLoginProvider;
         private readonly IUserUpdater _userUpdater;
@@ -55,8 +57,7 @@ namespace HeatingControl.Application.Commands
                                     LastSeenIpAddress = input.IpAddress
                                 });
 
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(JwtSigningKey, SecurityAlgorithms.HmacSha256);
             var issuer = _configuration["Jwt:Issuer"];
 
             var token = new JwtSecurityToken(issuer,
