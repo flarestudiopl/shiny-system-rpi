@@ -68,7 +68,12 @@ namespace HeatingControl.Application.Commands
                                               {
                                                   Zone = zone,
                                                   ControlMode = ZoneControlMode.LowOrDisabled,
-                                                  EnableOutputs = false
+                                                  EnableOutputs = false,
+                                                  ScheduleState = new ScheduleState
+                                                                  {
+                                                                      DesiredTemperature = 0.0f,
+                                                                      HeatingEnabled = false
+                                                                  }
                                               });
         }
 
