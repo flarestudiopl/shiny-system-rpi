@@ -59,7 +59,7 @@ namespace HeatingControl.Application.Loops
         private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState)
         {
             var temperatureData = _zoneTemperatureProvider.Provide(zoneState.Zone.ZoneId, controllerState);
-            ;
+
             if (temperatureData == null)
             {
                 Logger.Warning("No temperature data for sensor {0} in zone {1}. Proactive power cutoff.",
@@ -83,7 +83,11 @@ namespace HeatingControl.Application.Loops
                         setPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint;
                         break;
                     case ZoneControlMode.Schedule:
-                        setPoint = zoneState.ScheduleState.DesiredTemperature.Value;
+                        if (zoneState.ScheduleState.DesiredTemperature.HasValue)
+                        {
+                            setPoint = zoneState.ScheduleState.DesiredTemperature.Value;
+                        }
+
                         break;
                 }
 
@@ -116,7 +120,11 @@ namespace HeatingControl.Application.Loops
                     outputState = true;
                     break;
                 case ZoneControlMode.Schedule:
-                    outputState = zoneState.ScheduleState.HeatingEnabled.Value;
+                    if (zoneState.ScheduleState.HeatingEnabled.HasValue)
+                    {
+                        outputState = zoneState.ScheduleState.HeatingEnabled.Value;
+                    }
+
                     break;
             }
 
