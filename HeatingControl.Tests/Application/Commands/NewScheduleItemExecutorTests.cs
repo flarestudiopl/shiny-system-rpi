@@ -4,6 +4,7 @@ using NSubstitute;
 using Storage.BuildingModel;
 using System;
 using System.Collections.Generic;
+using HeatingControl.Models;
 using Xunit;
 
 namespace HeatingControl.Tests.Application.Commands
@@ -46,7 +47,7 @@ namespace HeatingControl.Tests.Application.Commands
                 }
             };
 
-            var input = new NewScheduleItemExecutorInput
+            var input = new NewScheduleItemCommand
             {
                 ZoneId = 1,
                 DaysOfWeek = new List<DayOfWeek> { DayOfWeek.Monday },
@@ -55,8 +56,8 @@ namespace HeatingControl.Tests.Application.Commands
             };
 
             //Act
-            var newScheduleItemExecutor = new NewScheduleItemExecutor(buildingModelSaver);
-            newScheduleItemExecutor.Execute(input, building);
+            var newScheduleItemExecutor = new NewScheduleItemCommandExecutor(buildingModelSaver);
+            newScheduleItemExecutor.Execute(input, new ControllerState { Model = building });
 
             //Assert
             buildingModelSaver.DidNotReceiveWithAnyArgs().Save(null);

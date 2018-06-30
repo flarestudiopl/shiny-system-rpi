@@ -35,13 +35,13 @@ namespace HeatingApi.Controllers
         [HttpGet]
         public PowerZoneListProviderResult GetPowerZoneList()
         {
-            return _powerZoneListProvider.Provide(_heatingControl.Model, _heatingControl.State);
+            return _powerZoneListProvider.Provide(_heatingControl.State.Model, _heatingControl.State);
         }
 
         [HttpGet("new")]
         public NewPowerZoneOptionsProviderResult GetAvailableDevices()
         {
-            return _newPowerZoneOptionsProvider.Provide(_heatingControl.State, _heatingControl.Model);
+            return _newPowerZoneOptionsProvider.Provide(_heatingControl.State, _heatingControl.State.Model);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace HeatingApi.Controllers
         [HttpPost]
         public void SavePowerZoneSettings([FromBody] SavePowerZoneExecutorInput input)
         {
-            _savePowerZoneExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
+            _savePowerZoneExecutor.Execute(input, _heatingControl.State.Model, _heatingControl.State);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("{powerZoneId}")]
         public void RemovePowerZone(int powerZoneId)
         {
-            _removePowerZoneExecutor.Execute(powerZoneId, _heatingControl.State, _heatingControl.Model);
+            _removePowerZoneExecutor.Execute(powerZoneId, _heatingControl.State, _heatingControl.State.Model);
         }
     }
 }

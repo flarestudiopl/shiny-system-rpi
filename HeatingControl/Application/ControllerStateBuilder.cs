@@ -22,7 +22,10 @@ namespace HeatingControl.Application
 
         public ControllerState Build(Building buildingModel)
         {
-            var state = new ControllerState();
+            var state = new ControllerState
+                        {
+                            Model = buildingModel
+                        };
 
             CollectAvailableSensors(state);
             MapConfiguredHeaters(buildingModel, state);

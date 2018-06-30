@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 
 namespace Commons
 {
@@ -36,6 +37,13 @@ namespace Commons
             var message = format.FormatWith(values);
 
             InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), message, Severity.Trace);
+        }
+
+        public static void TraceWithData(string message, object data, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
+        {
+            var messageWithData = $"{message} {JsonConvert.SerializeObject(data)}";
+
+            InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), messageWithData, Severity.Trace);
         }
 
         private static void InternalWrite(string source, string content, Severity severity)

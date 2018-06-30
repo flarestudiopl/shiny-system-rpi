@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
+using HeatingControl.Models;
 using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
-    public interface INewScheduleItemExecutor
-    {
-        void Execute(NewScheduleItemExecutorInput input, Building building);
-    }
-
-    public class NewScheduleItemExecutorInput
+   public class NewScheduleItemCommand
     {
         public int ZoneId { get; set; }
         public ICollection<DayOfWeek> DaysOfWeek { get; set; }
@@ -22,43 +19,40 @@ namespace HeatingControl.Application.Commands
         public float? SetPoint { get; set; }
     }
 
-    public class NewScheduleItemExecutor : INewScheduleItemExecutor
+    public class NewScheduleItemCommandExecutor : ICommandExecutor<NewScheduleItemCommand>
     {
         private readonly IBuildingModelSaver _buildingModelSaver;
 
-        public NewScheduleItemExecutor(IBuildingModelSaver buildingModelSaver)
+        public NewScheduleItemCommandExecutor(IBuildingModelSaver buildingModelSaver)
         {
             _buildingModelSaver = buildingModelSaver;
         }
 
-        public void Execute(NewScheduleItemExecutorInput input, Building building)
+        public CommandResult Execute(NewScheduleItemCommand command, ControllerState controllerState)
         {
+            var input = command; // TODO
+            var building = controllerState.Model;
+
             if (input.BeginTime >= input.EndTime)
             {
-                Logger.Warning("{0} should be greater than {1}.", new object[] { nameof(input.EndTime), nameof(input.BeginTime) });
-
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.EndTimeShouldBeGreaterBeginTime);
             }
 
             if (input.DaysOfWeek == null || !input.DaysOfWeek.Any())
             {
-                Logger.Warning("Please specify at least one day of week to add new schedule item.");
-
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.MissingDaysOfWeek);
             }
 
             var zone = building.Zones.FirstOrDefault(x => x.ZoneId == input.ZoneId);
 
             if (zone == null)
             {
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(input.ZoneId));
             }
 
             if (zone.IsTemperatureControlled() && !input.SetPoint.HasValue)
             {
-                Logger.Warning("{0} should be set for temperature controlled zone.", new object[] { nameof(input.SetPoint) });
-
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.SetPointIsForTemperatureControlledZoneOnly);
             }
 
             if (zone.Schedule.Any(x => x.DaysOfWeek.Any(d => input.DaysOfWeek.Contains(d) &&
@@ -66,9 +60,7 @@ namespace HeatingControl.Application.Commands
                                                               input.EndTime > x.BeginTime && input.EndTime <= x.EndTime ||
                                                               input.BeginTime < x.BeginTime && input.EndTime > x.EndTime))))
             {
-                Logger.Warning("Given schedule parameters overlaps existing item.");
-
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.ScheduleItemOverlaps);
             }
 
             var lastScheduleItem = zone.Schedule.OrderByDescending(x => x.ScheduleItemId).FirstOrDefault();
@@ -85,6 +77,8 @@ namespace HeatingControl.Application.Commands
             zone.Schedule.Add(newScheduleItem);
 
             _buildingModelSaver.Save(building);
+
+            return new CommandResult();
         }
     }
 }

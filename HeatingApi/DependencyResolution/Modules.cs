@@ -63,6 +63,8 @@ namespace HeatingApi.DependencyResolution
         {
             var assembly = typeof(IControllerStateBuilder).Assembly;
 
+            builder.RegisterType<CommandHandler>().As<ICommandHandler>().SingleInstance();
+
             builder.RegisterType<HeatingControl>()
                    .As<IHeatingControl>()
                    .As<IHostedService>()

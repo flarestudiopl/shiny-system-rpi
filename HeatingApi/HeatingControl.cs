@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Commons;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
-using Domain.BuildingModel;
 using HeatingControl.Application.Commands;
 using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +14,6 @@ namespace HeatingApi
     public interface IHeatingControl : IDisposable
     {
         void Start();
-        Building Model { get; }
         ControllerState State { get; }
         bool ControlEnabled { get; set; }
     }
@@ -29,8 +27,7 @@ namespace HeatingApi
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
 
-        public Building Model { get; private set; }
-        public ControllerState State { get; private set; }
+        public ControllerState State { get; }
 
         private bool _controlEnabled = true;
         public bool ControlEnabled
@@ -64,8 +61,8 @@ namespace HeatingApi
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
 
-            Model = buildingModelProvider.Provide();
-            State = controllerStateBuilder.Build(Model);
+            var model = buildingModelProvider.Provide();
+            State = controllerStateBuilder.Build(model);
         }
 
         public void Start()
@@ -80,9 +77,9 @@ namespace HeatingApi
 
             // TODO - different intervals
 
-            _temperatureReadingLoop.Start(Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
-            _scheduleDeterminationLoop.Start(Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
-            _outputStateProcessingLoop.Start(Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
+            _temperatureReadingLoop.Start(State, _cancellationTokenSource.Token);
+            _scheduleDeterminationLoop.Start(State.Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token); //TODO
+            _outputStateProcessingLoop.Start(State.Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
         }
 
         public void Dispose()

@@ -10,7 +10,7 @@ namespace HeatingControl.Application.Loops
 {
     public interface ITemperatureReadingLoop
     {
-        void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken);
+        void Start(ControllerState controllerState, CancellationToken cancellationToken);
     }
 
     public class TemperatureReadingLoop : ITemperatureReadingLoop
@@ -27,10 +27,10 @@ namespace HeatingControl.Application.Loops
             _temperatureSensor = temperatureSensor;
         }
 
-        public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
+        public void Start(ControllerState controllerState, CancellationToken cancellationToken)
         {
             Loop.Start("Temperature processing",
-                       intervalMilliseconds,
+                       controllerState.Model.ControlLoopIntervalSecondsMilliseconds,
                        () => ProcessReads(controllerState),
                        cancellationToken);
         }

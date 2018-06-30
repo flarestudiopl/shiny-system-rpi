@@ -1,4 +1,5 @@
-﻿using Domain.BuildingModel;
+﻿using Autofac;
+using Domain.BuildingModel;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,8 @@ namespace HeatingApi.Controllers
         private readonly ICounterResetExecutor _counterResetExecutor;
         private readonly IZoneControlModeExecutor _zoneControlModeExecutor;
         private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
-        private readonly INewScheduleItemExecutor _newScheduleItemExecutor;
         private readonly IRemoveScheduleItemExecutor _removeScheduleItemExecutor;
+        private readonly ICommandHandler _commandHandler;
 
         public DashboardController(IHeatingControl heatingControl,
                                    IDashboardSnapshotProvider dashboardSnapshotProvider,
@@ -26,8 +27,8 @@ namespace HeatingApi.Controllers
                                    ICounterResetExecutor counterResetExecutor,
                                    IZoneControlModeExecutor zoneControlModeExecutor,
                                    ITemperatureSetPointExecutor temperatureSetPointExecutor,
-                                   INewScheduleItemExecutor newScheduleItemExecutor,
-                                   IRemoveScheduleItemExecutor removeScheduleItemExecutor)
+                                   IRemoveScheduleItemExecutor removeScheduleItemExecutor,
+                                   ICommandHandler commandHandler)
         {
             _heatingControl = heatingControl;
             _dashboardSnapshotProvider = dashboardSnapshotProvider;
@@ -35,8 +36,8 @@ namespace HeatingApi.Controllers
             _counterResetExecutor = counterResetExecutor;
             _zoneControlModeExecutor = zoneControlModeExecutor;
             _temperatureSetPointExecutor = temperatureSetPointExecutor;
-            _newScheduleItemExecutor = newScheduleItemExecutor;
             _removeScheduleItemExecutor = removeScheduleItemExecutor;
+            _commandHandler = commandHandler;
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace HeatingApi.Controllers
         [HttpGet]
         public DashboardSnapshotProviderOutput GetSnapshot()
         {
-            return _dashboardSnapshotProvider.Provide(_heatingControl.Model, _heatingControl.State, _heatingControl.ControlEnabled);
+            return _dashboardSnapshotProvider.Provide(_heatingControl.State.Model, _heatingControl.State, _heatingControl.ControlEnabled);
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace HeatingApi.Controllers
         [HttpGet("zone/{zoneId}")]
         public ZoneDetailsProviderResult GetDetails(int zoneId)
         {
-            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.Model);
+            return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.State.Model);
         }
 
         /// <summary>
@@ -122,15 +123,15 @@ namespace HeatingApi.Controllers
         /// Adds new schedule item to zone. To be used by zone schedule editor.
         /// </summary>
         [HttpPost("zone/schedule")]
-        public void NewScheduleItem([FromBody] NewScheduleItemExecutorInput input)
+        public IActionResult NewScheduleItem([FromBody] NewScheduleItemCommand input)
         {
-            _newScheduleItemExecutor.Execute(input, _heatingControl.Model);
+            return _commandHandler.ExecuteCommand(input);
         }
 
         [HttpDelete("zone/{zoneId}/schedule/{scheduleItemId}")]
         public void RemoveScheduleItem(int zoneId, int scheduleItemId)
         {
-            _removeScheduleItemExecutor.Execute(zoneId, scheduleItemId, _heatingControl.State, _heatingControl.Model);
+            _removeScheduleItemExecutor.Execute(zoneId, scheduleItemId, _heatingControl.State, _heatingControl.State.Model);
         }
 
         [HttpPost("controllerState/{state}")]
@@ -148,7 +149,7 @@ namespace HeatingApi.Controllers
                                     Value = value
                                 };
 
-            _temperatureSetPointExecutor.Execute(executorInput, _heatingControl.Model);
+            _temperatureSetPointExecutor.Execute(executorInput, _heatingControl.State.Model);
         }
     }
 }

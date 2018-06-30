@@ -38,13 +38,13 @@ namespace HeatingApi.Controllers
         [HttpGet]
         public ZoneListProviderResult GetZoneList()
         {
-            return _zoneListProvider.Provide(_heatingControl.State, _heatingControl.Model);
+            return _zoneListProvider.Provide(_heatingControl.State, _heatingControl.State.Model);
         }
 
         [HttpGet("new")]
         public AvailableDevicesProviderResult GetAvailableDevices()
         {
-            return _availableDevicesProvider.Provide(_heatingControl.State, _heatingControl.Model);
+            return _availableDevicesProvider.Provide(_heatingControl.State, _heatingControl.State.Model);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace HeatingApi.Controllers
         [HttpGet("{zoneId}")]
         public ZoneSettingsProviderResult GetZoneSettings(int zoneId)
         {
-            return _zoneSettingsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.Model);
+            return _zoneSettingsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.State.Model);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace HeatingApi.Controllers
         [HttpPost]
         public void SaveZoneSettings([FromBody] SaveZoneExecutorInput input)
         {
-            _saveZoneExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
+            _saveZoneExecutor.Execute(input, _heatingControl.State.Model, _heatingControl.State);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace HeatingApi.Controllers
         [HttpDelete("{zoneId}")]
         public void RemoveZone(int zoneId)
         {
-            _removeZoneExecutor.Execute(zoneId, _heatingControl.Model, _heatingControl.State);
+            _removeZoneExecutor.Execute(zoneId, _heatingControl.State.Model, _heatingControl.State);
         }
     }
 }

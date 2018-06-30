@@ -15,7 +15,6 @@ namespace HeatingControl.Application.Commands
         public ZoneControlMode ControlMode { get; set; }
     }
 
-
     public class ZoneControlModeExecutor : IZoneControlModeExecutor
     {
         public void Execute(ZoneControlModeExecutorInput input, ControllerState state)

@@ -45,7 +45,7 @@ namespace HeatingApi.Controllers
         [HttpGet]
         public BuildingDevicesProviderResult GetDeviceConfiguration()
         {
-            return _buildingDevicesProvider.Provide(_heatingControl.State, _heatingControl.Model);
+            return _buildingDevicesProvider.Provide(_heatingControl.State, _heatingControl.State.Model);
         }
 
         [HttpPost("buildingName/{name}")]
@@ -55,25 +55,25 @@ namespace HeatingApi.Controllers
                                             {
                                                 Name = name
                                             },
-                                            _heatingControl.Model);
+                                            _heatingControl.State.Model);
         }
 
         [HttpGet("connectedTemperatureSensors")]
         public ICollection<ConnectedTemperatureSensor> GetConnectedTemperetureSensors()
         {
-            return _connectedTemperatureSensorsProvider.Provide(_heatingControl.Model);
+            return _connectedTemperatureSensorsProvider.Provide(_heatingControl.State.Model);
         }
 
         [HttpPost("temperatureSensor")]
         public void AddTemperatureSensor([FromBody] SaveTemperatureSensorExecutorInput input)
         {
-            _saveTemperatureSensorExecutor.Execute(input, _heatingControl.Model, _heatingControl.State);
+            _saveTemperatureSensorExecutor.Execute(input, _heatingControl.State.Model, _heatingControl.State);
         }
 
         [HttpDelete("temperatureSensor/{temperatureSensorId}")]
         public void RemoveTemperatureSensor(int temperatureSensorId)
         {
-            _removeTemperatureSensorExecutor.Execute(temperatureSensorId, _heatingControl.State, _heatingControl.Model);
+            _removeTemperatureSensorExecutor.Execute(temperatureSensorId, _heatingControl.State, _heatingControl.State.Model);
         }
 
         [HttpGet("heater/new")]
@@ -85,13 +85,13 @@ namespace HeatingApi.Controllers
         [HttpPost("heater")]
         public void AddHeater([FromBody] SaveHeaterExecutorInput input)
         {
-            _saveHeaterExecutor.Execute(input, _heatingControl.State, _heatingControl.Model);
+            _saveHeaterExecutor.Execute(input, _heatingControl.State, _heatingControl.State.Model);
         }
 
         [HttpDelete("heater/{heaterId}")]
         public void RemoveHeater(int heaterId)
         {
-            _removeHeaterExecutor.Execute(heaterId, _heatingControl.State, _heatingControl.Model);
+            _removeHeaterExecutor.Execute(heaterId, _heatingControl.State, _heatingControl.State.Model);
         }
     }
 }

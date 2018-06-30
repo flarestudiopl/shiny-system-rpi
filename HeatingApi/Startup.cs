@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,8 @@ using HeatingApi.DependencyResolution;
 using HeatingControl.Application.Commands;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
@@ -30,6 +33,21 @@ namespace HeatingApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<RequestLocalizationOptions>(
+                                                        opts =>
+                                                        {
+                                                            var supportedCultures = new List<CultureInfo>
+                                                                                    {
+                                                                                        new CultureInfo("en"),
+                                                                                        new CultureInfo("pl")
+                                                                                    };
+
+                                                            opts.DefaultRequestCulture = new RequestCulture("en");
+
+                                                            opts.SupportedCultures = supportedCultures;
+                                                            opts.SupportedUICultures = supportedCultures;
+                                                        });
+
             services.AddMvc()
                     .AddJsonOptions(x => x.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified);
 
@@ -97,6 +115,9 @@ namespace HeatingApi
             app.UseStaticFiles();
             app.UseAuthentication();
             
+            var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
+
             app.UseMvc(routes => { routes.MapRoute("Spa", "{*url}", new { controller = "Home", action = "Spa" }); });
         }
 
