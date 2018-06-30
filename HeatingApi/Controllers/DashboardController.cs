@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Domain.BuildingModel;
+﻿using Domain.BuildingModel;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -15,28 +14,16 @@ namespace HeatingApi.Controllers
         private readonly IHeatingControl _heatingControl;
         private readonly IDashboardSnapshotProvider _dashboardSnapshotProvider;
         private readonly IZoneDetailsProvider _zoneDetailsProvider;
-        private readonly ICounterResetExecutor _counterResetExecutor;
-        private readonly IZoneControlModeExecutor _zoneControlModeExecutor;
-        private readonly ITemperatureSetPointExecutor _temperatureSetPointExecutor;
-        private readonly IRemoveScheduleItemExecutor _removeScheduleItemExecutor;
         private readonly ICommandHandler _commandHandler;
 
         public DashboardController(IHeatingControl heatingControl,
                                    IDashboardSnapshotProvider dashboardSnapshotProvider,
                                    IZoneDetailsProvider zoneDetailsProvider,
-                                   ICounterResetExecutor counterResetExecutor,
-                                   IZoneControlModeExecutor zoneControlModeExecutor,
-                                   ITemperatureSetPointExecutor temperatureSetPointExecutor,
-                                   IRemoveScheduleItemExecutor removeScheduleItemExecutor,
                                    ICommandHandler commandHandler)
         {
             _heatingControl = heatingControl;
             _dashboardSnapshotProvider = dashboardSnapshotProvider;
             _zoneDetailsProvider = zoneDetailsProvider;
-            _counterResetExecutor = counterResetExecutor;
-            _zoneControlModeExecutor = zoneControlModeExecutor;
-            _temperatureSetPointExecutor = temperatureSetPointExecutor;
-            _removeScheduleItemExecutor = removeScheduleItemExecutor;
             _commandHandler = commandHandler;
         }
 
@@ -63,60 +50,66 @@ namespace HeatingApi.Controllers
         /// Switches zone control mode(0 - off/lo, 1 - on/high, 2 - schedule). To be used by zone tile on dashboard.
         /// </summary>
         [HttpPost("zone/{zoneId}/setMode/{controlMode}")]
-        public void SetControlMode(int zoneId, ZoneControlMode controlMode)
+        public IActionResult SetControlMode(int zoneId, ZoneControlMode controlMode)
         {
-            var input = new ZoneControlModeExecutorInput
-                        {
-                            ZoneId = zoneId,
-                            ControlMode = controlMode
-                        };
+            var command = new SetZoneControlModeCommand
+                          {
+                              ZoneId = zoneId,
+                              ControlMode = controlMode
+                          };
 
-            _zoneControlModeExecutor.Execute(input, _heatingControl.State);
+            return _commandHandler.ExecuteCommand(command);
         }
 
         /// <summary>
         /// Clears zone counters. To be used by zone counters view.
         /// </summary>
         [HttpDelete("zone/{zoneId}/resetCounters")]
-        public void ResetCounters(int zoneId)
+        public IActionResult ResetCounters(int zoneId)
         {
-            _counterResetExecutor.Execute(zoneId, UserId, _heatingControl.State);
+            var command = new ResetCounterCommand
+                          {
+                              ZoneId = zoneId,
+                              UserId = UserId
+                          };
+
+            return _commandHandler.ExecuteCommand(command);
         }
 
         /// <summary>
         /// Allows to set zone low setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setLowSetPoint/{value}")]
-        public void SetLowSetPoint(int zoneId, float value)
+        public IActionResult SetLowSetPoint(int zoneId, float value)
         {
-            SetSetPoint(zoneId, value, SetPointType.Low);
+            return SetSetPoint(zoneId, value, SetPointType.Low);
         }
 
         /// <summary>
         /// Allows to set zone high setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setHighSetPoint/{value}")]
-        public void SetHighSetPoint(int zoneId, float value)
+        public IActionResult SetHighSetPoint(int zoneId, float value)
         {
-            SetSetPoint(zoneId, value, SetPointType.High);
+            return SetSetPoint(zoneId, value, SetPointType.High);
         }
 
         /// <summary>
         /// Allows to set zone schedule default setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setScheduleSetPoint/{value}")]
-        public void SetScheduleSetPoint(int zoneId, float value)
+        public IActionResult SetScheduleSetPoint(int zoneId, float value)
         {
-            SetSetPoint(zoneId, value, SetPointType.Schedule);
+            return SetSetPoint(zoneId, value, SetPointType.Schedule);
         }
 
         /// <summary>
         /// Allows to set zone hysteresis. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setHysteresisSetPoint/{value}")]
-        public void SetHysteresisSetPoint(int zoneId, float value)
+        public IActionResult SetHysteresisSetPoint(int zoneId, float value)
         {
-            SetSetPoint(zoneId, value, SetPointType.Hysteresis);
+            return SetSetPoint(zoneId, value, SetPointType.Hysteresis);
         }
 
         /// <summary>
@@ -129,9 +122,15 @@ namespace HeatingApi.Controllers
         }
 
         [HttpDelete("zone/{zoneId}/schedule/{scheduleItemId}")]
-        public void RemoveScheduleItem(int zoneId, int scheduleItemId)
+        public IActionResult RemoveScheduleItem(int zoneId, int scheduleItemId)
         {
-            _removeScheduleItemExecutor.Execute(zoneId, scheduleItemId, _heatingControl.State, _heatingControl.State.Model);
+            var command = new RemoveScheduleItemCommand
+                          {
+                              ZoneId = zoneId,
+                              ScheduleItemId = scheduleItemId
+                          };
+
+            return _commandHandler.ExecuteCommand(command);
         }
 
         [HttpPost("controllerState/{state}")]
@@ -140,16 +139,16 @@ namespace HeatingApi.Controllers
             _heatingControl.ControlEnabled = state;
         }
 
-        private void SetSetPoint(int zoneId, float value, SetPointType setPointType)
+        private IActionResult SetSetPoint(int zoneId, float value, SetPointType setPointType)
         {
-            var executorInput = new TemperatureSetPoinExecutorInput
-                                {
-                                    SetPointType = setPointType,
-                                    ZoneId = zoneId,
-                                    Value = value
-                                };
+            var command = new SetTemperatureCommand
+                          {
+                              SetPointType = setPointType,
+                              ZoneId = zoneId,
+                              Value = value
+                          };
 
-            _temperatureSetPointExecutor.Execute(executorInput, _heatingControl.State.Model);
+            return _commandHandler.ExecuteCommand(command);
         }
     }
 }

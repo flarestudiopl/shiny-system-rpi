@@ -9,10 +9,11 @@ namespace HeatingControl.Application.Commands
 
     public class CommandResult
     {
-        public object Result { get; set; }
+        public object Response { get; set; }
         public string ValidationError { get; set; }
 
         public static CommandResult WithValidationError(string validationError) => new CommandResult { ValidationError = validationError };
-        public static CommandResult WithResult(object result) => new CommandResult { Result = result };
+        public static CommandResult WithResponse(object response) => new CommandResult { Response = response };
+        public static CommandResult Empty => new CommandResult();
     }
 }

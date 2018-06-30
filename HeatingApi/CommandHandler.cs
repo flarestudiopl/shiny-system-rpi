@@ -47,12 +47,12 @@ namespace HeatingApi
                 return new BadRequestObjectResult(commandResult.ValidationError);
             }
 
-            if (commandResult.Result == null)
+            if (commandResult.Response == null)
             {
                 return new OkResult();
             }
 
-            return new OkObjectResult(commandResult.Result);
+            return new OkObjectResult(commandResult.Response);
         }
     }
 }

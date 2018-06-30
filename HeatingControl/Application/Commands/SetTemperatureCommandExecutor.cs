@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Linq;
-using Domain.BuildingModel;
+using Commons.Extensions;
+using Commons.Localization;
 using HeatingControl.Extensions;
+using HeatingControl.Models;
 using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
-    public interface ITemperatureSetPointExecutor
-    {
-        void Execute(TemperatureSetPoinExecutorInput input, Building building);
-    }
-
-    public class TemperatureSetPoinExecutorInput
+    public class SetTemperatureCommand
     {
         public int ZoneId { get; set; }
         public SetPointType SetPointType { get; set; }
@@ -26,45 +23,47 @@ namespace HeatingControl.Application.Commands
         Hysteresis
     }
 
-    public class TemperatureSetPointExecutor : ITemperatureSetPointExecutor
+    public class SetTemperatureCommandExecutor : ICommandExecutor<SetTemperatureCommand>
     {
         private readonly IBuildingModelSaver _buildingModelSaver;
 
-        public TemperatureSetPointExecutor(IBuildingModelSaver buildingModelSaver)
+        public SetTemperatureCommandExecutor(IBuildingModelSaver buildingModelSaver)
         {
             _buildingModelSaver = buildingModelSaver;
         }
 
-        public void Execute(TemperatureSetPoinExecutorInput input, Building building)
+        public CommandResult Execute(SetTemperatureCommand command, ControllerState controllerState)
         {
-            var zone = building.Zones.FirstOrDefault(x => x.ZoneId == input.ZoneId);
+            var zone = controllerState.Model.Zones.FirstOrDefault(x => x.ZoneId == command.ZoneId);
 
             if (zone == null || !zone.IsTemperatureControlled())
             {
-                return;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(command.ZoneId));
             }
 
             var temperatureControlledZone = zone.TemperatureControlledZone;
 
-            switch (input.SetPointType)
+            switch (command.SetPointType)
             {
                 case SetPointType.Low:
-                    temperatureControlledZone.LowSetPoint = input.Value;
+                    temperatureControlledZone.LowSetPoint = command.Value;
                     break;
                 case SetPointType.High:
-                    temperatureControlledZone.HighSetPoint = input.Value;
+                    temperatureControlledZone.HighSetPoint = command.Value;
                     break;
                 case SetPointType.Schedule:
-                    temperatureControlledZone.ScheduleDefaultSetPoint = input.Value;
+                    temperatureControlledZone.ScheduleDefaultSetPoint = command.Value;
                     break;
                 case SetPointType.Hysteresis:
-                    temperatureControlledZone.Hysteresis = input.Value;
+                    temperatureControlledZone.Hysteresis = command.Value;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            _buildingModelSaver.Save(building);
+            _buildingModelSaver.Save(controllerState.Model);
+
+            return CommandResult.Empty;
         }
     }
 }

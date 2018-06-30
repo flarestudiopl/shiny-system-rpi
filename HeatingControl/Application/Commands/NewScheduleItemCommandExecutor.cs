@@ -35,7 +35,7 @@ namespace HeatingControl.Application.Commands
 
             if (input.BeginTime >= input.EndTime)
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.EndTimeShouldBeGreaterBeginTime);
+                return CommandResult.WithValidationError(Localization.ValidationMessage.EndTimeShouldBeGreaterThanBeginTime);
             }
 
             if (input.DaysOfWeek == null || !input.DaysOfWeek.Any())
