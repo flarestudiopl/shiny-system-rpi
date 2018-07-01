@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
 
@@ -52,7 +54,7 @@ namespace HeatingControl.Application.Loops
                                  }
                                  else
                                  {
-                                     Logger.Warning($"Sensor {zone.Key} CRC error. Skipping readout.");
+                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(zone.Key));
                                  }
                              });
         }

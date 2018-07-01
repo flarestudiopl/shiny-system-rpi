@@ -20,5 +20,25 @@ namespace Commons.Localization
                 }
             }
         }
+
+        private static readonly INotificationMessage NotificationMessagePl = new NotificationMessagePl();
+        private static readonly INotificationMessage NotificationMessageEn = new NotificationMessageEn();
+
+        public static INotificationMessage NotificationMessage
+        {
+            get
+            {
+                return NotificationMessagePl;
+                
+                // TODO
+                switch (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)
+                {
+                    case "pl":
+                        return NotificationMessagePl;
+                    default:
+                        return NotificationMessageEn;
+                }
+            }
+        }
     }
 }

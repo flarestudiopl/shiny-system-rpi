@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Commons;
+using Commons.Localization;
 using HeatingControl.Application;
 using HeatingControl.Application.Loops;
 using HeatingControl.Application.Commands;
@@ -30,6 +31,7 @@ namespace HeatingApi
         public ControllerState State { get; }
 
         private bool _controlEnabled = true;
+
         public bool ControlEnabled
         {
             get => _controlEnabled;
@@ -69,28 +71,26 @@ namespace HeatingApi
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
-            Logger.Info("Disabling all outputs...");
+            Logger.Info(Localization.NotificationMessage.DisablingAllOutputs);
 
             _disableAllOutputsCommandExecutor.Execute(null, new CommandContext { ControllerState = State });
 
-            Logger.Info("Starting control loops...");
-
-            // TODO - different intervals
+            Logger.Info(Localization.NotificationMessage.StartingControlLoops);
 
             _temperatureReadingLoop.Start(State, _cancellationTokenSource.Token);
-            _scheduleDeterminationLoop.Start(State.Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token); //TODO
-            _outputStateProcessingLoop.Start(State.Model.ControlLoopIntervalSecondsMilliseconds, State, _cancellationTokenSource.Token);
+            _scheduleDeterminationLoop.Start(State, _cancellationTokenSource.Token);
+            _outputStateProcessingLoop.Start(State, _cancellationTokenSource.Token);
         }
 
         public void Dispose()
         {
             using (_cancellationTokenSource)
             {
-                Logger.Info("Sending cancellation to control loops...");
+                Logger.Info(Localization.NotificationMessage.SendingCancellationToControlLoops);
 
                 _cancellationTokenSource.Cancel();
 
-                Logger.Info("Disabling all outputs...");
+                Logger.Info(Localization.NotificationMessage.DisablingAllOutputs);
 
                 _disableAllOutputsCommandExecutor.Execute(null, new CommandContext { ControllerState = State });
             }

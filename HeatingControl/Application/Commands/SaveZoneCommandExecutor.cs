@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Commons;
 using Commons.Extensions;
 using Commons.Localization;
 using Domain.BuildingModel;
+using HeatingControl.Extensions;
 using HeatingControl.Models;
 using Storage.BuildingModel;
 
@@ -137,8 +139,16 @@ namespace HeatingControl.Application.Commands
 
             if (existingZone != null)
             {
-                zone.Schedule = existingZone.Schedule;
                 zone.ZoneId = existingZone.ZoneId;
+
+                if (existingZone.IsTemperatureControlled() == zone.IsTemperatureControlled())
+                {
+                    zone.Schedule = existingZone.Schedule;
+                }
+                else
+                {
+                    Logger.Info(Localization.NotificationMessage.ScheduledRemovedDueToControlTypeChange.FormatWith(command.Name));
+                }
             }
             else
             {
