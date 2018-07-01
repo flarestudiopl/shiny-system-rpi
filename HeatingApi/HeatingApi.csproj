@@ -43,15 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="C:\Users\Michal\.nuget\packages\nlog.config\4.5.6\contentFiles\any\any\NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="C:\Users\Michal\.nuget\packages\nlog.config\4.5.6\contentFiles\any\any\NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Content Update="nlog.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
