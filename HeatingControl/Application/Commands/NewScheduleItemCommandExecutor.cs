@@ -66,9 +66,13 @@ namespace HeatingControl.Application.Commands
                                       ScheduleItemId = (lastScheduleItem?.ScheduleItemId ?? 0) + 1,
                                       DaysOfWeek = command.DaysOfWeek,
                                       BeginTime = command.BeginTime,
-                                      EndTime = command.EndTime,
-                                      SetPoint = command.SetPoint
+                                      EndTime = command.EndTime
                                   };
+
+            if (zone.IsTemperatureControlled())
+            {
+                newScheduleItem.SetPoint = command.SetPoint;
+            }
 
             zone.Schedule.Add(newScheduleItem);
 
