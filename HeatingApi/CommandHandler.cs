@@ -39,14 +39,14 @@ namespace HeatingApi
             }
             catch
             {
-                Logger.TraceWithData("Command that raised the exception", command);
+                Logger.WarningWithData("Command that raised the exception", command);
 
                 throw;
             }
 
             if (!commandResult.ValidationError.IsNullOrEmpty())
             {
-                Logger.TraceWithData(commandResult.ValidationError, command);
+                Logger.WarningWithData(commandResult.ValidationError, command);
 
                 return new BadRequestObjectResult(commandResult.ValidationError);
             }

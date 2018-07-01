@@ -10,6 +10,7 @@ namespace Commons
     public class Logger
     {
         private const int MaxLastMessages = 10;
+        private static readonly NLog.Logger NLogger = NLog.LogManager.GetCurrentClassLogger();
 
         public static Queue<LoggerMessage> LastMessages { get; } = new Queue<LoggerMessage>();
 
@@ -23,6 +24,14 @@ namespace Commons
             var message = format.FormatWith(values);
 
             InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), message, Severity.Warning);
+        }
+
+        public static void WarningWithData(string message, object data, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
+        {
+            var messageWithData = $"{message} {JsonConvert.SerializeObject(data)}";
+
+
+            InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), messageWithData, Severity.Warning);
         }
 
         public static void Info(string format, object[] values = null, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
@@ -39,13 +48,6 @@ namespace Commons
             InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), message, Severity.Trace);
         }
 
-        public static void TraceWithData(string message, object data, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
-        {
-            var messageWithData = $"{message} {JsonConvert.SerializeObject(data)}";
-
-            InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), messageWithData, Severity.Trace);
-        }
-
         private static void InternalWrite(string source, string content, Severity severity)
         {
             var now = DateTime.Now;
@@ -53,8 +55,31 @@ namespace Commons
 #if DEBUG
             Console.WriteLine($"[{now.ToLongTimeString()}] {source} {severity}: {content}");
 #endif
-
+            NlogWrite(source, content, severity);
             EmitNonTrace(content, severity, now);
+        }
+
+        private static void NlogWrite(string source, string content, Severity severity)
+        {
+            var message = $"{source}: {content}";
+
+            switch (severity)
+            {
+                case Severity.Error:
+                    NLogger.Error(message);
+                    break;
+                case Severity.Warning:
+                    NLogger.Warn(message);
+                    break;
+                case Severity.Info:
+                    NLogger.Info(message);
+                    break;
+                case Severity.Trace:
+                    NLogger.Trace(message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(severity), severity, null);
+            }
         }
 
         private static void EmitNonTrace(string content, Severity severity, DateTime now)
