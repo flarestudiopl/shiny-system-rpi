@@ -57,7 +57,13 @@ namespace HeatingControl.Tests.Application.Commands
 
             //Act
             var newScheduleItemExecutor = new NewScheduleItemCommandExecutor(buildingModelSaver);
-            newScheduleItemExecutor.Execute(input, new ControllerState { Model = building });
+            newScheduleItemExecutor.Execute(input, new CommandContext
+                                                   {
+                                                       ControllerState = new ControllerState
+                                                                         {
+                                                                             Model = building
+                                                                         }
+                                                   });
 
             //Assert
             buildingModelSaver.DidNotReceiveWithAnyArgs().Save(null);

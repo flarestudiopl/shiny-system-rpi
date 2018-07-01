@@ -1,7 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
 using Domain.BuildingModel;
-using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
 {
@@ -13,9 +12,9 @@ namespace HeatingControl.Application.Commands
 
     public class SetZoneControlModeCommandExecutor : ICommandExecutor<SetZoneControlModeCommand>
     {
-        public CommandResult Execute(SetZoneControlModeCommand command, ControllerState state)
+        public CommandResult Execute(SetZoneControlModeCommand command, CommandContext context)
         {
-            var zone = state.ZoneIdToState.GetValueOrDefault(command.ZoneId);
+            var zone = context.ControllerState.ZoneIdToState.GetValueOrDefault(command.ZoneId);
 
             if (zone == null)
             {

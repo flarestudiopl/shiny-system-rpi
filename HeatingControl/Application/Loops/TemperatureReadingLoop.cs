@@ -18,7 +18,7 @@ namespace HeatingControl.Application.Loops
         private const int TempAvgQueueLength = 5;
         private const int TempHistoryMinutesModule = 2;
 
-        private int _tempHistoryQueueLength = 200;//60 * 24 / TempHistoryMinutesModule;
+        private int _tempHistoryQueueLength = 200; //60 * 24 / TempHistoryMinutesModule;
 
         private readonly ITemperatureSensor _temperatureSensor;
 
@@ -60,7 +60,7 @@ namespace HeatingControl.Application.Loops
         private static void ProcessCurrentRead(TemperatureData temperatureData, Task<TemperatureSensorData> sensorRead)
         {
             temperatureData.Readouts.Enqueue(sensorRead.Result.Value);
-            temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x);
+            temperatureData.AverageTemperature = Math.Round(temperatureData.Readouts.Average(x => x), 2);
             temperatureData.LastRead = DateTime.Now;
 
             if (temperatureData.Readouts.Count > TempAvgQueueLength)

@@ -30,7 +30,7 @@ namespace HeatingControl.Application.Queries
 
             public class TemperatureControlSnapshot
             {
-                public float? Temperature { get; set; }
+                public double? Temperature { get; set; }
                 public float LowSetPoint { get; set; }
                 public float HighSetPoint { get; set; }
                 public float ScheduleSetPoint { get; set; }

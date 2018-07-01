@@ -6,22 +6,18 @@ using Microsoft.IdentityModel.Tokens;
 using Storage.StorageDatabase.User;
 using System.Security.Claims;
 using System.Collections.Generic;
+using Commons.Localization;
 
 namespace HeatingControl.Application.Commands
 {
-    public interface IAuthenticateUserExecutor
-    {
-        string Execute(AuthenticateUserExecutorInput input);
-    }
-
-    public class AuthenticateUserExecutorInput
+    public class AuthenticateUserCommand
     {
         public string Login { get; set; }
         public string Password { get; set; }
         public string IpAddress { get; set; }
     }
 
-    public class AuthenticateUserExecutor : IAuthenticateUserExecutor
+    public class AuthenticateUserCommandExecutor : ICommandExecutor<AuthenticateUserCommand>
     {
         private const int TokenLifetimeMinutes = 60;
         
@@ -31,29 +27,29 @@ namespace HeatingControl.Application.Commands
         private readonly IUserUpdater _userUpdater;
         private readonly IConfiguration _configuration;
 
-        public AuthenticateUserExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
-                                        IUserUpdater userUpdater,
-                                        IConfiguration configuration)
+        public AuthenticateUserCommandExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
+                                               IUserUpdater userUpdater,
+                                               IConfiguration configuration)
         {
             _activeUserByLoginProvider = activeUserByLoginProvider;
             _userUpdater = userUpdater;
             _configuration = configuration;
         }
 
-        public string Execute(AuthenticateUserExecutorInput input)
+        public CommandResult Execute(AuthenticateUserCommand command, CommandContext context)
         {
-            var user = _activeUserByLoginProvider.Provide(input.Login);
+            var user = _activeUserByLoginProvider.Provide(command.Login);
 
-            if (user == null || user.PasswordHash != input.Password.CalculateHash())
+            if (user == null || user.PasswordHash != command.Password.CalculateHash())
             {
-                return null;
+                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownUserOrWrongPassword);
             }
 
             _userUpdater.Update(new UserUpdaterInput
                                 {
                                     UserId = user.UserId,
                                     LastLogonDate = DateTime.Now,
-                                    LastSeenIpAddress = input.IpAddress
+                                    LastSeenIpAddress = command.IpAddress
                                 });
 
             var signingCredentials = new SigningCredentials(JwtSigningKey, SecurityAlgorithms.HmacSha256);
@@ -65,7 +61,7 @@ namespace HeatingControl.Application.Commands
                                              expires: DateTime.Now.AddMinutes(TokenLifetimeMinutes),
                                              signingCredentials: signingCredentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return CommandResult.WithResponse(new JwtSecurityTokenHandler().WriteToken(token));
         }
     }
 }

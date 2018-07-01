@@ -5,12 +5,12 @@ namespace HeatingControl.Models
 {
     public class TemperatureData
     {
-        public float AverageTemperature { get; set; }
+        public double AverageTemperature { get; set; }
 
-        public Queue<float> Readouts { get; set; } = new Queue<float>();
+        public Queue<double> Readouts { get; set; } = new Queue<double>();
 
         public DateTime LastRead { get; set; }
 
-        public Queue<Tuple<DateTime, float>> HistoricalReads { get; set; } = new Queue<Tuple<DateTime, float>>();
+        public Queue<Tuple<DateTime, double>> HistoricalReads { get; set; } = new Queue<Tuple<DateTime, double>>();
     }
 }

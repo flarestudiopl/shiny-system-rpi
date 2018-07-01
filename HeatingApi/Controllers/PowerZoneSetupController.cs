@@ -11,22 +11,19 @@ namespace HeatingApi.Controllers
         private readonly IPowerZoneListProvider _powerZoneListProvider;
         private readonly INewPowerZoneOptionsProvider _newPowerZoneOptionsProvider;
         private readonly IPowerZoneSettingsProvider _powerZoneSettingsProvider;
-        private readonly ISavePowerZoneExecutor _savePowerZoneExecutor;
-        private readonly IRemovePowerZoneExecutor _removePowerZoneExecutor;
+        private readonly ICommandHandler _commandHandler;
 
         public PowerZoneSetupController(IHeatingControl heatingControl,
                                         IPowerZoneListProvider powerZoneListProvider,
                                         INewPowerZoneOptionsProvider newPowerZoneOptionsProvider,
                                         IPowerZoneSettingsProvider powerZoneSettingsProvider,
-                                        ISavePowerZoneExecutor savePowerZoneExecutor,
-                                        IRemovePowerZoneExecutor removePowerZoneExecutor)
+                                        ICommandHandler commandHandler)
         {
             _heatingControl = heatingControl;
             _powerZoneListProvider = powerZoneListProvider;
             _newPowerZoneOptionsProvider = newPowerZoneOptionsProvider;
             _powerZoneSettingsProvider = powerZoneSettingsProvider;
-            _savePowerZoneExecutor = savePowerZoneExecutor;
-            _removePowerZoneExecutor = removePowerZoneExecutor;
+            _commandHandler = commandHandler;
         }
 
         /// <summary>
@@ -57,18 +54,22 @@ namespace HeatingApi.Controllers
         /// Saves new or existing power zone. Power zone settings editor should post data here.
         /// </summary>
         [HttpPost]
-        public void SavePowerZoneSettings([FromBody] SavePowerZoneExecutorInput input)
+        public IActionResult SavePowerZoneSettings([FromBody] SavePowerZoneCommand command)
         {
-            _savePowerZoneExecutor.Execute(input, _heatingControl.State.Model, _heatingControl.State);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         /// <summary>
         /// Allows to remove power zone. To be used by power zone settings grid (or editor).
         /// </summary>
         [HttpDelete("{powerZoneId}")]
-        public void RemovePowerZone(int powerZoneId)
+        public IActionResult RemovePowerZone(int powerZoneId)
         {
-            _removePowerZoneExecutor.Execute(powerZoneId, _heatingControl.State, _heatingControl.State.Model);
+            return _commandHandler.ExecuteCommand(new RemovePowerZoneCommand
+                                                  {
+                                                      PowerZoneId = powerZoneId
+                                                  },
+                                                  UserId);
         }
     }
 }

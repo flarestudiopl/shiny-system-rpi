@@ -1,4 +1,3 @@
-using HeatingControl.Application;
 using HeatingControl.Application.Loops.Processing;
 using Xunit;
 
@@ -7,13 +6,13 @@ namespace HeatingControl.Tests.Application.Loops.Processing
     public class HysteresisProcessorTests
     {
         [Theory]
-        [InlineData(16.9f, false, true)]
-        [InlineData(16.9f, true, true)]
-        [InlineData(19.1f, false, false)]
-        [InlineData(19.1f, true, true)]
-        [InlineData(21.1f, false, false)]
-        [InlineData(21.1f, true, false)]
-        public void keep_state_inside_hysteresis_loop(float currentTemperature, bool currentState, bool expectedResult)
+        [InlineData(16.90d, false, true)]
+        [InlineData(16.90d, true, true)]
+        [InlineData(19.10d, false, false)]
+        [InlineData(19.10d, true, true)]
+        [InlineData(21.10d, false, false)]
+        [InlineData(21.10d, true, false)]
+        public void keep_state_inside_hysteresis_loop(double currentTemperature, bool currentState, bool expectedResult)
         {
             //Arrange
             var setPoint = 20.0f;

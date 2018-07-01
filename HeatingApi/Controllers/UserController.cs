@@ -8,30 +8,39 @@ namespace HeatingApi.Controllers
     [Route("/api/user")]
     public class UserController : BaseController
     {
-        private readonly IAuthenticateUserExecutor _authenticateUserExecutor;
+        private readonly ICommandExecutor<AuthenticateUserCommand> _authenticateUserCommandExecutor;
 
-        public UserController(IAuthenticateUserExecutor authenticateUserExecutor)
+        public UserController(ICommandExecutor<AuthenticateUserCommand> authenticateUserCommandExecutor)
         {
-            _authenticateUserExecutor = authenticateUserExecutor;
+            _authenticateUserCommandExecutor = authenticateUserCommandExecutor;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult IssueToken(string login, string password)
         {
-            var token = _authenticateUserExecutor.Execute(new AuthenticateUserExecutorInput
-                                                          {
-                                                              Login = login,
-                                                              Password = password,
-                                                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
-                                                          });
+            var commandResult = _authenticateUserCommandExecutor.Execute(new AuthenticateUserCommand
+                                                                         {
+                                                                             Login = login,
+                                                                             Password = password,
+                                                                             IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                                                                         },
+                                                                         null);
 
-            if (token.IsNullOrEmpty())
+            if (!commandResult.ValidationError.IsNullOrEmpty())
+            {
+                return BadRequest(commandResult.ValidationError);
+            }
+
+            if (commandResult.Response == null)
             {
                 return Unauthorized();
             }
 
-            return Ok(new { token });
+            return Ok(new
+                      {
+                          token = commandResult.Response
+                      });
         }
     }
 }

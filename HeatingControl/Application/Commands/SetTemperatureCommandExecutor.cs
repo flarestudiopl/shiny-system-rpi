@@ -3,7 +3,6 @@ using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
 using HeatingControl.Extensions;
-using HeatingControl.Models;
 using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
@@ -32,9 +31,9 @@ namespace HeatingControl.Application.Commands
             _buildingModelSaver = buildingModelSaver;
         }
 
-        public CommandResult Execute(SetTemperatureCommand command, ControllerState controllerState)
+        public CommandResult Execute(SetTemperatureCommand command, CommandContext context)
         {
-            var zone = controllerState.Model.Zones.FirstOrDefault(x => x.ZoneId == command.ZoneId);
+            var zone = context.ControllerState.Model.Zones.FirstOrDefault(x => x.ZoneId == command.ZoneId);
 
             if (zone == null || !zone.IsTemperatureControlled())
             {
@@ -61,7 +60,7 @@ namespace HeatingControl.Application.Commands
                     throw new ArgumentOutOfRangeException();
             }
 
-            _buildingModelSaver.Save(controllerState.Model);
+            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

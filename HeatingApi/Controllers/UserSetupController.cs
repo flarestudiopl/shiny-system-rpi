@@ -11,16 +11,13 @@ namespace HeatingApi.Controllers
     public class UserSetupController : BaseController
     {
         private readonly IUserListProvider _userListProvider;
-        private readonly INewUserExecutor _newUserExecutor;
-        private readonly IRemoveUserExecutor _removeUserExecutor;
+        private readonly ICommandHandler _commandHandler;
 
         public UserSetupController(IUserListProvider userListProvider,
-                                   INewUserExecutor newUserExecutor,
-                                   IRemoveUserExecutor removeUserExecutor)
+                                   ICommandHandler commandHandler)
         {
             _userListProvider = userListProvider;
-            _newUserExecutor = newUserExecutor;
-            _removeUserExecutor = removeUserExecutor;
+            _commandHandler = commandHandler;
         }
 
         [HttpGet]
@@ -30,15 +27,19 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost]
-        public void AddUser([FromBody] NewUserExecutorInput input)
+        public IActionResult AddUser([FromBody] NewUserCommand command)
         {
-            _newUserExecutor.Execute(input, UserId);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpDelete("{userId}")]
-        public void DeleteUser(int userId)
+        public IActionResult RemoveUser(int userId)
         {
-            _removeUserExecutor.Execute(userId, UserId);
+            return _commandHandler.ExecuteCommand(new RemoveUserCommmand
+                                                  {
+                                                      UserId = userId
+                                                  },
+                                                  UserId);
         }
     }
 }

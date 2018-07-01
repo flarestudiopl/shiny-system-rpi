@@ -22,7 +22,6 @@ namespace HeatingApi.Controllers
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
         private readonly ICounterAccumulator _counterAccumulator;
-        private readonly ICounterResetter _counterResetter;
         private readonly ICurrentCountersByHeaterIdsProvider _currentCountersByHeaterIdsProvider;
 
         public TestController(IOneWire oneWire, 
@@ -33,7 +32,6 @@ namespace HeatingApi.Controllers
                               IBuildingModelProvider buildingModelProvider,
                               IBuildingModelSaver buildingModelSaver,
                               ICounterAccumulator counterAccumulator,
-                              ICounterResetter counterResetter,
                               ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider)
         {
             _oneWire = oneWire;
@@ -44,7 +42,6 @@ namespace HeatingApi.Controllers
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
             _counterAccumulator = counterAccumulator;
-            _counterResetter = counterResetter;
             _currentCountersByHeaterIdsProvider = currentCountersByHeaterIdsProvider;
         }
 

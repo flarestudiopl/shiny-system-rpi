@@ -83,7 +83,7 @@ namespace HeatingApi
                                                                               ValidateIssuerSigningKey = true,
                                                                               ValidIssuer = Configuration["Jwt:Issuer"],
                                                                               ValidAudience = Configuration["Jwt:Issuer"],
-                                                                              IssuerSigningKey = AuthenticateUserExecutor.JwtSigningKey
+                                                                              IssuerSigningKey = AuthenticateUserCommandExecutor.JwtSigningKey
                                                                           };
                                   });
 

@@ -4,7 +4,13 @@ namespace HeatingControl.Application.Commands
 {
     public interface ICommandExecutor<in TCommand>
     {
-        CommandResult Execute(TCommand command, ControllerState controllerState);
+        CommandResult Execute(TCommand command, CommandContext context);
+    }
+
+    public class CommandContext
+    {
+        public ControllerState ControllerState { get; set; }
+        public int UserId { get; set; }
     }
 
     public class CommandResult

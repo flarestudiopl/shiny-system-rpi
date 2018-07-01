@@ -22,7 +22,7 @@ namespace HeatingApi
     {
         private CancellationTokenSource _cancellationTokenSource;
 
-        private readonly IDisableAllOutputsExecutor _disableAllOutputsExecutor;
+        private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
@@ -51,12 +51,12 @@ namespace HeatingApi
 
         public HeatingControl(IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
-                              IDisableAllOutputsExecutor disableAllOutputsExecutor,
+                              ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
                               IOutputStateProcessingLoop outputStateProcessingLoop)
         {
-            _disableAllOutputsExecutor = disableAllOutputsExecutor;
+            _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
@@ -71,7 +71,7 @@ namespace HeatingApi
 
             Logger.Info("Disabling all outputs...");
 
-            _disableAllOutputsExecutor.Execute(State);
+            _disableAllOutputsCommandExecutor.Execute(null, new CommandContext { ControllerState = State });
 
             Logger.Info("Starting control loops...");
 
@@ -92,7 +92,7 @@ namespace HeatingApi
 
                 Logger.Info("Disabling all outputs...");
 
-                _disableAllOutputsExecutor.Execute(State);
+                _disableAllOutputsCommandExecutor.Execute(null, new CommandContext { ControllerState = State });
             }
         }
 

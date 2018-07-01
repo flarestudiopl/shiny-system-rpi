@@ -1,5 +1,4 @@
 ﻿using System;
-using HeatingControl.Models;
 using Storage.StorageDatabase.Counter;
 using Commons.Extensions;
 using Commons.Localization;
@@ -24,9 +23,9 @@ namespace HeatingControl.Application.Commands
             _counterAccumulator = counterAccumulator;
         }
 
-        public CommandResult Execute(ResetCounterCommand command, ControllerState controllerState)
+        public CommandResult Execute(ResetCounterCommand command, CommandContext context)
         {
-            var zone = controllerState.ZoneIdToState.GetValueOrDefault(command.ZoneId);
+            var zone = context.ControllerState.ZoneIdToState.GetValueOrDefault(command.ZoneId);
 
             if (zone == null)
             {
@@ -35,7 +34,7 @@ namespace HeatingControl.Application.Commands
 
             foreach (var heaterId in zone.Zone.HeaterIds)
             {
-                controllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.Now;
+                context.ControllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.Now;
 
                 _counterResetter.Reset(new CounterResetterInput
                                        {

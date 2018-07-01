@@ -1,5 +1,4 @@
 ﻿using Commons.Extensions;
-using HeatingControl.Models;
 using Storage.BuildingModel;
 using System.Linq;
 using Commons.Localization;
@@ -21,9 +20,9 @@ namespace HeatingControl.Application.Commands
             _buildingModelSaver = buildingModelSaver;
         }
 
-        public CommandResult Execute(RemoveScheduleItemCommand command, ControllerState controllerState)
+        public CommandResult Execute(RemoveScheduleItemCommand command, CommandContext context)
         {
-            var zone = controllerState.ZoneIdToState.GetValueOrDefault(command.ZoneId);
+            var zone = context.ControllerState.ZoneIdToState.GetValueOrDefault(command.ZoneId);
 
             if (zone == null)
             {
@@ -39,7 +38,7 @@ namespace HeatingControl.Application.Commands
 
             zone.Zone.Schedule.Remove(scheduleItem);
 
-            _buildingModelSaver.Save(controllerState.Model);
+            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

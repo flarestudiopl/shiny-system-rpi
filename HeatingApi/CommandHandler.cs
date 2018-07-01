@@ -8,7 +8,7 @@ namespace HeatingApi
 {
     public interface ICommandHandler
     {
-        IActionResult ExecuteCommand<TCommand>(TCommand command);
+        IActionResult ExecuteCommand<TCommand>(TCommand command, int userId);
     }
 
     public class CommandHandler : ICommandHandler
@@ -23,7 +23,7 @@ namespace HeatingApi
             _heatingControl = heatingControl;
         }
 
-        public IActionResult ExecuteCommand<TCommand>(TCommand command)
+        public IActionResult ExecuteCommand<TCommand>(TCommand command, int userId)
         {
             var commandExecutor = _componentContext.Resolve<ICommandExecutor<TCommand>>();
 
@@ -31,7 +31,11 @@ namespace HeatingApi
 
             try
             {
-                commandResult = commandExecutor.Execute(command, _heatingControl.State);
+                commandResult = commandExecutor.Execute(command, new CommandContext
+                                                                 {
+                                                                     ControllerState = _heatingControl.State,
+                                                                     UserId = userId
+                                                                 });
             }
             catch
             {

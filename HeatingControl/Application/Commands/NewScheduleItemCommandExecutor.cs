@@ -5,12 +5,11 @@ using Commons.Extensions;
 using Commons.Localization;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
-using HeatingControl.Models;
 using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
-   public class NewScheduleItemCommand
+    public class NewScheduleItemCommand
     {
         public int ZoneId { get; set; }
         public ICollection<DayOfWeek> DaysOfWeek { get; set; }
@@ -28,37 +27,34 @@ namespace HeatingControl.Application.Commands
             _buildingModelSaver = buildingModelSaver;
         }
 
-        public CommandResult Execute(NewScheduleItemCommand command, ControllerState controllerState)
+        public CommandResult Execute(NewScheduleItemCommand command, CommandContext context)
         {
-            var input = command; // TODO
-            var building = controllerState.Model;
-
-            if (input.BeginTime >= input.EndTime)
+            if (command.BeginTime >= command.EndTime)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.EndTimeShouldBeGreaterThanBeginTime);
             }
 
-            if (input.DaysOfWeek == null || !input.DaysOfWeek.Any())
+            if (command.DaysOfWeek == null || !command.DaysOfWeek.Any())
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.MissingDaysOfWeek);
             }
 
-            var zone = building.Zones.FirstOrDefault(x => x.ZoneId == input.ZoneId);
+            var zone = context.ControllerState.Model.Zones.FirstOrDefault(x => x.ZoneId == command.ZoneId);
 
             if (zone == null)
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(input.ZoneId));
+                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(command.ZoneId));
             }
 
-            if (zone.IsTemperatureControlled() && !input.SetPoint.HasValue)
+            if (zone.IsTemperatureControlled() && !command.SetPoint.HasValue)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.SetPointIsForTemperatureControlledZoneOnly);
             }
 
-            if (zone.Schedule.Any(x => x.DaysOfWeek.Any(d => input.DaysOfWeek.Contains(d) &&
-                                                             (input.BeginTime >= x.BeginTime && input.BeginTime < x.EndTime ||
-                                                              input.EndTime > x.BeginTime && input.EndTime <= x.EndTime ||
-                                                              input.BeginTime < x.BeginTime && input.EndTime > x.EndTime))))
+            if (zone.Schedule.Any(x => x.DaysOfWeek.Any(d => command.DaysOfWeek.Contains(d) &&
+                                                             (command.BeginTime >= x.BeginTime && command.BeginTime < x.EndTime ||
+                                                              command.EndTime > x.BeginTime && command.EndTime <= x.EndTime ||
+                                                              command.BeginTime < x.BeginTime && command.EndTime > x.EndTime))))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.ScheduleItemOverlaps);
             }
@@ -68,15 +64,15 @@ namespace HeatingControl.Application.Commands
             var newScheduleItem = new ScheduleItem
                                   {
                                       ScheduleItemId = (lastScheduleItem?.ScheduleItemId ?? 0) + 1,
-                                      DaysOfWeek = input.DaysOfWeek,
-                                      BeginTime = input.BeginTime,
-                                      EndTime = input.EndTime,
-                                      SetPoint = input.SetPoint
+                                      DaysOfWeek = command.DaysOfWeek,
+                                      BeginTime = command.BeginTime,
+                                      EndTime = command.EndTime,
+                                      SetPoint = command.SetPoint
                                   };
 
             zone.Schedule.Add(newScheduleItem);
 
-            _buildingModelSaver.Save(building);
+            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return new CommandResult();
         }

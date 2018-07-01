@@ -58,7 +58,7 @@ namespace HeatingApi.Controllers
                               ControlMode = controlMode
                           };
 
-            return _commandHandler.ExecuteCommand(command);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace HeatingApi.Controllers
                               UserId = UserId
                           };
 
-            return _commandHandler.ExecuteCommand(command);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         /// <summary>
@@ -116,9 +116,9 @@ namespace HeatingApi.Controllers
         /// Adds new schedule item to zone. To be used by zone schedule editor.
         /// </summary>
         [HttpPost("zone/schedule")]
-        public IActionResult NewScheduleItem([FromBody] NewScheduleItemCommand input)
+        public IActionResult NewScheduleItem([FromBody] NewScheduleItemCommand command)
         {
-            return _commandHandler.ExecuteCommand(input);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpDelete("zone/{zoneId}/schedule/{scheduleItemId}")]
@@ -130,7 +130,7 @@ namespace HeatingApi.Controllers
                               ScheduleItemId = scheduleItemId
                           };
 
-            return _commandHandler.ExecuteCommand(command);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpPost("controllerState/{state}")]
@@ -148,7 +148,7 @@ namespace HeatingApi.Controllers
                               Value = value
                           };
 
-            return _commandHandler.ExecuteCommand(command);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
     }
 }

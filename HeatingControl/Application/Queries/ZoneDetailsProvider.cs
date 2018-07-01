@@ -33,7 +33,7 @@ namespace HeatingControl.Application.Queries
             public float LowSetPoint { get; set; }
             public float HightSetPoint { get; set; }
             public float Hysteresis { get; set; }
-            public IDictionary<DateTime, float> PlotData { get; set; }
+            public IDictionary<DateTime, double> PlotData { get; set; }
         }
 
         public class ScheduleSettings

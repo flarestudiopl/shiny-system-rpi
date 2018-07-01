@@ -14,22 +14,19 @@ namespace HeatingApi.Controllers
         private readonly IZoneListProvider _zoneListProvider;
         private readonly IAvailableDevicesProvider _availableDevicesProvider;
         private readonly IZoneSettingsProvider _zoneSettingsProvider;
-        private readonly ISaveZoneExecutor _saveZoneExecutor;
-        private readonly IRemoveZoneExecutor _removeZoneExecutor;
+        private readonly ICommandHandler _commandHandler;
 
         public ZoneSetupController(IHeatingControl heatingControl,
                                    IZoneListProvider zoneListProvider,
                                    IAvailableDevicesProvider availableDevicesProvider,
                                    IZoneSettingsProvider zoneSettingsProvider,
-                                   ISaveZoneExecutor saveZoneExecutor,
-                                   IRemoveZoneExecutor removeZoneExecutor)
+                                   ICommandHandler commandHandler)
         {
             _heatingControl = heatingControl;
             _zoneListProvider = zoneListProvider;
             _availableDevicesProvider = availableDevicesProvider;
             _zoneSettingsProvider = zoneSettingsProvider;
-            _saveZoneExecutor = saveZoneExecutor;
-            _removeZoneExecutor = removeZoneExecutor;
+            _commandHandler = commandHandler;
         }
 
         /// <summary>
@@ -60,18 +57,22 @@ namespace HeatingApi.Controllers
         /// Saves new or existing zone. Zone settings editor should post data here.
         /// </summary>
         [HttpPost]
-        public void SaveZoneSettings([FromBody] SaveZoneExecutorInput input)
+        public IActionResult SaveZoneSettings([FromBody] SaveZoneCommand command)
         {
-            _saveZoneExecutor.Execute(input, _heatingControl.State.Model, _heatingControl.State);
+            return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         /// <summary>
         /// Allows to remove zone. To be used by zone settings grid (or editor).
         /// </summary>
         [HttpDelete("{zoneId}")]
-        public void RemoveZone(int zoneId)
+        public IActionResult RemoveZone(int zoneId)
         {
-            _removeZoneExecutor.Execute(zoneId, _heatingControl.State.Model, _heatingControl.State);
+            return _commandHandler.ExecuteCommand(new RemoveZoneCommand
+                                                  {
+                                                      ZoneId = zoneId
+                                                  },
+                                                  UserId);
         }
     }
 }
