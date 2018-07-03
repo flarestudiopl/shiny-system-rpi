@@ -40,7 +40,7 @@ namespace HeatingControl.Application.Commands
         {
             var user = _activeUserByLoginProvider.Provide(command.Login);
 
-            if (user == null || user.PasswordHash != command.Password.CalculateHash())
+            if (user == null || command.Password.IsNullOrEmpty() || user.PasswordHash != command.Password.CalculateHash())
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownUserOrWrongPassword);
             }

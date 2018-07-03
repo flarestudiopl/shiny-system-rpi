@@ -26,14 +26,6 @@ namespace Commons
             InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), message, Severity.Warning);
         }
 
-        public static void WarningWithData(string message, object data, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
-        {
-            var messageWithData = $"{message} {JsonConvert.SerializeObject(data)}";
-
-
-            InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), messageWithData, Severity.Warning);
-        }
-
         public static void Info(string format, object[] values = null, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
         {
             var message = format.FormatWith(values);
@@ -46,6 +38,13 @@ namespace Commons
             var message = format.FormatWith(values);
 
             InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), message, Severity.Trace);
+        }
+
+        public static void DebugWithData(string message, object data, [CallerMemberName] string callerMember = null, [CallerFilePath] string callerFilePath = null, [CallerLineNumber] int callerLineNumber = 0)
+        {
+            var messageWithData = $"{message} {JsonConvert.SerializeObject(data)}";
+
+            InternalWrite(GetLineBeginning(callerMember, callerFilePath, callerLineNumber), messageWithData, Severity.Debug);
         }
 
         private static void InternalWrite(string source, string content, Severity severity)
@@ -74,6 +73,9 @@ namespace Commons
                 case Severity.Info:
                     NLogger.Info(message);
                     break;
+                case Severity.Debug:
+                    NLogger.Debug(message);
+                    break;
                 case Severity.Trace:
                     NLogger.Trace(message);
                     break;
@@ -84,7 +86,8 @@ namespace Commons
 
         private static void EmitNonTrace(string content, Severity severity, DateTime now)
         {
-            if (severity != Severity.Trace)
+            if (severity != Severity.Trace && 
+                severity != Severity.Debug)
             {
                 LastMessages.Enqueue(new LoggerMessage
                                      {
@@ -117,7 +120,8 @@ namespace Commons
             Error = 1,
             Warning = 2,
             Info = 3,
-            Trace = 4
+            Debug = 4,
+            Trace = 5
         }
     }
 }
