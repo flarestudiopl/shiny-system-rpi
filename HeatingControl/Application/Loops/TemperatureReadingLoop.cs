@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
 
@@ -10,7 +12,7 @@ namespace HeatingControl.Application.Loops
 {
     public interface ITemperatureReadingLoop
     {
-        void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken);
+        void Start(ControllerState controllerState, CancellationToken cancellationToken);
     }
 
     public class TemperatureReadingLoop : ITemperatureReadingLoop
@@ -18,7 +20,7 @@ namespace HeatingControl.Application.Loops
         private const int TempAvgQueueLength = 5;
         private const int TempHistoryMinutesModule = 2;
 
-        private int _tempHistoryQueueLength = 200;//60 * 24 / TempHistoryMinutesModule;
+        private int _tempHistoryQueueLength = 200; //60 * 24 / TempHistoryMinutesModule;
 
         private readonly ITemperatureSensor _temperatureSensor;
 
@@ -27,10 +29,10 @@ namespace HeatingControl.Application.Loops
             _temperatureSensor = temperatureSensor;
         }
 
-        public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
+        public void Start(ControllerState controllerState, CancellationToken cancellationToken)
         {
             Loop.Start("Temperature processing",
-                       intervalMilliseconds,
+                       controllerState.Model.ControlLoopIntervalSecondsMilliseconds,
                        () => ProcessReads(controllerState),
                        cancellationToken);
         }
@@ -52,7 +54,7 @@ namespace HeatingControl.Application.Loops
                                  }
                                  else
                                  {
-                                     Logger.Warning($"Sensor {zone.Key} CRC error. Skipping readout.");
+                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(zone.Key));
                                  }
                              });
         }
@@ -75,7 +77,7 @@ namespace HeatingControl.Application.Loops
 
             if (now.Minute % TempHistoryMinutesModule == 0 && temperatureData.HistoricalReads.LastOrDefault()?.Item1.Minute != now.Minute)
             {
-                temperatureData.HistoricalReads.Enqueue(Tuple.Create(now, temperatureData.AverageTemperature));
+                temperatureData.HistoricalReads.Enqueue(Tuple.Create(now, Math.Round(temperatureData.AverageTemperature, 1)));
             }
 
             if (temperatureData.HistoricalReads.Count > _tempHistoryQueueLength)

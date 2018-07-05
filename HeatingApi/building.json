@@ -1,5 +1,5 @@
 {
-  "Name": "hakunamatata",
+  "Name": "Kurczaki",
   "Zones": [
     {
       "ZoneId": 2,
@@ -45,9 +45,7 @@
     {
       "ZoneId": 4,
       "Name": "pusta strefa",
-      "HeaterIds": [
-        13
-      ],
+      "HeaterIds": [],
       "Schedule": [],
       "TemperatureControlledZone": null
     }

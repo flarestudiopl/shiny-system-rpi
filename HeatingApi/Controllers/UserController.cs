@@ -1,5 +1,4 @@
-﻿using Commons.Extensions;
-using HeatingControl.Application.Commands;
+﻿using HeatingControl.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,30 +7,28 @@ namespace HeatingApi.Controllers
     [Route("/api/user")]
     public class UserController : BaseController
     {
-        private readonly IAuthenticateUserExecutor _authenticateUserExecutor;
+        private readonly ICommandHandler _commandHandler;
 
-        public UserController(IAuthenticateUserExecutor authenticateUserExecutor)
+        public UserController(ICommandHandler commandHandler)
         {
-            _authenticateUserExecutor = authenticateUserExecutor;
+            _commandHandler = commandHandler;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult IssueToken(string login, string password)
         {
-            var token = _authenticateUserExecutor.Execute(new AuthenticateUserExecutorInput
-                                                          {
-                                                              Login = login,
-                                                              Password = password,
-                                                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
-                                                          });
+            var command = new AuthenticateUserCommand
+                          {
+                              Login = login,
+                              Password = password,
+                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                          };
 
-            if (token.IsNullOrEmpty())
-            {
-                return Unauthorized();
-            }
-
-            return Ok(new { token });
+            return _commandHandler.ExecuteCommand(command, -1, result => Ok(new
+                                                                            {
+                                                                                token = result
+                                                                            }));
         }
     }
 }

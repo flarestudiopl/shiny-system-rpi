@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 
 namespace HeatingControl.Application.Loops
 {
@@ -27,7 +29,7 @@ namespace HeatingControl.Application.Loops
                              }
                              catch (Exception exception)
                              {
-                                 Logger.Error($"{loopName} loop failed! Pausing for {FailureStopTimeoutMilliseconds / 1000} seconds.", exception);
+                                 Logger.Error(Localization.NotificationMessage.LoopFailed.FormatWith(loopName, FailureStopTimeoutMilliseconds / 1000), exception);
 
                                  await Task.Delay(FailureStopTimeoutMilliseconds, cancellationToken);
                              }

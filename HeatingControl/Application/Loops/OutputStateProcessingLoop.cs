@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 using HeatingControl.Application.Loops.Processing;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
@@ -10,7 +12,7 @@ namespace HeatingControl.Application.Loops
 {
     public interface IOutputStateProcessingLoop
     {
-        void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken);
+        void Start(ControllerState controllerState, CancellationToken cancellationToken);
     }
 
     public class OutputStateProcessingLoop : IOutputStateProcessingLoop
@@ -31,10 +33,10 @@ namespace HeatingControl.Application.Loops
             _outputsWriter = outputsWriter;
         }
 
-        public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
+        public void Start(ControllerState controllerState, CancellationToken cancellationToken)
         {
             Loop.Start("Output state",
-                       intervalMilliseconds,
+                       controllerState.Model.ControlLoopIntervalSecondsMilliseconds,
                        () =>
                        {
                            ProcessZones(controllerState);
@@ -62,8 +64,7 @@ namespace HeatingControl.Application.Loops
 
             if (temperatureData == null)
             {
-                Logger.Warning("No temperature data for sensor {0} in zone {1}. Proactive power cutoff.",
-                               new object[] { zoneState.Zone.TemperatureControlledZone.TemperatureSensorId, zoneState.Zone.Name });
+                Logger.Warning(Localization.NotificationMessage.NoTemperatureData.FormatWith(zoneState.Zone.TemperatureControlledZone.TemperatureSensorId, zoneState.Zone.Name));
 
                 return false;
             }
@@ -100,8 +101,7 @@ namespace HeatingControl.Application.Loops
             {
                 outputState = false;
 
-                Logger.Warning("Temperature value for zone {0} is too old. Proactive power cutoff.",
-                               new object[] { zoneState.Zone.Name });
+                Logger.Warning(Localization.NotificationMessage.TemperatureValueTooOld.FormatWith(zoneState.Zone.Name));
             }
 
             return outputState;

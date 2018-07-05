@@ -20,7 +20,7 @@ namespace HardwareAccess.Dummy.Devices
                        .ContinueWith(_ => new TemperatureSensorData
                                           {
                                               CrcOk = _random.Next(0, 100) < 98,
-                                              Value = (float)_random.NextDouble() + 20f
+                                              Value = _random.NextDouble() + 20d
                                           });
         }
     }

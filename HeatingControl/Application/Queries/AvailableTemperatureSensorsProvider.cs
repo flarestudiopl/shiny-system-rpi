@@ -15,7 +15,7 @@ namespace HeatingControl.Application.Queries
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public float Readout { get; set; }
+        public double Readout { get; set; }
         public string Assignment { get; set; }
     }
 

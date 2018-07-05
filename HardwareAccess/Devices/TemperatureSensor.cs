@@ -15,7 +15,7 @@ namespace HardwareAccess.Devices
 
     public struct TemperatureSensorData
     {
-        public float Value { get; set; }
+        public double Value { get; set; }
         public bool CrcOk { get; set; }
     }
 
@@ -53,7 +53,7 @@ namespace HardwareAccess.Devices
 
                     if (int.TryParse(rawData.Substring(indexOfTemp, rawData.Length - (indexOfTemp + 1)), out int temp))
                     {
-                        result.Value = temp / 1000f;
+                        result.Value = temp / 1000d;
                     }
 
                     return result;

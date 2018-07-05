@@ -8,13 +8,13 @@ namespace HeatingApi.Controllers
     public class NotificationController : BaseController
     {
         private readonly ILoggerLastMessagesProvider _loggerLastMessagesProvider;
-        private readonly IClearLoggerLastMessagesExecutor _clearLoggerLastMessagesExecutor;
+        private readonly ICommandHandler _commandHandler;
 
         public NotificationController(ILoggerLastMessagesProvider loggerLastMessagesProvider,
-                                      IClearLoggerLastMessagesExecutor clearLoggerLastMessagesExecutor)
+                                      ICommandHandler commandHandler)
         {
             _loggerLastMessagesProvider = loggerLastMessagesProvider;
-            _clearLoggerLastMessagesExecutor = clearLoggerLastMessagesExecutor;
+            _commandHandler = commandHandler;
         }
 
         [HttpGet]
@@ -24,9 +24,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpDelete]
-        public void ClearAlerts()
+        public IActionResult ClearAlerts()
         {
-            _clearLoggerLastMessagesExecutor.Execute();
+            return _commandHandler.ExecuteCommand(new ClearLoggerMessagesCommand(), UserId);
         }
     }
 }

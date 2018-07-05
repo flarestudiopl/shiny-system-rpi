@@ -1,5 +1,6 @@
 ﻿using Commons;
 using Commons.Extensions;
+using Commons.Localization;
 using HardwareAccess.Devices;
 using Domain.BuildingModel;
 using HeatingControl.Models;
@@ -22,7 +23,10 @@ namespace HeatingControl.Application
 
         public ControllerState Build(Building buildingModel)
         {
-            var state = new ControllerState();
+            var state = new ControllerState
+                        {
+                            Model = buildingModel
+                        };
 
             CollectAvailableSensors(state);
             MapConfiguredHeaters(buildingModel, state);
@@ -47,7 +51,7 @@ namespace HeatingControl.Application
             {
                 if (heater.Name.IsNullOrEmpty())
                 {
-                    Logger.Warning("Skipping heater without name.");
+                    Logger.Warning(Localization.NotificationMessage.SkippingHeaterWithoutName);
 
                     continue;
                 }
@@ -72,7 +76,7 @@ namespace HeatingControl.Application
             {
                 if (sensor.Name.IsNullOrEmpty())
                 {
-                    Logger.Warning("Skipping sensor without name.");
+                    Logger.Warning(Localization.NotificationMessage.SkippingSensorWithoutName);
 
                     continue;
                 }
@@ -87,18 +91,18 @@ namespace HeatingControl.Application
             {
                 if (zone.Name.IsNullOrEmpty())
                 {
-                    Logger.Warning("Skipping zone without name.");
+                    Logger.Warning(Localization.NotificationMessage.SkippingZoneWithoutName);
 
                     continue;
                 }
 
                 state.ZoneIdToState.Add(zone.ZoneId,
-                                                new ZoneState
-                                                {
-                                                    Zone = zone,
-                                                    ControlMode = GetInitialControlMode(zone),
-                                                    EnableOutputs = false
-                                                });
+                                        new ZoneState
+                                        {
+                                            Zone = zone,
+                                            ControlMode = GetInitialControlMode(zone),
+                                            EnableOutputs = false
+                                        });
             }
         }
 
@@ -108,7 +112,7 @@ namespace HeatingControl.Application
             {
                 if (powerZone.Name.IsNullOrEmpty())
                 {
-                    Logger.Warning("Skipping power zone without name.");
+                    Logger.Warning(Localization.NotificationMessage.SkippingPowerZoneWithoutName);
 
                     continue;
                 }

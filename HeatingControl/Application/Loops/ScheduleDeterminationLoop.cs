@@ -10,15 +10,15 @@ namespace HeatingControl.Application.Loops
 {
     public interface IScheduleDeterminationLoop
     {
-        void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken);
+        void Start(ControllerState controllerState, CancellationToken cancellationToken);
     }
 
     public class ScheduleDeterminationLoop : IScheduleDeterminationLoop
     {
-        public void Start(int intervalMilliseconds, ControllerState controllerState, CancellationToken cancellationToken)
+        public void Start(ControllerState controllerState, CancellationToken cancellationToken)
         {
             Loop.Start("Schedule determination",
-                       intervalMilliseconds,
+                       controllerState.Model.ControlLoopIntervalSecondsMilliseconds,
                        () => ProcessSchedule(controllerState),
                        cancellationToken);
         }
