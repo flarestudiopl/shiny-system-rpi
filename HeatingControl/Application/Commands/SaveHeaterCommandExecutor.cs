@@ -33,6 +33,16 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.NameCantBeEmpty);
             }
 
+            if (command.UsagePerHour < 0m)
+            {
+                return CommandResult.WithValidationError(Localization.ValidationMessage.UsageCantBeNegative);
+            }
+
+            if (command.MinimumStateChangeIntervalSeconds < 0)
+            {
+                return CommandResult.WithValidationError(Localization.ValidationMessage.MinimumStateChangeIntervalCantBeNegative);
+            }
+
             if (context.ControllerState.Model.Heaters.Any(x => x.PowerOutputDeviceId == command.PowerOutputDeviceId &&
                                                                x.PowerOutputChannel == command.PowerOutputChannel))
             {

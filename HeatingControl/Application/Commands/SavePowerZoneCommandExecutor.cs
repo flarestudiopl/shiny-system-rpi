@@ -69,6 +69,11 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.NameCantBeEmpty);
             }
 
+            if (command.PowerLimitValue < 0m)
+            {
+                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerLimitCantBeNegative);
+            }
+
             if (command.PowerZoneId.HasValue && !controllerState.PowerZoneIdToState.ContainsKey(command.PowerZoneId.Value))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownPowerZoneId.FormatWith(command.PowerZoneId.Value));

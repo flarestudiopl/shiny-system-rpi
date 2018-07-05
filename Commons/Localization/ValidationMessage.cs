@@ -26,7 +26,9 @@
         string DeviceIdCantBeEmpty { get; }
         string DeviceIdAlreadyInUse { get; }
         string HeaterAlreadyInUseByAnotherZone { get; }
-
+        string UsageCantBeNegative { get; }
+        string PowerLimitCantBeNegative { get; }
+        string MinimumStateChangeIntervalCantBeNegative { get; }
     }
 
     public class ValidationMessagePl : IValidationMessage
@@ -40,7 +42,7 @@
         public string UnknownUserOrWrongPassword => "Nieznany użytkownik lub błędne hasło.";
         public string UserAlreadyExists => "Użytkownik '{0}' już istnieje.";
         public string UserNameAndLoginShallNotBeEmpty => "Login i hasło nie mogą być puste.";
-        public string UnknownHeaterId=> "Nieznany ogrzewacza o identyfikatorze '{0}'.";
+        public string UnknownHeaterId => "Nieznany ogrzewacza o identyfikatorze '{0}'.";
         public string CantDeleteHeaterAssignedToZone => "Nie można usunąć ogrzewacza przypisanego do strefy.";
         public string CantDeleteHeaterAssignedToPowerZone => "Nie można usunąć ogrzewacza przypisanego do strefy zasilania.";
         public string UnknownPowerZoneId => "Nieznana strefa zasilania o identyfikatorze '{0}'.";
@@ -54,7 +56,10 @@
         public string PowerZoneTotalLimitLessThanTopHeaterUsage => "Nie można dodać strefy zasilania z limitem mniejszym niż największe zużycie spośród wybranych ogrzewaczy.";
         public string DeviceIdCantBeEmpty => "Identyfikator urządzenia nie może być pusty.";
         public string DeviceIdAlreadyInUse => "Identyfikator urządzenia jest już w użyciu.";
-        public string HeaterAlreadyInUseByAnotherZone  => "Ogrzewacz o identyfikatorze '{0}' jest już przypisany do innej strefy.";
+        public string HeaterAlreadyInUseByAnotherZone => "Ogrzewacz o identyfikatorze '{0}' jest już przypisany do innej strefy.";
+        public string UsageCantBeNegative => "Zużycie nie może być ujemne.";
+        public string PowerLimitCantBeNegative => "Ograniczenie mocy nie może być ujemne.";
+        public string MinimumStateChangeIntervalCantBeNegative => "Minimalny czas przełączania nie może być ujemny.";
     }
 
     public class ValidationMessageEn : IValidationMessage
@@ -68,12 +73,12 @@
         public string UnknownUserOrWrongPassword => "Unknown user or wrong password.";
         public string UserAlreadyExists => "User with login '{0}' already exists.";
         public string UserNameAndLoginShallNotBeEmpty => "User login and password shall not be empty.";
-        public string UnknownHeaterId  => "Unknown heater with id '{0}'.";
+        public string UnknownHeaterId => "Unknown heater with id '{0}'.";
         public string CantDeleteHeaterAssignedToZone => "Can't delete heater assigned to zone.";
         public string CantDeleteHeaterAssignedToPowerZone => "Can't delete heater assigned to power zone.";
         public string UnknownPowerZoneId => "Unknown power zone with id '{0}'.";
-        public string UnknownTemperatureSensorId  => "Unknown temperature sensor with id '{0}'.";
-        public string CantDeleteSensorAssignedToZone=> "Can't delete temperature sensor assigned to zone.";
+        public string UnknownTemperatureSensorId => "Unknown temperature sensor with id '{0}'.";
+        public string CantDeleteSensorAssignedToZone => "Can't delete temperature sensor assigned to zone.";
         public string NameCantBeEmpty => "Name can't be empty.";
         public string PowerOutputParametersAlreadyAssigned => "Heater with the same power output parameters ({0}/{1}) already exists.";
         public string PowerZoneIntervalCantBeLessThan1Minute => "Cannot set power zone interval to less than 1 minute.";
@@ -82,6 +87,9 @@
         public string PowerZoneTotalLimitLessThanTopHeaterUsage => "Cannot add power zone with total limit less than highest usage from heaters.";
         public string DeviceIdCantBeEmpty => "Device id can't be empty.";
         public string DeviceIdAlreadyInUse => "Device id already in use.";
-        public string HeaterAlreadyInUseByAnotherZone=> "Heater of id '{0}' is already in use by another zone.";
+        public string HeaterAlreadyInUseByAnotherZone => "Heater of id '{0}' is already in use by another zone.";
+        public string UsageCantBeNegative => "Usage can't be negative.";
+        public string PowerLimitCantBeNegative => "Power limit can't be negative.";
+        public string MinimumStateChangeIntervalCantBeNegative => "Minimum state change interval can't be negative.";
     }
 }
