@@ -34,7 +34,8 @@ namespace HeatingControl.Application.Queries
                                                                                              .Select(z => z.Value.PowerZone)
                                                                                              .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId))
                                                                                              .Select(z => z.Name).JoinWith(", "),
-                                                                 PowerUnit = x.Heater.UsageUnit
+                                                                 PowerUnit = x.Heater.UsageUnit,
+                                                                 OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })
                                                 .ToList()
                    };

@@ -27,6 +27,7 @@ namespace HeatingControl.Application.Queries
             public string Name { get; set; }
             public string Assignment { get; set; }
             public UsageUnit PowerUnit { get; set; }
+            public bool OutputState { get; set; }
         }
     }
 
@@ -61,7 +62,8 @@ namespace HeatingControl.Application.Queries
                                                                                              .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId) &&
                                                                                                          z.PowerZoneId != powerZoneId)
                                                                                              .Select(z => z.Name).JoinWith(", "),
-                                                                 PowerUnit = x.Heater.UsageUnit
+                                                                 PowerUnit = x.Heater.UsageUnit,
+                                                                 OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })
                                                 .ToList(),
                        RoundRobinIntervalMinutes = powerZoneModel.RoundRobinIntervalMinutes
