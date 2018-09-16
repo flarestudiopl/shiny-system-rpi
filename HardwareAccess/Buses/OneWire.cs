@@ -22,7 +22,9 @@ namespace HardwareAccess.Buses
         {
             if (Directory.Exists(OneWirePath))
             {
-                return Directory.EnumerateDirectories(OneWirePath).Select(Path.GetFileName).ToList();
+                return Directory.EnumerateDirectories(OneWirePath)
+                                .Select(Path.GetFileName)
+                                .ToList();
             }
             else
             {

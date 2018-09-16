@@ -39,6 +39,14 @@ namespace HeatingControl.Application.Loops
 
         private void ProcessReads(ControllerState controllerState)
         {
+            foreach(var availableDeviceId in _temperatureSensor.GetAvailableSensors())
+            {
+                if (!controllerState.TemperatureDeviceIdToTemperatureData.ContainsKey(availableDeviceId))
+                {
+                    controllerState.TemperatureDeviceIdToTemperatureData.Add(availableDeviceId, new TemperatureData());
+                }
+            }
+
             Parallel.ForEach(controllerState.TemperatureDeviceIdToTemperatureData,
                              zone =>
                              {

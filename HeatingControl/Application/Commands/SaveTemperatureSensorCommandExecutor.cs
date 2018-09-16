@@ -39,11 +39,6 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdAlreadyInUse);
             }
 
-            if (!context.ControllerState.TemperatureDeviceIdToTemperatureData.ContainsKey(command.DeviceId))
-            {
-                context.ControllerState.TemperatureDeviceIdToTemperatureData.Add(command.DeviceId, new TemperatureData());
-            }
-
             var temperatureSensor = new TemperatureSensor
                                     {
                                         TemperatureSensorId = (context.ControllerState.TemperatureSensorIdToDeviceId.Keys.Any()

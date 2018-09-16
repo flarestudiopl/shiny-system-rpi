@@ -1,7 +1,6 @@
 ﻿using Commons;
 using Commons.Extensions;
 using Commons.Localization;
-using HardwareAccess.Devices;
 using Domain.BuildingModel;
 using HeatingControl.Models;
 
@@ -14,13 +13,6 @@ namespace HeatingControl.Application
 
     public class ControllerStateBuilder : IControllerStateBuilder
     {
-        private readonly ITemperatureSensor _temperatureSensor;
-
-        public ControllerStateBuilder(ITemperatureSensor temperatureSensor)
-        {
-            _temperatureSensor = temperatureSensor;
-        }
-
         public ControllerState Build(Building buildingModel)
         {
             var state = new ControllerState
@@ -28,21 +20,12 @@ namespace HeatingControl.Application
                             Model = buildingModel
                         };
 
-            CollectAvailableSensors(state);
             MapConfiguredHeaters(buildingModel, state);
             MapConfiguredSensors(buildingModel, state);
             MapConfiguredZones(buildingModel, state);
             MapConfiguredPowerZones(buildingModel, state);
 
             return state;
-        }
-
-        private void CollectAvailableSensors(ControllerState state)
-        {
-            foreach (var sensor in _temperatureSensor.GetAvailableSensors())
-            {
-                state.TemperatureDeviceIdToTemperatureData.Add(sensor, new TemperatureData());
-            }
         }
 
         private static void MapConfiguredHeaters(Building buildingModel, ControllerState state)
