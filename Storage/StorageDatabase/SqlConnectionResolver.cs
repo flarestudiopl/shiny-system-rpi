@@ -1,12 +1,13 @@
 ﻿using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace Storage.StorageDatabase
 {
     public interface ISqlConnectionResolver
     {
-        DbConnection Resolve();
+        IDbConnection Resolve();
     }
 
     public class SqlConnectionResolver : ISqlConnectionResolver
@@ -25,7 +26,7 @@ namespace Storage.StorageDatabase
             _connectionString = connectionStringBuilder.ConnectionString;
         }
 
-        public DbConnection Resolve()
+        public IDbConnection Resolve()
         {
             var connection = new SqliteConnection(_connectionString);
 

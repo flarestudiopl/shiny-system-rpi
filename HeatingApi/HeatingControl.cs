@@ -9,6 +9,7 @@ using HeatingControl.Application.Commands;
 using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
+using Storage.StorageDatabase;
 
 namespace HeatingApi
 {
@@ -22,7 +23,6 @@ namespace HeatingApi
     public class HeatingControl : IHeatingControl, IHostedService
     {
         private CancellationTokenSource _cancellationTokenSource;
-
         private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
@@ -51,13 +51,16 @@ namespace HeatingApi
             }
         }
 
-        public HeatingControl(IBuildingModelProvider buildingModelProvider,
+        public HeatingControl(IMigrator migrator,
+                              IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
                               IOutputStateProcessingLoop outputStateProcessingLoop)
         {
+            migrator.Run();
+
             _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;

@@ -1,6 +1,8 @@
 ﻿using HeatingControl.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
 
 namespace HeatingApi.Controllers
 {
@@ -30,5 +32,27 @@ namespace HeatingApi.Controllers
                                                                                 token = result
                                                                             }));
         }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate-by-pin")]
+        public IActionResult IssueTokenByPin(string login, int pin)
+        {
+            throw new NotImplementedException();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("list")]
+        public IActionResult ListPinAllowedUsers()
+        {
+            if (!IPAddress.IsLoopback(Request.HttpContext.Connection.RemoteIpAddress))
+            {
+                return new BadRequestResult();
+            }
+
+            // TODO - users that can log in via pin
+
+            return new OkResult();
+        }
+        
     }
 }
