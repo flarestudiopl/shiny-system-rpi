@@ -8,6 +8,7 @@ namespace HeatingControl.Application.Commands
     {
         public string Login { get; set; }
         public string Password { get; set; }
+        public string Pin { get; set; }
     }
 
     public class NewUserCommandExecutor : ICommandExecutor<NewUserCommand>
@@ -16,7 +17,7 @@ namespace HeatingControl.Application.Commands
         private readonly IUserSaver _userSaver;
 
         public NewUserCommandExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
-                               IUserSaver userSaver)
+                                      IUserSaver userSaver)
         {
             _activeUserByLoginProvider = activeUserByLoginProvider;
             _userSaver = userSaver;
@@ -34,7 +35,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UserNameAndLoginShallNotBeEmpty);
             }
 
-            _userSaver.Save(command.Login, command.Password.CalculateHash(), context.UserId);
+            _userSaver.Save(command.Login, command.Password.CalculateHash(), command.Pin?.CalculateHash(), context.UserId);
 
             return CommandResult.Empty;
         }

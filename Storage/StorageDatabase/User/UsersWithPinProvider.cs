@@ -3,16 +3,16 @@ using Dapper;
 
 namespace Storage.StorageDatabase.User
 {
-    public interface IPinAllowedUsersProvider
+    public interface IUsersWithPinProvider
     {
         ICollection<Domain.StorageDatabase.User> Provide();
     }
 
-    public class PinAllowedUsersProvider : IPinAllowedUsersProvider
+    public class UsersWithPinProvider : IUsersWithPinProvider
     {
         private readonly ISqlConnectionResolver _sqlConnectionResolver;
 
-        public PinAllowedUsersProvider(ISqlConnectionResolver sqlConnectionResolver)
+        public UsersWithPinProvider(ISqlConnectionResolver sqlConnectionResolver)
         {
             _sqlConnectionResolver = sqlConnectionResolver;
         }
@@ -24,7 +24,7 @@ SELECT *
 FROM [User] 
 WHERE [IsActiveBool] = 1 AND 
       [IsBrowseableBool] = 1 AND
-      [IsPinLoginAllowed] = 1";
+      [QuickLoginPinHash] IS NOT NULL";
 
             using (var connection = _sqlConnectionResolver.Resolve())
             {

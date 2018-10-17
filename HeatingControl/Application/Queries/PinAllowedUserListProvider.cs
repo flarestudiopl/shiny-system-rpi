@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Storage.StorageDatabase.User;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace HeatingControl.Application.Queries
 {
@@ -16,14 +16,21 @@ namespace HeatingControl.Application.Queries
 
     public class PinAllowedUserListProvider : IPinAllowedUserListProvider
     {
-        public PinAllowedUserListProvider()
-        {
+        private readonly IUsersWithPinProvider _usersWithPinProvider;
 
+        public PinAllowedUserListProvider(IUsersWithPinProvider usersWithPinProvider)
+        {
+            _usersWithPinProvider = usersWithPinProvider;
         }
 
         public PinAllowedUserListProviderResult Provide()
         {
-            throw new NotImplementedException();
+            return new PinAllowedUserListProviderResult
+            {
+                Logins = _usersWithPinProvider.Provide()
+                                              .Select(x => x.Login)
+                                              .ToList()
+            };
         }
     }
 }

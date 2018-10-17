@@ -5,7 +5,7 @@ namespace Storage.StorageDatabase.User
 {
     public interface IUserSaver
     {
-        void Save(string login, string passwordHash, int createdByUserId);
+        void Save(string login, string passwordHash, string pinHash, int createdByUserId);
     }
 
     public class UserSaver : IUserSaver
@@ -17,13 +17,13 @@ namespace Storage.StorageDatabase.User
             _sqlConnectionResolver = sqlConnectionResolver;
         }
 
-        public void Save(string login, string passwordHash, int createdByUserId)
+        public void Save(string login, string passwordHash, string pinHash, int createdByUserId)
         {
             const string query = @"
 INSERT INTO [User]
-([Login], [PasswordHash], [CreatedDateTime], [CreatedBy], [LastLogonDateTime])
+([Login], [PasswordHash], [CreatedDateTime], [CreatedBy], [LastLogonDateTime], [QuickLoginPinHash])
 VALUES
-(@Login, @PasswordHash, @CreatedDateTime, @CreatedBy, @LastLogonDateTime)";
+(@Login, @PasswordHash, @CreatedDateTime, @CreatedBy, @LastLogonDateTime, @QuickLoginPinHash)";
 
             using (var connection = _sqlConnectionResolver.Resolve())
             {
@@ -36,7 +36,8 @@ VALUES
                                        PasswordHash = passwordHash,
                                        CreatedDateTime = now,
                                        CreatedBy = createdByUserId,
-                                       LastLogonDateTime = now
+                                       LastLogonDateTime = now,
+                                       QuickLoginPinHash = pinHash
                                    });
             }
         }
