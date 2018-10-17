@@ -35,5 +35,7 @@ namespace Domain.StorageDatabase
         public long? DisabledDateTime { get; set; }
 
         public DateTime? Disabled => DomainModelHelpers.ParseDateTime(DisabledDateTime);
+
+        public string QuickLoginPinHash { get; set; }
     }
 }

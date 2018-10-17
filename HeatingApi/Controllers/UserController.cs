@@ -1,7 +1,7 @@
 ﻿using HeatingControl.Application.Commands;
+using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Net;
 
 namespace HeatingApi.Controllers
@@ -10,10 +10,13 @@ namespace HeatingApi.Controllers
     public class UserController : BaseController
     {
         private readonly ICommandHandler _commandHandler;
+        private readonly IPinAllowedUserListProvider _pinAllowedUserListProvider;
 
-        public UserController(ICommandHandler commandHandler)
+        public UserController(ICommandHandler commandHandler,
+            IPinAllowedUserListProvider pinAllowedUserListProvider)
         {
             _commandHandler = commandHandler;
+            _pinAllowedUserListProvider = pinAllowedUserListProvider;
         }
 
         [AllowAnonymous]
@@ -35,24 +38,38 @@ namespace HeatingApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate-by-pin")]
-        public IActionResult IssueTokenByPin(string login, int pin)
+        public IActionResult IssueTokenByPin(string login, string pin)
         {
-            throw new NotImplementedException();
+            // TODO - list of allowed hosts stored in configuration
+            if (!IPAddress.IsLoopback(Request.HttpContext.Connection.RemoteIpAddress))
+            {
+                return null;
+            }
+
+            var command = new AuthenticateUserByPinCommand
+                          {
+                              Login = login,
+                              Pin = pin,
+                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                          };
+
+            return _commandHandler.ExecuteCommand(command, -1, result => Ok(new
+                                                                            {
+                                                                                token = result
+                                                                            }));
         }
 
         [AllowAnonymous]
         [HttpGet("list")]
-        public IActionResult ListPinAllowedUsers()
+        public PinAllowedUserListProviderResult ListPinAllowedUsers()
         {
+            // TODO - list of allowed hosts stored in configuration
             if (!IPAddress.IsLoopback(Request.HttpContext.Connection.RemoteIpAddress))
             {
-                return new BadRequestResult();
+                return null;
             }
 
-            // TODO - users that can log in via pin
-
-            return new OkResult();
+           return _pinAllowedUserListProvider.Provide();
         }
-        
     }
 }

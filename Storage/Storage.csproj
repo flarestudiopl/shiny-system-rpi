@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="StorageDatabase\MigrationScripts\00002_UserPin.sql" />
     <EmbeddedResource Include="StorageDatabase\MigrationScripts\00001_Initial.sql" />
   </ItemGroup>
 
