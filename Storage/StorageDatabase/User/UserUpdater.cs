@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using System;
 
 namespace Storage.StorageDatabase.User
 {
@@ -11,8 +10,8 @@ namespace Storage.StorageDatabase.User
     public class UserUpdaterInput
     {
         public int UserId { get; set; }
-        public DateTime LastLogonDate { get; set; }
-        public string LastSeenIpAddress { get; set; }
+        public string PasswordHash { get; set; }
+        public string QuickLoginPinHash { get; set; }
     }
 
     public class UserUpdater : IUserUpdater
@@ -26,10 +25,10 @@ namespace Storage.StorageDatabase.User
 
         public void Update(UserUpdaterInput input)
         {
-            var query = @"
+            const string query = @"
 UPDATE [User] 
-SET [LastLogonDateTime] = @LastLogonDateTime,
-    [LastSeenIpAddress] = @LastSeenIpAddress
+SET [PasswordHash] = COALESCE(@PasswordHash, [PasswordHash]),
+    [QuickLoginPinHash] = COALESCE(@QuickLoginPinHash, [QuickLoginPinHash]) 
 WHERE [UserId] = @UserId";
 
             using (var connection = _sqlConnectionResolver.Resolve())
@@ -37,9 +36,9 @@ WHERE [UserId] = @UserId";
                 connection.Execute(query,
                                    new
                                    {
-                                       input.UserId,
-                                       input.LastSeenIpAddress,
-                                       LastLogonDateTime = input.LastLogonDate.Ticks
+                                       UserId = input.UserId,
+                                       PasswordHash = input.PasswordHash,
+                                       QuickLoginPinHash = input.QuickLoginPinHash
                                    });
             }
         }
