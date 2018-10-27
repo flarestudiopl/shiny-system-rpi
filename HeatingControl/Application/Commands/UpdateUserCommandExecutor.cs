@@ -7,7 +7,7 @@ namespace HeatingControl.Application.Commands
     {
         public int UserId { get; set; }
         public string Password { get; set; }
-        public string QuickLoginPin { get; set; }
+        public string Pin { get; set; }
     }
 
     public class UpdateUserCommandExecutor : ICommandExecutor<UpdateUserCommmand>
@@ -25,7 +25,7 @@ namespace HeatingControl.Application.Commands
             {
                 UserId = command.UserId,
                 PasswordHash = command.Password?.CalculateHash(),
-                QuickLoginPinHash = command.QuickLoginPin?.CalculateHash()
+                QuickLoginPinHash = command.Pin?.CalculateHash()
             });
 
             return CommandResult.Empty;
