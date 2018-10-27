@@ -24,11 +24,11 @@ namespace HeatingControl.Application.Commands
         public static SecurityKey JwtSigningKey = new SymmetricSecurityKey(Guid.NewGuid().ToByteArray());
 
         private readonly IActiveUserByLoginProvider _activeUserByLoginProvider;
-        private readonly IUserUpdater _userUpdater;
+        private readonly IUserLastLogonUpdater _userUpdater;
         private readonly IConfiguration _configuration;
 
         public AuthenticateUserCommandExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
-                                               IUserUpdater userUpdater,
+                                               IUserLastLogonUpdater userUpdater,
                                                IConfiguration configuration)
         {
             _activeUserByLoginProvider = activeUserByLoginProvider;
@@ -45,7 +45,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownUserOrWrongPassword);
             }
 
-            _userUpdater.Update(new UserUpdaterInput
+            _userUpdater.Update(new UserLastLogonUpdaterInput
                                 {
                                     UserId = user.UserId,
                                     LastLogonDate = DateTime.Now,
