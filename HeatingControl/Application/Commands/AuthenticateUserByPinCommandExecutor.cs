@@ -20,9 +20,7 @@ namespace HeatingControl.Application.Commands
     public class AuthenticateUserByPinCommandExecutor : ICommandExecutor<AuthenticateUserByPinCommand>
     {
         private const int TokenLifetimeMinutes = 15;
-
-        public static SecurityKey JwtSigningKey = new SymmetricSecurityKey(Guid.NewGuid().ToByteArray());
-
+        
         private readonly IActiveUserByLoginProvider _activeUserByLoginProvider;
         private readonly IUserLastLogonUpdater _userUpdater;
         private readonly IConfiguration _configuration;
@@ -52,7 +50,7 @@ namespace HeatingControl.Application.Commands
                                     LastSeenIpAddress = command.IpAddress
                                 });
 
-            var signingCredentials = new SigningCredentials(JwtSigningKey, SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(AuthenticateUserCommandExecutor.JwtSigningKey, SecurityAlgorithms.HmacSha256);
             var issuer = _configuration["Jwt:Issuer"];
 
             var token = new JwtSecurityToken(issuer,
