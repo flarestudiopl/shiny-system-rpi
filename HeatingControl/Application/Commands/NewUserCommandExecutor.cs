@@ -35,6 +35,14 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UserNameAndLoginShallNotBeEmpty);
             }
 
+            if (command.Pin != null)
+            {
+                if (command.Pin.IsNullOrEmpty() || !command.Pin.ContainsDigitsOnly() || !command.Pin.HasLengthBetween(4, 8))
+                {
+                    return CommandResult.WithValidationError(Localization.ValidationMessage.IncorrectPinError);
+                }
+            }
+
             _userSaver.Save(command.Login, command.Password.CalculateHash(), command.Pin?.CalculateHash(), context.UserId);
 
             return CommandResult.Empty;
