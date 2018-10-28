@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using HardwareAccess.Buses.PlatformIntegration;
+using HardwareAccess.PlatformIntegration;
 using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl.Application;
@@ -50,6 +50,9 @@ namespace HeatingApi.DependencyResolution
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
         {
+            // PlatformIntegration
+            builder.RegisterType<ProcessRunner>().As<IProcessRunner>().SingleInstance();
+
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
