@@ -46,6 +46,12 @@ namespace HeatingApi.Controllers
                                                   UserId);
         }
 
+        [HttpPost("controlState/{state}")]
+        public void SetControllerState(bool state)
+        {
+            _heatingControl.SetControlEnabled(state);
+        }
+
         [HttpGet("connectedTemperatureSensors")]
         public ICollection<ConnectedTemperatureSensor> GetConnectedTemperetureSensors()
         {

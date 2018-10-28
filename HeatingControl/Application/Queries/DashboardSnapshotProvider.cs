@@ -9,7 +9,7 @@ namespace HeatingControl.Application.Queries
 {
     public interface IDashboardSnapshotProvider
     {
-        DashboardSnapshotProviderOutput Provide(Building model, ControllerState state, bool controlEnabled);
+        DashboardSnapshotProviderOutput Provide(Building model, ControllerState state);
     }
 
     public class DashboardSnapshotProviderOutput
@@ -52,12 +52,12 @@ namespace HeatingControl.Application.Queries
             _zoneTemperatureProvider = zoneTemperatureProvider;
         }
 
-        public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state, bool controlEnabled)
+        public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state)
         {
             var output = new DashboardSnapshotProviderOutput
                          {
                              BuildingName = model.Name,
-                             ControlEnabled = controlEnabled,
+                             ControlEnabled = state.ControlEnabled,
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState
                                           .Values

@@ -5,6 +5,8 @@ namespace HeatingControl.Models
 {
     public class ControllerState
     {
+        public bool ControlEnabled { get; set; }
+
         public Building Model { get; set; }
 
         public IDictionary<string, TemperatureData> TemperatureDeviceIdToTemperatureData { get; set; } = new Dictionary<string, TemperatureData>();

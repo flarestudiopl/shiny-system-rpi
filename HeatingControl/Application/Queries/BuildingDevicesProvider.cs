@@ -14,6 +14,7 @@ namespace HeatingControl.Application.Queries
         public string Name { get; set; }
         public ICollection<HeaterData> Heaters { get; set; }
         public ICollection<SensorData> TemperatureSensors { get; set; }
+        public bool ControlEnabled { get; set; }
     }
 
     public class BuildingDevicesProvider : IBuildingDevicesProvider
@@ -30,11 +31,12 @@ namespace HeatingControl.Application.Queries
             var devices = _availableDevicesProvider.Provide(controllerState, building);
 
             return new BuildingDevicesProviderResult
-                   {
-                       Name = building.Name,
-                       Heaters = devices.Heaters,
-                       TemperatureSensors = devices.TemperatureSensors
-                   };
+            {
+                Name = building.Name,
+                Heaters = devices.Heaters,
+                TemperatureSensors = devices.TemperatureSensors,
+                ControlEnabled = controllerState.ControlEnabled
+            };
         }
     }
 }

@@ -16,8 +16,8 @@ namespace HeatingApi
     public interface IHeatingControl : IDisposable
     {
         void Start();
+        void SetControlEnabled(bool controlEnabled);
         ControllerState State { get; }
-        bool ControlEnabled { get; set; }
     }
 
     public class HeatingControl : IHeatingControl, IHostedService
@@ -29,27 +29,6 @@ namespace HeatingApi
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
 
         public ControllerState State { get; }
-
-        private bool _controlEnabled = true;
-
-        public bool ControlEnabled
-        {
-            get => _controlEnabled;
-            set
-            {
-                if (value && !_controlEnabled)
-                {
-                    Start();
-                }
-
-                if (!value && _controlEnabled)
-                {
-                    Dispose();
-                }
-
-                _controlEnabled = value;
-            }
-        }
 
         public HeatingControl(IMigrator migrator,
                               IBuildingModelProvider buildingModelProvider,
@@ -83,6 +62,8 @@ namespace HeatingApi
             _temperatureReadingLoop.Start(State, _cancellationTokenSource.Token);
             _scheduleDeterminationLoop.Start(State, _cancellationTokenSource.Token);
             _outputStateProcessingLoop.Start(State, _cancellationTokenSource.Token);
+            
+            State.ControlEnabled = true;
         }
 
         public void Dispose()
@@ -97,6 +78,8 @@ namespace HeatingApi
 
                 _disableAllOutputsCommandExecutor.Execute(null, new CommandContext { ControllerState = State });
             }
+
+            State.ControlEnabled = false;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -107,6 +90,19 @@ namespace HeatingApi
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.Run(() => Dispose(), cancellationToken);
+        }
+
+        public void SetControlEnabled(bool controlEnabled)
+        {
+            if (controlEnabled && !State.ControlEnabled)
+            {
+                Start();
+            }
+
+            if (!controlEnabled && State.ControlEnabled)
+            {
+                Dispose();
+            }
         }
     }
 }
