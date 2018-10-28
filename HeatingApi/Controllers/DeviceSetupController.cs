@@ -2,6 +2,7 @@
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Commons;
 
 namespace HeatingApi.Controllers
 {
@@ -44,6 +45,20 @@ namespace HeatingApi.Controllers
                                                       Name = name
                                                   },
                                                   UserId);
+        }
+
+        [HttpPost("controlState/{state}")]
+        public void SetControllerState(bool state)
+        {
+            _heatingControl.SetControlEnabled(state);
+        }
+
+        [HttpPost("powerOff")]
+        public IActionResult PowerOff()
+        {
+            _heatingControl.SetControlEnabled(false);
+
+            return _commandHandler.ExecuteCommand(new PowerOffCommand(), UserId);
         }
 
         [HttpGet("connectedTemperatureSensors")]

@@ -14,6 +14,7 @@
         string NoTemperatureData { get; }
         string LoopFailed { get; }
         string SensorCrcError { get; }
+        string PowerOffRequested { get; }
     }
 
     public class NotificationMessagePl : INotificationMessage
@@ -30,6 +31,7 @@
         public string NoTemperatureData => "Brak danych z czujnika '{0}' w strefie '{1}'. Proaktywne odłączenie zasilania.";
         public string LoopFailed => "Awaria pętli '{0}'! Ponowna próba za {0} sekund.";
         public string SensorCrcError => "Błąd CRC czujnika '{0}'. Pomijam odczyt.";
+        public string PowerOffRequested => "Rozpoczęto procedurę wyłączania sterownika...";
     }
 
     public class NotificationMessageEn : INotificationMessage
@@ -46,5 +48,6 @@
         public string NoTemperatureData => "No temperature data for sensor '{0}' in zone '{1}'. Proactive power cutoff.";
         public string LoopFailed => "{0} loop failed! Retrying in {0} seconds.";
         public string SensorCrcError => "Sensor '{0}' CRC error. Skipping readout.";
+        public string PowerOffRequested => "Shutdown sequence started...";
     }
 }

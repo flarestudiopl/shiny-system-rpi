@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HardwareAccess.Buses.PlatformIntegration
+namespace HardwareAccess.PlatformIntegration
 {
     public interface ILibcWrapper
     {

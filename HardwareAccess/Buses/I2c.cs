@@ -1,6 +1,6 @@
 ﻿using Commons;
 using Commons.Exceptions;
-using HardwareAccess.Buses.PlatformIntegration;
+using HardwareAccess.PlatformIntegration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

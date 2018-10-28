@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace HardwareAccess.Buses.PlatformIntegration
+namespace HardwareAccess.PlatformIntegration
 {
     public interface IProcessRunner
     {

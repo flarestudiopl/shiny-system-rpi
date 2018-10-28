@@ -34,7 +34,7 @@ namespace HeatingApi.Controllers
         [HttpGet]
         public DashboardSnapshotProviderOutput GetSnapshot()
         {
-            return _dashboardSnapshotProvider.Provide(_heatingControl.State.Model, _heatingControl.State, _heatingControl.ControlEnabled);
+            return _dashboardSnapshotProvider.Provide(_heatingControl.State.Model, _heatingControl.State);
         }
 
         /// <summary>
@@ -131,12 +131,6 @@ namespace HeatingApi.Controllers
                           };
 
             return _commandHandler.ExecuteCommand(command, UserId);
-        }
-
-        [HttpPost("controllerState/{state}")]
-        public void SetControllerState(bool state)
-        {
-            _heatingControl.ControlEnabled = state;
         }
 
         private IActionResult SetSetPoint(int zoneId, float value, SetPointType setPointType)
