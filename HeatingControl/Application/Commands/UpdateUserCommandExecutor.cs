@@ -1,4 +1,5 @@
 ﻿using Commons.Extensions;
+using Commons.Localization;
 using Storage.StorageDatabase.User;
 
 namespace HeatingControl.Application.Commands
@@ -21,6 +22,22 @@ namespace HeatingControl.Application.Commands
 
         public CommandResult Execute(UpdateUserCommmand command, CommandContext context)
         {
+            if (command.Pin != null)
+            {
+                if (command.Pin.IsNullOrEmpty() || !command.Pin.ContainsDigitsOnly() || !command.Pin.HasLengthBetween(4, 8))
+                {
+                    return CommandResult.WithValidationError(Localization.ValidationMessage.IncorrectPinError);
+                }
+            }
+
+            if (command.Password != null)
+            {
+                if (command.Password.IsNullOrEmpty())
+                {
+                    return CommandResult.WithValidationError(Localization.ValidationMessage.PasswordCannotBeEmpty);
+                }
+            }
+
             _userUpdater.Update(new UserUpdaterInput
             {
                 UserId = command.UserId,
