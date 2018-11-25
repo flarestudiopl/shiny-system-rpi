@@ -105,5 +105,11 @@ namespace HeatingApi.Controllers
                                                   },
                                                   UserId);
         }
+
+        [HttpPut("dateTime")]
+        public IActionResult SetDateTime([FromBody] SetDateTimeCommand command)
+        {
+            return _commandHandler.ExecuteCommand(command, UserId);
+        }
     }
 }
