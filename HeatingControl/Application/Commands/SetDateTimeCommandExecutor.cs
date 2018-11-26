@@ -29,8 +29,8 @@ namespace HeatingControl.Application.Commands
         {
             var localTime = command.NewDateTimeUtc.ToLocalTime();
 
-            _processRunner.Run(_configuration[SetDateTimeCommandConfigPath].FormatWith(localTime),
-                               _configuration[SetDateTimeArgumentsConfigPath].FormatWith(localTime))
+            _processRunner.Run(_configuration[SetDateTimeCommandConfigPath].FormatWith(command.NewDateTimeUtc, localTime),
+                               _configuration[SetDateTimeArgumentsConfigPath].FormatWith(command.NewDateTimeUtc, localTime))
                           .Wait(2000);
 
             return CommandResult.Empty;
