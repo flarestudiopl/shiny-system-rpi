@@ -15,8 +15,8 @@ namespace HeatingControl.Application.Commands
         private readonly IConfiguration _configuration;
         private readonly IProcessRunner _processRunner;
 
-        public const string PowerOffCommandConfigPath = "PlatformIntegration:PowerOffCommand";
-        public const string PowerOffArgumentConfigPath = "PlatformIntegration:PowerOffArguments";
+        private const string PowerOffCommandConfigPath = "PlatformIntegration:PowerOffCommand";
+        private const string PowerOffArgumentConfigPath = "PlatformIntegration:PowerOffArguments";
 
         public PowerOffCommandExecutor(IConfiguration configuration,
                                        IProcessRunner processRunner)
