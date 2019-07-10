@@ -1,6 +1,8 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Storage.StorageDatabase.User;
+using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
+using System;
 
 namespace HeatingControl.Application.Commands
 {
@@ -13,19 +15,18 @@ namespace HeatingControl.Application.Commands
 
     public class NewUserCommandExecutor : ICommandExecutor<NewUserCommand>
     {
-        private readonly IActiveUserByLoginProvider _activeUserByLoginProvider;
-        private readonly IUserSaver _userSaver;
+        private readonly IRepository<User> _userRepository;
 
-        public NewUserCommandExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
-                                      IUserSaver userSaver)
+        public NewUserCommandExecutor(IRepository<User> userRepository)
         {
-            _activeUserByLoginProvider = activeUserByLoginProvider;
-            _userSaver = userSaver;
+            _userRepository = userRepository;
         }
 
         public CommandResult Execute(NewUserCommand command, CommandContext context)
         {
-            if (_activeUserByLoginProvider.Provide(command.Login) != null)
+            if (_userRepository.ReadSingleOrDefault(x => x.IsActive &&
+                                                         x.IsBrowseable &&
+                                                         x.Login == command.Login) != null)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UserAlreadyExists.FormatWith(command.Login));
             }
@@ -43,7 +44,18 @@ namespace HeatingControl.Application.Commands
                 }
             }
 
-            _userSaver.Save(command.Login, command.Password.CalculateHash(), command.Pin?.CalculateHash(), context.UserId);
+            var user = new User
+            {
+                Login = command.Login,
+                PasswordHash = command.Password.CalculateHash(),
+                QuickLoginPinHash = command.Pin?.CalculateHash(),
+                CreatedByUserId = context.UserId,
+                CreatedDate = DateTime.UtcNow,
+                IsActive = true,
+                IsBrowseable = true
+            };
+
+            _userRepository.Create(user);
 
             return CommandResult.Empty;
         }

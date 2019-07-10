@@ -99,7 +99,7 @@ namespace HeatingControl.Application.Queries
 
             return new ZoneDetailsProviderResult.CountersData
                    {
-                       LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.Start) : (DateTime?)null,
+                       LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.StartDate) : (DateTime?)null,
                        UsageUnitToValue = usageUnitToHeaterToValue.ToDictionary(x => x.Key,
                                                                                 x => x.Value.Sum(h => h.Value)),
                        UsageUnitToHeaterNameToValue = usageUnitToHeaterToValue

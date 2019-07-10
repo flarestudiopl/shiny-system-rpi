@@ -12,30 +12,25 @@ namespace Domain.StorageDatabase
 
         public string LastSeenIpAddress { get; set; }
 
-        public long LastLogonDateTime { get; set; }
+        public DateTime? LastLogonDate { get; set; }
 
-        public DateTime LastLogon => DomainModelHelpers.ParseDateTime(LastLogonDateTime);
+        public bool IsActive { get; set; }
 
-        public int IsActiveBool { get; set; }
+        public bool IsBrowseable { get; set; }
+        
+        public int? CreatedByUserId { get; set; }
 
-        public bool IsActive => DomainModelHelpers.ParseBool(IsActiveBool);
+        public User CreatedBy { get; set; }
 
-        public int IsBrowseableBool { get; set; }
+        public DateTime CreatedDate { get; set; }
 
-        public bool IsBrowseable => DomainModelHelpers.ParseBool(IsBrowseableBool);
+        public int? DisabledByUserId { get; set; }
 
-        public int CreatedBy { get; set; }
+        public User DisabledBy { get; set; }
 
-        public long CreatedDateTime { get; set; }
-
-        public DateTime Created => DomainModelHelpers.ParseDateTime(CreatedDateTime);
-
-        public int? DisabledBy { get; set; }
-
-        public long? DisabledDateTime { get; set; }
-
-        public DateTime? Disabled => DomainModelHelpers.ParseDateTime(DisabledDateTime);
+        public DateTime? DisabledDate { get; set; }
 
         public string QuickLoginPinHash { get; set; }
+        
     }
 }

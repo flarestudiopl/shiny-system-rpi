@@ -3,10 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using Commons.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Storage.StorageDatabase.User;
 using System.Security.Claims;
 using System.Collections.Generic;
 using Commons.Localization;
+using HeatingControl.Application.DataAccess.User;
 
 namespace HeatingControl.Application.Commands
 {

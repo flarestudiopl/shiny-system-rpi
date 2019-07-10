@@ -7,6 +7,7 @@ using HeatingControl.Application.Loops;
 using HeatingControl.Application.Loops.Processing;
 using Microsoft.Extensions.Hosting;
 using Storage.StorageDatabase;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -79,6 +80,15 @@ namespace HeatingApi.DependencyResolution
             // Application/Commands
             builder.RegisterAssemblyTypes(assembly)
                    .Where(x => x.FullName.StartsWith("HeatingControl.Application.Commands."))
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
+
+            // Application/DataAccess
+            builder.RegisterGeneric(typeof(Repository<>))
+                   .As(typeof(IRepository<>));
+
+            builder.RegisterAssemblyTypes(assembly)
+                   .Where(x => x.FullName.StartsWith("HeatingControl.Application.DataAccess."))
                    .AsImplementedInterfaces()
                    .SingleInstance();
 

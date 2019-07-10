@@ -1,4 +1,5 @@
-﻿using Storage.StorageDatabase.User;
+﻿using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Queries
 {
@@ -14,16 +15,18 @@ namespace HeatingControl.Application.Queries
 
     public class UserProvider : IUserProvider
     {
-        private readonly IActiveBrowseableUserProvider _activeBrowseableUserProvider;
+        private readonly IRepository<User> _userRepository;
 
-        public UserProvider(IActiveBrowseableUserProvider activeBrowseableUserProvider)
+        public UserProvider(IRepository<User> userRepository)
         {
-            _activeBrowseableUserProvider = activeBrowseableUserProvider;
+            _userRepository = userRepository;
         }
 
         public UserProviderResult Provide(int userId)
         {
-            var user = _activeBrowseableUserProvider.Provider(userId);
+            var user = _userRepository.ReadSingleOrDefault(x => x.UserId == userId &&
+                                                                x.IsActive &&
+                                                                x.IsBrowseable);
 
             return new UserProviderResult
             {

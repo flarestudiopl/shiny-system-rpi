@@ -1,4 +1,6 @@
-﻿using Storage.StorageDatabase.User;
+﻿using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
+using System;
 
 namespace HeatingControl.Application.Commands
 {
@@ -9,16 +11,27 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveUserCommandExecutor : ICommandExecutor<RemoveUserCommmand>
     {
-        private readonly IUserDeactivator _userDeactivator;
+        private readonly IRepository<User> _userRepository;
 
-        public RemoveUserCommandExecutor(IUserDeactivator userDeactivator)
+        public RemoveUserCommandExecutor(IRepository<User> userRepository)
         {
-            _userDeactivator = userDeactivator;
+            _userRepository = userRepository;
         }
 
         public CommandResult Execute(RemoveUserCommmand command, CommandContext context)
         {
-            _userDeactivator.Deactivate(command.UserId, context.UserId);
+            var user = _userRepository.ReadSingleOrDefault(x => x.UserId == command.UserId &&
+                                                                x.IsActive &&
+                                                                x.IsBrowseable);
+
+            if (user != null)
+            {
+                user.IsActive = false;
+                user.DisabledByUserId = context.UserId;
+                user.DisabledDate = DateTime.UtcNow;
+
+                _userRepository.Update(user);
+            }
 
             return CommandResult.Empty;
         }

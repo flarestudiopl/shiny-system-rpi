@@ -1,6 +1,4 @@
-﻿using DbUp;
-using DbUp.SQLite.Helpers;
-using System.Reflection;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Storage.StorageDatabase
 {
@@ -11,30 +9,16 @@ namespace Storage.StorageDatabase
 
     public class Migrator : IMigrator
     {
-        private readonly ISqlConnectionResolver _sqlConnectionResolver;
+        private readonly IDbExecutor _dbExecutor;
 
-        public Migrator(ISqlConnectionResolver sqlConnectionResolver)
+        public Migrator(IDbExecutor dbExecutor)
         {
-            _sqlConnectionResolver = sqlConnectionResolver;
+            _dbExecutor = dbExecutor;
         }
 
         public void Run()
         {
-            using (var connection = _sqlConnectionResolver.Resolve())
-            {
-                var upgrader = DeployChanges.To
-                                            .SQLiteDatabase(new SharedConnection(connection))
-                                            .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
-                                            .LogToConsole()
-                                            .Build();
-
-                var result = upgrader.PerformUpgrade();
-
-                if (result.Error != null)
-                {
-                    throw result.Error;
-                }
-            }
+            _dbExecutor.Execute(c => c.Database.Migrate());
         }
     }
 }
