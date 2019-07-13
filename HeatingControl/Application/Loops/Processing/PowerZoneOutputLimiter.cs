@@ -26,7 +26,7 @@ namespace HeatingControl.Application.Loops.Processing
                 return;
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var heatersThatCantBeDisabled = controllerState.HeaterIdToState
                                                            .Where(x => x.Value.OutputState &&

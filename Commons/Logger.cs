@@ -49,7 +49,7 @@ namespace Commons
 
         private static void InternalWrite(string source, string content, Severity severity)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
 #if DEBUG
             Console.WriteLine($"[{now.ToLongTimeString()}] {source} {severity}: {content}");

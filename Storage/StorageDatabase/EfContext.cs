@@ -20,7 +20,10 @@ namespace Storage.StorageDatabase
             modelBuilder.Entity<Domain.StorageDatabase.Counter>(x =>
             {
                 x.ToTable(nameof(Domain.StorageDatabase.Counter));
+                
                 x.HasOne(c => c.ResettedBy).WithMany().HasForeignKey(c => c.ResettedByUserId).OnDelete(DeleteBehavior.Restrict);
+
+                x.HasIndex(c => new { c.HeaterId, c.ResetDate }).HasFilter($"[{nameof(Domain.StorageDatabase.Counter.ResetDate)}] IS NULL").IsUnique();
             });
 
             modelBuilder.Entity<Domain.StorageDatabase.User>(x =>
@@ -42,7 +45,7 @@ namespace Storage.StorageDatabase
                     PasswordHash = "testowy".CalculateHash(),
                     IsActive = true,
                     IsBrowseable = true,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = new DateTime(2019, 7, 10, 18, 4, 28, 876, DateTimeKind.Utc).AddTicks(8468)
                 });
             });
         }

@@ -1,6 +1,6 @@
 ﻿using System;
+using HeatingControl.Application.DataAccess.Counter;
 using HeatingControl.Models;
-using Storage.StorageDatabase.Counter;
 
 namespace HeatingControl.Application.Loops.Processing
 {
@@ -33,7 +33,7 @@ namespace HeatingControl.Application.Loops.Processing
                     controllerState.InstantUsage[heater.UsageUnit] += heater.UsagePerHour;
                 }
 
-                heaterState.LastCounterStart = DateTime.Now;
+                heaterState.LastCounterStart = DateTime.UtcNow;
             }
             else
             {
@@ -49,7 +49,7 @@ namespace HeatingControl.Application.Loops.Processing
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
                                                {
                                                    HeaterId = heater.HeaterId,
-                                                   SecondsToAccumulate = (int)(DateTime.Now - heaterState.LastCounterStart).TotalSeconds
+                                                   SecondsToAccumulate = (int)(DateTime.UtcNow - heaterState.LastCounterStart).TotalSeconds
                                                });
             }
         }

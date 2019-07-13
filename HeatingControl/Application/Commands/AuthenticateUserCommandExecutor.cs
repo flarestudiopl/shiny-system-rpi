@@ -48,7 +48,7 @@ namespace HeatingControl.Application.Commands
             _userUpdater.Update(new UserLastLogonUpdaterInput
                                 {
                                     UserId = user.UserId,
-                                    LastLogonDate = DateTime.Now,
+                                    LastLogonDate = DateTime.UtcNow,
                                     LastSeenIpAddress = command.IpAddress
                                 });
 
@@ -58,7 +58,7 @@ namespace HeatingControl.Application.Commands
             var token = new JwtSecurityToken(issuer,
                                              issuer,
                                              new List<Claim> { new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()) },
-                                             expires: DateTime.Now.AddMinutes(TokenLifetimeMinutes),
+                                             expires: DateTime.UtcNow.AddMinutes(TokenLifetimeMinutes),
                                              signingCredentials: signingCredentials);
 
             return CommandResult.WithResponse(new JwtSecurityTokenHandler().WriteToken(token));

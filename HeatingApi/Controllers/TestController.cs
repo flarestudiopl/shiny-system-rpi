@@ -6,7 +6,7 @@ using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
 using Storage.BuildingModel;
-using Storage.StorageDatabase.Counter;
+using HeatingControl.Application.DataAccess.Counter;
 
 namespace HeatingApi.Controllers
 {
@@ -22,7 +22,6 @@ namespace HeatingApi.Controllers
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
         private readonly ICounterAccumulator _counterAccumulator;
-        private readonly ICurrentCountersByHeaterIdsProvider _currentCountersByHeaterIdsProvider;
 
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
@@ -31,8 +30,7 @@ namespace HeatingApi.Controllers
                               IHeatingControl heatingControl,
                               IBuildingModelProvider buildingModelProvider,
                               IBuildingModelSaver buildingModelSaver,
-                              ICounterAccumulator counterAccumulator,
-                              ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider)
+                              ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
@@ -42,7 +40,6 @@ namespace HeatingApi.Controllers
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
             _counterAccumulator = counterAccumulator;
-            _currentCountersByHeaterIdsProvider = currentCountersByHeaterIdsProvider;
         }
 
         /// <summary>
@@ -108,12 +105,6 @@ namespace HeatingApi.Controllers
                                                HeaterId = heaterId,
                                               SecondsToAccumulate = value
                                            });
-        }
-
-        [HttpGet("counter/getbyids")]
-        public ICollection<Counter> GetCounters(int[] heaterIds)
-        {
-            return _currentCountersByHeaterIdsProvider.Provide(heaterIds);
         }
     }
 }

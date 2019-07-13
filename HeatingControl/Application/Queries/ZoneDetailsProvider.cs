@@ -4,9 +4,10 @@ using System.Linq;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
-using Storage.StorageDatabase.Counter;
 using Commons.Extensions;
 using HeatingControl.Application.Loops.Processing;
+using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Queries
 {
@@ -45,13 +46,13 @@ namespace HeatingControl.Application.Queries
 
     public class ZoneDetailsProvider : IZoneDetailsProvider
     {
-        private readonly ICurrentCountersByHeaterIdsProvider _currentCountersByHeaterIdsProvider;
+        private readonly IRepository<Counter> _counterRepository;
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
 
-        public ZoneDetailsProvider(ICurrentCountersByHeaterIdsProvider currentCountersByHeaterIdsProvider,
+        public ZoneDetailsProvider(IRepository<Counter> counterRepository,
                                    IZoneTemperatureProvider zoneTemperatureProvider)
         {
-            _currentCountersByHeaterIdsProvider = currentCountersByHeaterIdsProvider;
+            _counterRepository = counterRepository;
             _zoneTemperatureProvider = zoneTemperatureProvider;
         }
 
@@ -65,21 +66,22 @@ namespace HeatingControl.Application.Queries
             }
 
             return new ZoneDetailsProviderResult
-                   {
-                       Counters = GetCountersData(zone, controllerState, building),
-                       Temperatures = GetTemperatureSettings(zone, controllerState),
-                       Schedule = GetScheduleSettings(zone)
-                   };
+            {
+                Counters = GetCountersData(zone, controllerState, building),
+                Temperatures = GetTemperatureSettings(zone, controllerState),
+                Schedule = GetScheduleSettings(zone)
+            };
         }
 
         private ZoneDetailsProviderResult.CountersData GetCountersData(ZoneState zone, ControllerState state, Building building)
         {
             var heaterIds = zone.Zone.HeaterIds;
-            var heatersCounters = _currentCountersByHeaterIdsProvider.Provide(heaterIds)
-                                                                     .ToDictionary(x => x.HeaterId,
-                                                                                   x => x);
+            var heatersCounters = _counterRepository.Read(x => heaterIds.Contains(x.HeaterId) &&
+                                                               !x.ResetDate.HasValue)
+                                                    .ToDictionary(x => x.HeaterId,
+                                                                  x => x);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var heaterIdToCountedSeconds = heaterIds.ToDictionary(x => x,
                                                                   x =>
@@ -98,12 +100,12 @@ namespace HeatingControl.Application.Queries
                                                                  x => x.ToDictionary(h => h.Name, h => h.UsagePerHour * (decimal)(heaterIdToCountedSeconds[h.HeaterId] / 3600f)));
 
             return new ZoneDetailsProviderResult.CountersData
-                   {
-                       LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.StartDate) : (DateTime?)null,
-                       UsageUnitToValue = usageUnitToHeaterToValue.ToDictionary(x => x.Key,
+            {
+                LastResetDate = heatersCounters.Any() ? heatersCounters.Values.Min(x => x.StartDate) : (DateTime?)null,
+                UsageUnitToValue = usageUnitToHeaterToValue.ToDictionary(x => x.Key,
                                                                                 x => x.Value.Sum(h => h.Value)),
-                       UsageUnitToHeaterNameToValue = usageUnitToHeaterToValue
-                   };
+                UsageUnitToHeaterNameToValue = usageUnitToHeaterToValue
+            };
         }
 
         private ZoneDetailsProviderResult.TemperatureSettings GetTemperatureSettings(ZoneState zone, ControllerState controllerState)
@@ -116,27 +118,27 @@ namespace HeatingControl.Application.Queries
             var temperatureControlledZone = zone.Zone.TemperatureControlledZone;
 
             return new ZoneDetailsProviderResult.TemperatureSettings
-                   {
-                       HightSetPoint = temperatureControlledZone.HighSetPoint,
-                       LowSetPoint = temperatureControlledZone.LowSetPoint,
-                       Hysteresis = temperatureControlledZone.Hysteresis,
-                       PlotData = _zoneTemperatureProvider.Provide(zone.Zone.ZoneId, controllerState)
+            {
+                HightSetPoint = temperatureControlledZone.HighSetPoint,
+                LowSetPoint = temperatureControlledZone.LowSetPoint,
+                Hysteresis = temperatureControlledZone.Hysteresis,
+                PlotData = _zoneTemperatureProvider.Provide(zone.Zone.ZoneId, controllerState)
                                                           .HistoricalReads
                                                           .ToDictionary(x => x.Item1,
                                                                         x => x.Item2)
-                   };
+            };
         }
 
         private static ZoneDetailsProviderResult.ScheduleSettings GetScheduleSettings(ZoneState zone)
         {
             var scheduleSettings = new ZoneDetailsProviderResult.ScheduleSettings
-                                   {
-                                       Items = zone.Zone
+            {
+                Items = zone.Zone
                                                    .Schedule
                                                    .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
                                                    .ThenBy(x => x.BeginTime)
                                                    .ToList()
-                                   };
+            };
 
             if (zone.Zone.IsTemperatureControlled())
             {
