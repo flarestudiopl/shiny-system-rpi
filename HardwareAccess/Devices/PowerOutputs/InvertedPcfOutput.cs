@@ -41,7 +41,7 @@ namespace HardwareAccess.Devices.PowerOutputs
             _i2c = i2c;
         }
 
-        public async Task<int[]> GetDeviceIds()
+        public async Task<ICollection<int>> GetDeviceIds()
         {
             var i2cDevices = await _i2c.GetI2cDevices();
 

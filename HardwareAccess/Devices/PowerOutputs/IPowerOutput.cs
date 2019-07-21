@@ -9,7 +9,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         ICollection<string> OutputNames { get; }
 
-        Task<int[]> GetDeviceIds();
+        Task<ICollection<int>> GetDeviceIds();
 
         void SetState(int deviceId, string outputName, bool state);
 
