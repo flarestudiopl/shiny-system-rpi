@@ -11,13 +11,13 @@ namespace HeatingControl.Application.Loops.Processing
 
     public class OutputsWriter : IOutputsWriter
     {
-        private readonly IPowerOutput _powerOutput;
+        private readonly IPowerOutputProvider _powerOutputProvider;
         private readonly IUsageCollector _usageCollector;
 
-        public OutputsWriter(IPowerOutput powerOutput,
+        public OutputsWriter(IPowerOutputProvider powerOutputProvider,
                              IUsageCollector usageCollector)
         {
-            _powerOutput = powerOutput;
+            _powerOutputProvider = powerOutputProvider;
             _usageCollector = usageCollector;
         }
 
@@ -30,7 +30,9 @@ namespace HeatingControl.Application.Loops.Processing
                 if (CanSwitchState(now, heater, forceImmidiateAction) &&
                     StateShouldBeUpdated(heater))
                 {
-                    _powerOutput.SetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel, heater.OutputState);
+                    _powerOutputProvider.Provide(heater.Heater.PowerOutputProtocolName)
+                                        .SetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel, heater.OutputState);
+
                     _usageCollector.Collect(heater, controllerState);
 
                     heater.LastStateChange = now;
@@ -46,7 +48,8 @@ namespace HeatingControl.Application.Loops.Processing
 
         private bool StateShouldBeUpdated(HeaterState heater)
         {
-            return heater.OutputState != _powerOutput.GetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel);
+            return heater.OutputState != _powerOutputProvider.Provide(heater.Heater.PowerOutputProtocolName)
+                                                             .GetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel);
         }
     }
 }

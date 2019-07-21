@@ -2,7 +2,6 @@
 using Commons.Exceptions;
 using HardwareAccess.PlatformIntegration;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,8 +10,9 @@ namespace HardwareAccess.Buses
 {
     public interface II2c
     {
-        Task<IList<int>> GetI2cDevices();
+        Task<int[]> GetI2cDevices();
         void WriteToDevice(int i2cDevice, byte value);
+        void WriteToDevice(int i2cDevice, byte register, byte value);
     }
 
     public class I2c : II2c
@@ -30,7 +30,7 @@ namespace HardwareAccess.Buses
             _i2cBusHandle = new Lazy<int>(() => _libcWrapper.OpenReadWrite("/dev/i2c-1"));
         }
 
-        public async Task<IList<int>> GetI2cDevices()
+        public async Task<int[]> GetI2cDevices()
         {
             var detectResult = await _processRunner.Run("i2cdetect", "-y 1");
 
@@ -42,7 +42,7 @@ namespace HardwareAccess.Buses
                                             .SelectMany(x => x.Split(' '))
                                             .Where(x => !string.IsNullOrWhiteSpace(x) && x != "--" && x != "UU")
                                             .Select(x => int.Parse(x, NumberStyles.AllowHexSpecifier))
-                                            .ToList();
+                                            .ToArray();
 
                 return addresses;
             }
@@ -54,9 +54,19 @@ namespace HardwareAccess.Buses
 
         public void WriteToDevice(int i2cDevice, byte value)
         {
+            I2cSlaveWrite(i2cDevice, new[] { value });
+        }
+
+        public void WriteToDevice(int i2cDevice, byte register, byte value)
+        {
+            I2cSlaveWrite(i2cDevice, new[] { register, value });
+        }
+
+        private void I2cSlaveWrite(int i2cDevice, byte[] data)
+        {
             if (_libcWrapper.SendControl(_i2cBusHandle.Value, I2C_SLAVE_REQUEST, i2cDevice) >= 0)
             {
-                _libcWrapper.Write(_i2cBusHandle.Value, new[] { value });
+                _libcWrapper.Write(_i2cBusHandle.Value, data);
             }
             else
             {

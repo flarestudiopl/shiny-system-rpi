@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.csproj" />
+    <ProjectReference Include="..\HeatingControl.Domain\Domain.csproj" />
   </ItemGroup>
 
 </Project>

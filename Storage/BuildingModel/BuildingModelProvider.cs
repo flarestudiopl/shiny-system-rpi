@@ -1,4 +1,5 @@
 ﻿using Commons;
+using Domain;
 using Domain.BuildingModel;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
@@ -86,7 +87,8 @@ namespace Storage.BuildingModel
                                          Name = "Grzejnik A",
                                          MinimumStateChangeIntervalSeconds = 1,
                                          PowerOutputDeviceId = 56,
-                                         PowerOutputChannel = 5,
+                                         PowerOutputChannel = "O5",
+                                         PowerOutputProtocolName = ProtocolNames.InvertedPcf,
                                          UsagePerHour = 2,
                                          UsageUnit = UsageUnit.kW
                                      },
@@ -96,7 +98,8 @@ namespace Storage.BuildingModel
                                          Name = "Grzejnik B",
                                          MinimumStateChangeIntervalSeconds = 1,
                                          PowerOutputDeviceId = 56,
-                                         PowerOutputChannel = 6,
+                                         PowerOutputChannel = "O6",
+                                         PowerOutputProtocolName = ProtocolNames.InvertedPcf,
                                          UsagePerHour = 2,
                                          UsageUnit = UsageUnit.kW
                                      }

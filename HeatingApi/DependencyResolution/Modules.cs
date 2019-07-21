@@ -8,6 +8,7 @@ using HeatingControl.Application.Loops.Processing;
 using Microsoft.Extensions.Hosting;
 using Storage.StorageDatabase;
 using HeatingControl.Application.DataAccess;
+using HardwareAccess.Devices.PowerOutputs;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -45,8 +46,11 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<I2c>().As<II2c>().SingleInstance();
 
             // Devices
-            builder.RegisterType<PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+
+            // Devices/PowerOutputs
+            builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
         }
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
@@ -59,8 +63,11 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
 
             // Devices
-            builder.RegisterType<HardwareAccess.Dummy.Devices.PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+
+            // Devices/PowerOutputs
+            builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)
