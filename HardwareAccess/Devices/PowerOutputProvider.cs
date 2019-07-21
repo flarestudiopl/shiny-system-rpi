@@ -16,9 +16,11 @@ namespace HardwareAccess.Devices
     {
         private static readonly IDictionary<string, IPowerOutput> _availablePowerOutputs = new Dictionary<string, IPowerOutput>();
 
-        public PowerOutputProvider(IInvertedPcfOutput invertedPcfOutput)
+        public PowerOutputProvider(IInvertedPcfOutput invertedPcfOutput,
+                                   IShinyMcpExpander shinyMcpExpander)
         {
             _availablePowerOutputs.Add(invertedPcfOutput.ProtocolName, invertedPcfOutput);
+            _availablePowerOutputs.Add(shinyMcpExpander.ProtocolName, shinyMcpExpander);
         }
 
         public ICollection<string> GetAvailableProtocolNames()

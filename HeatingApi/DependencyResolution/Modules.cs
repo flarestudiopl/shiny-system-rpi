@@ -51,6 +51,7 @@ namespace HeatingApi.DependencyResolution
 
             // Devices/PowerOutputs
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
+            builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
         }
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
@@ -68,6 +69,7 @@ namespace HeatingApi.DependencyResolution
 
             // Devices/PowerOutputs
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
+            builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)
