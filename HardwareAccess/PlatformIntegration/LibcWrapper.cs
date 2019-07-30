@@ -1,12 +1,23 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace HardwareAccess.PlatformIntegration
 {
     public interface ILibcWrapper
     {
-        int OpenReadWrite(string fileName);
+        int Open(string fileName, LibcOpenMode libcOpenMode);
+        int Close(int handle);
         int SendControl(int handle, int request, int data);
         int Write(int handle, byte[] data);
+        byte[] Read(int handle, int length);
+    }
+
+    public enum LibcOpenMode : int
+    {
+        Read = 0,
+        Write = 1,
+        ReadWrite = 2
     }
 
     public class LibcWrapper : ILibcWrapper
@@ -23,11 +34,17 @@ namespace HardwareAccess.PlatformIntegration
         [DllImport("libc.so.6", EntryPoint = "write", SetLastError = true)]
         private static extern int Write(int handle, byte[] data, int length);
 
-        private const int READ_WRITE_MODE = 2;
+        [DllImport("libc.so.6", EntryPoint = "close", SetLastError = true)]
+        public static extern int CloseHandle(int handle);
 
-        public int OpenReadWrite(string fileName)
+        public int Open(string fileName, LibcOpenMode libcOpenMode)
         {
-            return Open(fileName, READ_WRITE_MODE);
+            return Open(fileName, (int)libcOpenMode);
+        }
+
+        public int Close(int handle)
+        {
+            return CloseHandle(handle);
         }
 
         public int SendControl(int handle, int request, int data)
@@ -38,6 +55,24 @@ namespace HardwareAccess.PlatformIntegration
         public int Write(int handle, byte[] data)
         {
             return Write(handle, data, data.Length);
+        }
+
+        public byte[] Read(int handle, int length)
+        {
+            var result = new byte[length];
+            var bytesRead = Read(handle, result, length);
+
+            if(bytesRead == -1)
+            {
+                throw new ArgumentException("Can't read from handle.", nameof(handle));
+            }
+
+            if(bytesRead == length)
+            {
+                return result;
+            }
+
+            return result.Take(bytesRead).ToArray();
         }
     }
 }

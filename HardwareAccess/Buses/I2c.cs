@@ -27,7 +27,7 @@ namespace HardwareAccess.Buses
         {
             _processRunner = processRunner;
             _libcWrapper = libcWrapper;
-            _i2cBusHandle = new Lazy<int>(() => _libcWrapper.OpenReadWrite("/dev/i2c-1"));
+            _i2cBusHandle = new Lazy<int>(() => _libcWrapper.Open("/dev/i2c-1", LibcOpenMode.Write));
         }
 
         public async Task<int[]> GetI2cDevices()

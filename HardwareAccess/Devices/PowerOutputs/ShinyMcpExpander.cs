@@ -29,6 +29,10 @@ namespace HardwareAccess.Devices.PowerOutputs
             ["O10"] = Channel.Create(Bank.A, 2),
             ["N1"] = Channel.Create(Bank.A, 1),
             ["N2"] = Channel.Create(Bank.A, 0),
+            ["AUX1"] = Channel.Create(Bank.A, 4),
+            ["AUX2"] = Channel.Create(Bank.A, 5),
+            ["AUX3"] = Channel.Create(Bank.A, 6),
+            ["AUX4"] = Channel.Create(Bank.A, 7)
         };
 
         private readonly II2c _i2c;
