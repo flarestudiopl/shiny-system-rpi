@@ -20,5 +20,7 @@ namespace HeatingControl.Models
         public IDictionary<UsageUnit, decimal> InstantUsage { get; set; } = new Dictionary<UsageUnit, decimal>();
 
         public IDictionary<int, PowerZoneState> PowerZoneIdToState { get; set; } = new Dictionary<int, PowerZoneState>();
+
+        public IDictionary<DigitalInputFunction, DigitalInputState> DigitalInputFunctionToState { get; set; } = new Dictionary<DigitalInputFunction, DigitalInputState>();
     }
 }

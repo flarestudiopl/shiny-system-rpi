@@ -1,4 +1,5 @@
-﻿using Commons;
+﻿using System.Linq;
+using Commons;
 using Commons.Extensions;
 using Commons.Localization;
 using Domain.BuildingModel;
@@ -16,14 +17,15 @@ namespace HeatingControl.Application
         public ControllerState Build(Building buildingModel)
         {
             var state = new ControllerState
-                        {
-                            Model = buildingModel
-                        };
+            {
+                Model = buildingModel
+            };
 
             MapConfiguredHeaters(buildingModel, state);
             MapConfiguredSensors(buildingModel, state);
             MapConfiguredZones(buildingModel, state);
             MapConfiguredPowerZones(buildingModel, state);
+            MapConfiguredDigitalInputs(buildingModel, state);
 
             return state;
         }
@@ -106,6 +108,20 @@ namespace HeatingControl.Application
                                                  PowerZone = powerZone
                                              });
             }
+        }
+
+        private void MapConfiguredDigitalInputs(Building buildingModel, ControllerState state)
+        {
+            if (buildingModel.DigitalInputs == null)
+            {
+                return;
+            }
+
+            state.DigitalInputFunctionToState = buildingModel.DigitalInputs.ToDictionary(x => x.Function,
+                                                                                         x => new DigitalInputState
+                                                                                         {
+                                                                                             DigitalInput = x
+                                                                                         });
         }
 
         private static ZoneControlMode GetInitialControlMode(Zone zone)

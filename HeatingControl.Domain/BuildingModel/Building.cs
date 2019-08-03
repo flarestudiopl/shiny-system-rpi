@@ -14,6 +14,8 @@ namespace Domain.BuildingModel
 
         public ICollection<PowerZone> PowerZones { get; set; }
 
+        public ICollection<DigitalInput> DigitalInputs { get; set; }
+
         public int ControlLoopIntervalSecondsMilliseconds { get; set; }
     }
 }

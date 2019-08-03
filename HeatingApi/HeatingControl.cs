@@ -27,6 +27,7 @@ namespace HeatingApi
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
+        private readonly IDigitalInputReadingLoop _digitalInputReadingLoop;
 
         public ControllerState State { get; }
 
@@ -36,7 +37,8 @@ namespace HeatingApi
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
-                              IOutputStateProcessingLoop outputStateProcessingLoop)
+                              IOutputStateProcessingLoop outputStateProcessingLoop,
+                              IDigitalInputReadingLoop digitalInputReadingLoop)
         {
             migrator.Run();
 
@@ -44,6 +46,7 @@ namespace HeatingApi
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
+            _digitalInputReadingLoop = digitalInputReadingLoop;
 
             var model = buildingModelProvider.Provide();
             State = controllerStateBuilder.Build(model);
@@ -62,7 +65,8 @@ namespace HeatingApi
             _temperatureReadingLoop.Start(State, _cancellationTokenSource.Token);
             _scheduleDeterminationLoop.Start(State, _cancellationTokenSource.Token);
             _outputStateProcessingLoop.Start(State, _cancellationTokenSource.Token);
-            
+            _digitalInputReadingLoop.Start(State, _cancellationTokenSource.Token);
+
             State.ControlEnabled = true;
         }
 
