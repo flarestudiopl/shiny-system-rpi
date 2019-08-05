@@ -19,8 +19,6 @@ namespace HardwareAccess.Devices.DigitalInputs
             ["Low bat"] = 21
         };
 
-        private readonly IDictionary<string, int> InputNameToValueHandle = new Dictionary<string, int>();
-
         private readonly ILibcWrapper _libcWrapper;
 
         public string ProtocolName => ProtocolNames.ShinyBoard;
@@ -41,16 +39,22 @@ namespace HardwareAccess.Devices.DigitalInputs
 
         public Task<bool> GetState(int deviceId, string inputName)
         {
-            int handle;
-            if (!InputNameToValueHandle.TryGetValue(inputName, out handle))
+            if (!InputNameToGpioNumber.TryGetValue(inputName, out var gpioNumber))
             {
                 throw new ArgumentException(nameof(inputName));
             }
 
+            var valuePath = GetGpioValuePath(gpioNumber);
+            var handle = _libcWrapper.Open(valuePath, LibcOpenMode.Read);
             var result = _libcWrapper.Read(handle, 1);
-            var parsedResult = Encoding.UTF8.GetString(result);
+            _libcWrapper.Close(handle);
 
-            return Task.FromResult(parsedResult == "0");
+            if(result.Length != 1)
+            {
+                throw new Exception($"Unexpected response from {valuePath}.");
+            }
+
+            return Task.FromResult(result[0] == 48);
         }
 
         private void Initialize()
@@ -61,14 +65,11 @@ namespace HardwareAccess.Devices.DigitalInputs
             {
                 var gpioNumber = input.Value;
 
-                _libcWrapper.Write(exportHandle, new byte[] { gpioNumber });
+                _libcWrapper.Write(exportHandle, Encoding.UTF8.GetBytes(gpioNumber.ToString()));
 
                 var directionHandle = _libcWrapper.Open(GetGpioDirectionPath(gpioNumber), LibcOpenMode.Write);
                 _libcWrapper.Write(gpioNumber, Encoding.UTF8.GetBytes("1"));
                 _libcWrapper.Close(directionHandle);
-
-                var valueHandle = _libcWrapper.Open(GetGpioValuePath(gpioNumber), LibcOpenMode.Read);
-                InputNameToValueHandle.Add(input.Key, valueHandle);
             }
 
             _libcWrapper.Close(exportHandle);
