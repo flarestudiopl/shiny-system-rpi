@@ -71,7 +71,7 @@ namespace HeatingControl.Application.Loops
         {
             temperatureData.Readouts.Enqueue(sensorRead.Result.Value);
             temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x);
-            temperatureData.LastRead = DateTime.Now;
+            temperatureData.LastRead = DateTime.UtcNow;
 
             if (temperatureData.Readouts.Count > TempAvgQueueLength)
             {
@@ -81,7 +81,7 @@ namespace HeatingControl.Application.Loops
 
         private void ProcessHistory(TemperatureData temperatureData)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             if (now.Minute % TempHistoryMinutesModule == 0 && temperatureData.HistoricalReads.LastOrDefault()?.Item1.Minute != now.Minute)
             {

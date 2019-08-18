@@ -1,5 +1,5 @@
 ﻿using HardwareAccess.Buses;
-using HardwareAccess.Buses.PlatformIntegration;
+using HardwareAccess.PlatformIntegration;
 using NSubstitute;
 using Xunit;
 

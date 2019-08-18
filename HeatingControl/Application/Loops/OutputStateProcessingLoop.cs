@@ -71,7 +71,7 @@ namespace HeatingControl.Application.Loops
 
             var outputState = zoneState.EnableOutputs;
 
-            if (DateTime.Now - temperatureData.LastRead < TimeSpan.FromMinutes(5))
+            if (DateTime.UtcNow - temperatureData.LastRead < TimeSpan.FromMinutes(5))
             {
                 var setPoint = 0f;
 

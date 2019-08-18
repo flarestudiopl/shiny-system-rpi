@@ -23,7 +23,7 @@ namespace HeatingControl.Application.Loops.Processing
 
         public void Write(ControllerState controllerState, bool forceImmidiateAction)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             foreach (var heater in controllerState.HeaterIdToState.Values)
             {

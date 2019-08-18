@@ -10,14 +10,12 @@ namespace Domain.StorageDatabase
 
         public int CountedSeconds { get; set; }
 
-        public long StartDateTime { get; set; }
+        public DateTime StartDate { get; set; }
 
-        public DateTime Start => DomainModelHelpers.ParseDateTime(StartDateTime);
+        public DateTime? ResetDate { get; set; }
 
-        public long? ResetDateTime { get; set; }
+        public int? ResettedByUserId { get; set; }
 
-        public DateTime? Reset => DomainModelHelpers.ParseDateTime(ResetDateTime);
-
-        public int? ResettedBy { get; set; }
+        public User ResettedBy { get; set; }
     }
 }

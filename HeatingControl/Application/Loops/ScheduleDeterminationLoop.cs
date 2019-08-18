@@ -25,7 +25,7 @@ namespace HeatingControl.Application.Loops
 
         private static void ProcessSchedule(ControllerState controllerState)
         {
-            var currentTime = DateTime.Now;
+            var currentTime = DateTime.UtcNow;
 
             foreach (var zoneState in controllerState.ZoneIdToState.Values)
             {

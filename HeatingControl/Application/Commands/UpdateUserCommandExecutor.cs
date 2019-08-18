@@ -1,6 +1,7 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Storage.StorageDatabase.User;
+using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
 {
@@ -13,11 +14,11 @@ namespace HeatingControl.Application.Commands
 
     public class UpdateUserCommandExecutor : ICommandExecutor<UpdateUserCommmand>
     {
-        private readonly IUserUpdater _userUpdater;
+        private readonly IRepository<User> _userRepository;
 
-        public UpdateUserCommandExecutor(IUserUpdater userUpdater)
+        public UpdateUserCommandExecutor(IRepository<User> userRepository)
         {
-            _userUpdater = userUpdater;
+            _userRepository = userRepository;
         }
 
         public CommandResult Execute(UpdateUserCommmand command, CommandContext context)
@@ -38,12 +39,12 @@ namespace HeatingControl.Application.Commands
                 }
             }
 
-            _userUpdater.Update(new UserUpdaterInput
-            {
-                UserId = command.UserId,
-                PasswordHash = command.Password?.CalculateHash(),
-                QuickLoginPinHash = command.Pin?.CalculateHash()
-            });
+            var user = _userRepository.Read(command.UserId);
+
+            user.PasswordHash = command.Password?.CalculateHash() ?? user.PasswordHash;
+            user.QuickLoginPinHash = command.Pin?.CalculateHash() ?? user.QuickLoginPinHash;
+
+            _userRepository.Update(user);
 
             return CommandResult.Empty;
         }

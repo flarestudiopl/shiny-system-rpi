@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Storage.StorageDatabase.User;
+using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Queries
 {
@@ -24,29 +25,30 @@ namespace HeatingControl.Application.Queries
 
     public class UserListProvider : IUserListProvider
     {
-        private readonly IActiveBrowseableUsersProvider _activeBrowseableUsersProvider;
+        private readonly IRepository<User> _userRepository;
 
-        public UserListProvider(IActiveBrowseableUsersProvider activeBrowseableUsersProvider)
+        public UserListProvider(IRepository<User> userRepository)
         {
-            _activeBrowseableUsersProvider = activeBrowseableUsersProvider;
+            _userRepository = userRepository;
         }
 
         public UserListProviderResult Provide()
         {
-            var users = _activeBrowseableUsersProvider.Provider()
-                                                      .Select(x => new UserListProviderResult.UserListItem
-                                                                   {
-                                                                       Id = x.UserId,
-                                                                       Login = x.Login,
-                                                                       LastLogonDate = x.LastLogon
-                                                                   })
-                                                      .OrderBy(x => x.Login)
-                                                      .ToList();
+            var users = _userRepository.Read(x => x.IsActive &&
+                                                  x.IsBrowseable)
+                                       .Select(x => new UserListProviderResult.UserListItem
+                                       {
+                                           Id = x.UserId,
+                                           Login = x.Login,
+                                           LastLogonDate = x.LastLogonDate
+                                       })
+                                       .OrderBy(x => x.Login)
+                                       .ToList();
 
             return new UserListProviderResult
-                   {
-                       Users = users
-                   };
+            {
+                Users = users
+            };
         }
     }
 }

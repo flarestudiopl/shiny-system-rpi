@@ -1,7 +1,9 @@
 ﻿using System;
-using Storage.StorageDatabase.Counter;
 using Commons.Extensions;
 using Commons.Localization;
+using Domain.StorageDatabase;
+using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.Counter;
 
 namespace HeatingControl.Application.Commands
 {
@@ -13,13 +15,13 @@ namespace HeatingControl.Application.Commands
 
     public class ResetCounterCommandExecutor : ICommandExecutor<ResetCounterCommand>
     {
-        private readonly ICounterResetter _counterResetter;
+        private readonly IRepository<Counter> _counterRepository;
         private readonly ICounterAccumulator _counterAccumulator;
 
-        public ResetCounterCommandExecutor(ICounterResetter counterResetter,
+        public ResetCounterCommandExecutor(IRepository<Counter> counterRepository,
                                            ICounterAccumulator counterAccumulator)
         {
-            _counterResetter = counterResetter;
+            _counterRepository = counterRepository;
             _counterAccumulator = counterAccumulator;
         }
 
@@ -34,19 +36,20 @@ namespace HeatingControl.Application.Commands
 
             foreach (var heaterId in zone.Zone.HeaterIds)
             {
-                context.ControllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.Now;
+                context.ControllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.UtcNow;
 
-                _counterResetter.Reset(new CounterResetterInput
-                                       {
-                                           HeaterId = heaterId,
-                                           UserId = command.UserId
-                                       });
+                var counter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == heaterId && !x.ResetDate.HasValue);
+
+                counter.ResetDate = DateTime.UtcNow;
+                counter.ResettedByUserId = command.UserId;
+
+                _counterRepository.Update(counter);
 
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
-                                               {
-                                                   HeaterId = heaterId,
-                                                   SecondsToAccumulate = 0
-                                               });
+                {
+                    HeaterId = heaterId,
+                    SecondsToAccumulate = 0
+                });
             }
 
             return CommandResult.Empty;
