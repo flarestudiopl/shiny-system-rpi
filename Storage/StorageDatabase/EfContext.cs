@@ -6,13 +6,20 @@ namespace Storage.StorageDatabase
 {
     public class EfContext : DbContext
     {
+        private readonly string _connectionString;
+
         public DbSet<Domain.StorageDatabase.Counter> Counters { get; set; }
 
         public DbSet<Domain.StorageDatabase.User> Users { get; set; }
 
+        public EfContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=./ef_test.db");
+            optionsBuilder.UseSqlite(_connectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

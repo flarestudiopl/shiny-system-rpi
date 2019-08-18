@@ -27,7 +27,7 @@ namespace HeatingApi.DependencyResolution
 
         private static void RegisterPersistence(ContainerBuilder builder)
         {
-            var assembly = typeof(ISqlConnectionResolver).Assembly;
+            var assembly = typeof(IDbExecutor).Assembly;
 
             builder.RegisterAssemblyTypes(assembly)
                    .AsImplementedInterfaces()
