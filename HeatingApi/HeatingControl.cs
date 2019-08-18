@@ -10,6 +10,7 @@ using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
 using Storage.StorageDatabase;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HeatingApi
 {
@@ -23,6 +24,7 @@ namespace HeatingApi
     public class HeatingControl : IHeatingControl, IHostedService
     {
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly IApplicationLifetime _appLifetime;
         private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
@@ -31,7 +33,8 @@ namespace HeatingApi
 
         public ControllerState State { get; }
 
-        public HeatingControl(IMigrator migrator,
+        public HeatingControl(IApplicationLifetime appLifetime,
+                              IMigrator migrator,
                               IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
@@ -42,6 +45,7 @@ namespace HeatingApi
         {
             migrator.Run();
 
+            _appLifetime = appLifetime;
             _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
@@ -55,6 +59,8 @@ namespace HeatingApi
         public void Start()
         {
             _cancellationTokenSource = new CancellationTokenSource();
+
+            _appLifetime.ApplicationStopping.Register(Dispose);
 
             Logger.Info(Localization.NotificationMessage.DisablingAllOutputs);
 
@@ -93,7 +99,7 @@ namespace HeatingApi
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() => Dispose(), cancellationToken);
+            return Task.CompletedTask;
         }
 
         public void SetControlEnabled(bool controlEnabled)
