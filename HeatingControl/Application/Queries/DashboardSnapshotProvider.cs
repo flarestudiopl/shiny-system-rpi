@@ -4,6 +4,8 @@ using HeatingControl.Application.Loops.Processing;
 using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
+using Commons.Extensions;
+using System;
 
 namespace HeatingControl.Application.Queries
 {
@@ -15,7 +17,9 @@ namespace HeatingControl.Application.Queries
     public class DashboardSnapshotProviderOutput
     {
         public string BuildingName { get; set; }
+        public DateTime ControllerDateTime { get; set; }
         public bool ControlEnabled { get; set; }
+        public bool BatteryMode { get;set;}
         public IDictionary<UsageUnit, decimal> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
 
@@ -57,7 +61,9 @@ namespace HeatingControl.Application.Queries
             var output = new DashboardSnapshotProviderOutput
                          {
                              BuildingName = model.Name,
+                             ControllerDateTime = DateTime.UtcNow,
                              ControlEnabled = state.ControlEnabled,
+                             BatteryMode = state.DigitalInputFunctionToState.GetValueOrDefault(DigitalInputFunction.BatteryMode)?.State ?? false,
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState
                                           .Values

@@ -8,6 +8,8 @@ using HeatingControl.Application.Loops.Processing;
 using Microsoft.Extensions.Hosting;
 using Storage.StorageDatabase;
 using HeatingControl.Application.DataAccess;
+using HardwareAccess.Devices.PowerOutputs;
+using HardwareAccess.Devices.DigitalInputs;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -45,22 +47,39 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<I2c>().As<II2c>().SingleInstance();
 
             // Devices
-            builder.RegisterType<PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
+            builder.RegisterType<DigitalInputProvider>().As<IDigitalInputProvider>().SingleInstance();
             builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+
+            // Devices/DigitalInputs
+            builder.RegisterType<ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
+
+            // Devices/PowerOutputs
+            builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
+            builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
         }
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
         {
             // PlatformIntegration
             builder.RegisterType<ProcessRunner>().As<IProcessRunner>().SingleInstance();
+            builder.RegisterType<HardwareAccess.Dummy.PlatformIntegration.LibcWrapper >().As<ILibcWrapper>().SingleInstance();
 
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
 
             // Devices
-            builder.RegisterType<HardwareAccess.Dummy.Devices.PowerOutput>().As<IPowerOutput>().SingleInstance();
+            builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
+            builder.RegisterType<DigitalInputProvider>().As<IDigitalInputProvider>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+
+            // Devices/DigitalInputs
+            builder.RegisterType<ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
+
+            // Devices/PowerOutputs
+            builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
+            builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)
@@ -96,6 +115,7 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<OutputStateProcessingLoop>().As<IOutputStateProcessingLoop>().SingleInstance();
             builder.RegisterType<ScheduleDeterminationLoop>().As<IScheduleDeterminationLoop>().SingleInstance();
             builder.RegisterType<TemperatureReadingLoop>().As<ITemperatureReadingLoop>().SingleInstance();
+            builder.RegisterType<DigitalInputReadingLoop>().As<IDigitalInputReadingLoop>().SingleInstance();
 
             // Application/Loops/Processing
             builder.RegisterType<HysteresisProcessor>().As<IHysteresisProcessor>().SingleInstance();

@@ -6,9 +6,11 @@
 
         public string Name { get; set; }
 
+        public string PowerOutputProtocolName { get; set; }
+
         public int PowerOutputDeviceId { get; set; }
 
-        public int PowerOutputChannel { get; set; }
+        public string PowerOutputChannel { get; set; }
 
         public UsageUnit UsageUnit { get; set; }
 

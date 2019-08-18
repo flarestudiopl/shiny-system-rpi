@@ -3,6 +3,7 @@ using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Commons;
+using System.Threading.Tasks;
 
 namespace HeatingApi.Controllers
 {
@@ -84,9 +85,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("heater/new")]
-        public NewHeaterOptionsProviderResult GetNewHeaterOptions()
+        public async Task<NewHeaterOptionsProviderResult> GetNewHeaterOptions()
         {
-            return _newHeaterOptionsProvider.Provide();
+            return await _newHeaterOptionsProvider.Provide();
         }
 
         [HttpPost("heater")]

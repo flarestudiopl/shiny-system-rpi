@@ -7,6 +7,7 @@ using HardwareAccess.Devices;
 using HeatingControl.Models;
 using Storage.BuildingModel;
 using HeatingControl.Application.DataAccess.Counter;
+using HardwareAccess.Devices.PowerOutputs;
 
 namespace HeatingApi.Controllers
 {
@@ -17,7 +18,7 @@ namespace HeatingApi.Controllers
         private readonly IOneWire _oneWire;
         private readonly ITemperatureSensor _temperatureSensor;
         private readonly II2c _i2C;
-        private readonly IPowerOutput _powerOutput;
+        private readonly IPowerOutputProvider _powerOutputProvider;
         private readonly IHeatingControl _heatingControl;
         private readonly IBuildingModelProvider _buildingModelProvider;
         private readonly IBuildingModelSaver _buildingModelSaver;
@@ -26,7 +27,7 @@ namespace HeatingApi.Controllers
         public TestController(IOneWire oneWire, 
                               ITemperatureSensor temperatureSensor, 
                               II2c i2c,
-                              IPowerOutput powerOutput,
+                              IPowerOutputProvider powerOutputProvider,
                               IHeatingControl heatingControl,
                               IBuildingModelProvider buildingModelProvider,
                               IBuildingModelSaver buildingModelSaver,
@@ -35,7 +36,7 @@ namespace HeatingApi.Controllers
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
             _i2C = i2c;
-            _powerOutput = powerOutput;
+            _powerOutputProvider = powerOutputProvider;
             _heatingControl = heatingControl;
             _buildingModelProvider = buildingModelProvider;
             _buildingModelSaver = buildingModelSaver;
@@ -77,9 +78,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost("i2c/power")]
-        public void SetPowerOutput(int deviceId, int channel, bool state)
+        public void SetPowerOutput(string protocolName, int deviceId, string channel, bool state)
         {
-            _powerOutput.SetState(deviceId, channel, state);
+            _powerOutputProvider.Provide(protocolName).SetState(deviceId, channel, state);
         }
 
         [HttpGet("control/temp/{deviceId}")]

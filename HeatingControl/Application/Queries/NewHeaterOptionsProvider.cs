@@ -1,37 +1,59 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Commons.Extensions;
 using Domain.BuildingModel;
-using HardwareAccess.Buses;
+using HardwareAccess.Devices;
 
 namespace HeatingControl.Application.Queries
 {
     public interface INewHeaterOptionsProvider
     {
-        NewHeaterOptionsProviderResult Provide();
+        Task<NewHeaterOptionsProviderResult> Provide();
     }
 
     public class NewHeaterOptionsProviderResult
     {
-        public ICollection<int> AvailableHeaterModules { get; set; }
+        public ICollection<SupportedOutputProtocol> AvailableHeaterModules { get; set; }
         public IDictionary<int, string> UsageUnits { get; set; }
+
+        public class SupportedOutputProtocol
+        {
+            public string ProtocolName { get; set; }
+            public ICollection<string> OutputNames { get; set; }
+            public ICollection<int> AvailableDeviceIds { get; set; }
+        }
     }
 
     public class NewHeaterOptionsProvider : INewHeaterOptionsProvider
     {
-        private readonly II2c _i2C;
+        private readonly IPowerOutputProvider _powerOutputProvider;
 
-        public NewHeaterOptionsProvider(II2c i2C)
+        public NewHeaterOptionsProvider(IPowerOutputProvider powerOutputProvider)
         {
-            _i2C = i2C;
+            _powerOutputProvider = powerOutputProvider;
         }
 
-        public NewHeaterOptionsProviderResult Provide()
+        public async Task<NewHeaterOptionsProviderResult> Provide()
         {
+            var availableHeaterModules = await Task.WhenAll(_powerOutputProvider.GetAvailableProtocolNames()
+                                                                                .Select(async x =>
+                                                                                {
+                                                                                    var powerOutput = _powerOutputProvider.Provide(x);
+                                                                                
+                                                                                    return new NewHeaterOptionsProviderResult.SupportedOutputProtocol
+                                                                                    {
+                                                                                        ProtocolName = x,
+                                                                                        OutputNames = powerOutput.OutputNames,
+                                                                                        AvailableDeviceIds = await powerOutput.GetDeviceIds()
+                                                                                    };
+                                                                                }));
+
             return new NewHeaterOptionsProviderResult
-                   {
-                       AvailableHeaterModules = _i2C.GetI2cDevices().Result,
-                       UsageUnits = EnumExtensions.AsDictionary<UsageUnit>()
-                   };
+            {
+                AvailableHeaterModules = availableHeaterModules,
+                UsageUnits = EnumExtensions.AsDictionary<UsageUnit>()
+            };
         }
     }
 }

@@ -11,7 +11,8 @@ namespace HeatingControl.Application.Commands
     {
         public string Name { get; set; }
         public int PowerOutputDeviceId { get; set; }
-        public int PowerOutputChannel { get; set; }
+        public string PowerOutputChannel { get; set; }
+        public string PowerOutputProtocolName { get; set; }
         public UsageUnit UsageUnit { get; set; }
         public decimal UsagePerHour { get; set; }
         public int MinimumStateChangeIntervalSeconds { get; set; }
@@ -44,26 +45,28 @@ namespace HeatingControl.Application.Commands
             }
 
             if (context.ControllerState.Model.Heaters.Any(x => x.PowerOutputDeviceId == command.PowerOutputDeviceId &&
-                                                               x.PowerOutputChannel == command.PowerOutputChannel))
+                                                               x.PowerOutputChannel == command.PowerOutputChannel &&
+                                                               x.PowerOutputProtocolName == command.PowerOutputProtocolName))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDeviceId, command.PowerOutputChannel));
             }
 
             var heater = new Heater
-                         {
-                             HeaterId = (context.ControllerState.HeaterIdToState.Keys.Any() ? context.ControllerState.HeaterIdToState.Keys.Max() : 0) + 1,
-                             Name = command.Name,
-                             PowerOutputDeviceId = command.PowerOutputDeviceId,
-                             PowerOutputChannel = command.PowerOutputChannel,
-                             UsageUnit = command.UsageUnit,
-                             UsagePerHour = command.UsagePerHour,
-                             MinimumStateChangeIntervalSeconds = command.MinimumStateChangeIntervalSeconds
-                         };
+            {
+                HeaterId = (context.ControllerState.HeaterIdToState.Keys.Any() ? context.ControllerState.HeaterIdToState.Keys.Max() : 0) + 1,
+                Name = command.Name,
+                PowerOutputDeviceId = command.PowerOutputDeviceId,
+                PowerOutputChannel = command.PowerOutputChannel,
+                PowerOutputProtocolName = command.PowerOutputProtocolName,
+                UsageUnit = command.UsageUnit,
+                UsagePerHour = command.UsagePerHour,
+                MinimumStateChangeIntervalSeconds = command.MinimumStateChangeIntervalSeconds
+            };
 
             context.ControllerState.HeaterIdToState.Add(heater.HeaterId, new HeaterState
-                                                                         {
-                                                                             Heater = heater
-                                                                         });
+            {
+                Heater = heater
+            });
 
             context.ControllerState.Model.Heaters.Add(heater);
             _buildingModelSaver.Save(context.ControllerState.Model);

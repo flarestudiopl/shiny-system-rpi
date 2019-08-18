@@ -11,7 +11,6 @@ namespace HeatingControl.Application.Queries
 
     public class LoggerLastMessagesProviderResult
     {
-        public DateTime ControllerDateTime { get; set; }
         public ICollection<Logger.LoggerMessage> Messages { get; set; }
     }
 
@@ -21,7 +20,6 @@ namespace HeatingControl.Application.Queries
         {
             return new LoggerLastMessagesProviderResult
                    {
-                       ControllerDateTime = DateTime.UtcNow,
                        Messages = Logger.LastMessages.ToArray()
                    };
         }

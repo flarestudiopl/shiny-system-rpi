@@ -10,6 +10,7 @@ using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.BuildingModel;
 using Storage.StorageDatabase;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HeatingApi
 {
@@ -23,27 +24,33 @@ namespace HeatingApi
     public class HeatingControl : IHeatingControl, IHostedService
     {
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly IApplicationLifetime _appLifetime;
         private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
         private readonly IOutputStateProcessingLoop _outputStateProcessingLoop;
+        private readonly IDigitalInputReadingLoop _digitalInputReadingLoop;
 
         public ControllerState State { get; }
 
-        public HeatingControl(IMigrator migrator,
+        public HeatingControl(IApplicationLifetime appLifetime,
+                              IMigrator migrator,
                               IBuildingModelProvider buildingModelProvider,
                               IControllerStateBuilder controllerStateBuilder,
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
                               IScheduleDeterminationLoop scheduleDeterminationLoop,
-                              IOutputStateProcessingLoop outputStateProcessingLoop)
+                              IOutputStateProcessingLoop outputStateProcessingLoop,
+                              IDigitalInputReadingLoop digitalInputReadingLoop)
         {
             migrator.Run();
 
+            _appLifetime = appLifetime;
             _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
+            _digitalInputReadingLoop = digitalInputReadingLoop;
 
             var model = buildingModelProvider.Provide();
             State = controllerStateBuilder.Build(model);
@@ -52,6 +59,8 @@ namespace HeatingApi
         public void Start()
         {
             _cancellationTokenSource = new CancellationTokenSource();
+
+            _appLifetime.ApplicationStopping.Register(Dispose);
 
             Logger.Info(Localization.NotificationMessage.DisablingAllOutputs);
 
@@ -62,7 +71,8 @@ namespace HeatingApi
             _temperatureReadingLoop.Start(State, _cancellationTokenSource.Token);
             _scheduleDeterminationLoop.Start(State, _cancellationTokenSource.Token);
             _outputStateProcessingLoop.Start(State, _cancellationTokenSource.Token);
-            
+            _digitalInputReadingLoop.Start(State, _cancellationTokenSource.Token);
+
             State.ControlEnabled = true;
         }
 
@@ -89,7 +99,7 @@ namespace HeatingApi
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() => Dispose(), cancellationToken);
+            return Task.CompletedTask;
         }
 
         public void SetControlEnabled(bool controlEnabled)
