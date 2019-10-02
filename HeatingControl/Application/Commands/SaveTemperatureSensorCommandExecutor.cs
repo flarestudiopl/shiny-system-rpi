@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
-using HeatingControl.Models;
-using Storage.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
 {
@@ -15,11 +14,11 @@ namespace HeatingControl.Application.Commands
 
     public class SaveTemperatureSensorCommandExecutor : ICommandExecutor<SaveTemperatureSensorCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<TemperatureSensor> _temperatureSensorRepository;
 
-        public SaveTemperatureSensorCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public SaveTemperatureSensorCommandExecutor(IRepository<TemperatureSensor> temperatureSensorRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _temperatureSensorRepository = temperatureSensorRepository;
         }
 
         public CommandResult Execute(SaveTemperatureSensorCommand command, CommandContext context)
@@ -41,18 +40,14 @@ namespace HeatingControl.Application.Commands
 
             var temperatureSensor = new TemperatureSensor
                                     {
-                                        TemperatureSensorId = (context.ControllerState.TemperatureSensorIdToDeviceId.Keys.Any()
-                                                                   ? context.ControllerState.TemperatureSensorIdToDeviceId.Keys.Max()
-                                                                   : 0) + 1,
                                         Name = command.Name,
                                         DeviceId = command.DeviceId
                                     };
 
+            temperatureSensor = _temperatureSensorRepository.Create(temperatureSensor);
+
             context.ControllerState.TemperatureSensorIdToDeviceId.Add(temperatureSensor.TemperatureSensorId, command.DeviceId);
-
             context.ControllerState.Model.TemperatureSensors.Add(temperatureSensor);
-
-            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

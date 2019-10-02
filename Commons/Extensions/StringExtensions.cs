@@ -21,12 +21,7 @@ namespace Commons.Extensions
 
         public static bool HasLengthBetween(this string value, int from, int to) => value.Length >= from && value.Length <= to;
 
-        public static string JoinWith(this IEnumerable<string> values, string separator)
-        {
-            values = values.ToList();
-
-            return values.Any() ? string.Join(separator, values) : null;
-        }
+        public static string JoinWith(this IEnumerable<string> values, string separator) => string.Join(separator, values);
 
         public static string CalculateHash(this string value)
         {

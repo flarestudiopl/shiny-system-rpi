@@ -1,4 +1,4 @@
-﻿using Domain.BuildingModel;
+﻿using Domain;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;

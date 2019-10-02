@@ -1,7 +1,6 @@
 ﻿using System;
-using Domain.BuildingModel;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
-using Storage.BuildingModel;
 
 namespace HeatingApi.Controllers
 {
@@ -9,30 +8,17 @@ namespace HeatingApi.Controllers
     [Route("/api/setup")]
     public class SetupController : BaseController
     {
-        private readonly IBuildingModelProvider _buildingModelProvider;
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IHeatingControl _heatingControl;
 
-        public SetupController(IBuildingModelProvider buildingModelProvider,
-                               IBuildingModelSaver buildingModelSaver)
+        public SetupController(IHeatingControl heatingControl)
         {
-            _buildingModelProvider = buildingModelProvider;
-            _buildingModelSaver = buildingModelSaver;
+            _heatingControl = heatingControl;
         }
-
-        #region TODO - REMOVE
 
         [HttpGet]
         public Building GetBuildingModel()
         {
-            return _buildingModelProvider.Provide();
+            return _heatingControl.State.Model;
         }
-
-        [HttpPut]
-        public void SaveBuildingModel([FromBody] Building building)
-        {
-            _buildingModelSaver.Save(building);
-        }
-
-        #endregion // TODO - REMOVE
     }
 }

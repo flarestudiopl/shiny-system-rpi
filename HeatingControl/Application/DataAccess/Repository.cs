@@ -14,6 +14,7 @@ namespace HeatingControl.Application.DataAccess
         TItem ReadSingle(Expression<Func<TItem, bool>> filterPredicate);
         TItem ReadSingleOrDefault(Expression<Func<TItem, bool>> filterPredicate);
         void Update(TItem item);
+        void Delete(TItem item);
     }
 
     public class Repository<TItem> : IRepository<TItem> where TItem : class
@@ -61,6 +62,15 @@ namespace HeatingControl.Application.DataAccess
             _dbExecutor.Execute(c =>
             {
                 c.Set<TItem>().Update(item);
+                c.SaveChanges();
+            });
+        }
+
+        public void Delete(TItem item)
+        {
+            _dbExecutor.Execute(c =>
+            {
+                c.Set<TItem>().Remove(item);
                 c.SaveChanges();
             });
         }

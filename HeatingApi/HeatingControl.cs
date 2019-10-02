@@ -8,9 +8,10 @@ using HeatingControl.Application.Loops;
 using HeatingControl.Application.Commands;
 using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
-using Storage.BuildingModel;
 using Storage.StorageDatabase;
 using Microsoft.AspNetCore.Hosting;
+using HeatingControl.Application.DataAccess;
+using Domain;
 
 namespace HeatingApi
 {
@@ -25,6 +26,7 @@ namespace HeatingApi
     {
         private CancellationTokenSource _cancellationTokenSource;
         private readonly IApplicationLifetime _appLifetime;
+        private readonly IRepository<Building> _buildingRepository;
         private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
@@ -35,7 +37,7 @@ namespace HeatingApi
 
         public HeatingControl(IApplicationLifetime appLifetime,
                               IMigrator migrator,
-                              IBuildingModelProvider buildingModelProvider,
+                              IRepository<Building> buildingRepository,
                               IControllerStateBuilder controllerStateBuilder,
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
@@ -46,13 +48,14 @@ namespace HeatingApi
             migrator.Run();
 
             _appLifetime = appLifetime;
+            _buildingRepository = buildingRepository;
             _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
             _digitalInputReadingLoop = digitalInputReadingLoop;
 
-            var model = buildingModelProvider.Provide();
+            var model = _buildingRepository.ReadSingle(x => x.IsDefault);
             State = controllerStateBuilder.Build(model);
         }
 

@@ -1,19 +1,21 @@
 ﻿using System.Collections.Generic;
 
-namespace Domain.BuildingModel
+namespace Domain
 {
     public  class PowerZone
     {
         public int PowerZoneId { get; set; }
 
+        public int BuildingId { get; set; }
+        
         public string Name { get; set; }
-
-        public HashSet<int> HeaterIds { get; set; } = new HashSet<int>();
 
         public decimal MaxUsage { get; set; }
 
         public UsageUnit UsageUnit { get; set; }
 
         public int RoundRobinIntervalMinutes { get; set; }
+        
+        public ICollection<Heater> Heaters { get; set; }
     }
 }

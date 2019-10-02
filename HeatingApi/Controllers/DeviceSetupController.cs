@@ -2,7 +2,6 @@
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
-using Commons;
 using System.Threading.Tasks;
 
 namespace HeatingApi.Controllers

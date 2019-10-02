@@ -1,6 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Storage.BuildingModel;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
 {
@@ -11,16 +11,18 @@ namespace HeatingControl.Application.Commands
 
     public class RemovePowerZoneCommandExecutor : ICommandExecutor<RemovePowerZoneCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<Domain.PowerZone> _powerZoneRepository;
 
-        public RemovePowerZoneCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public RemovePowerZoneCommandExecutor(IRepository<Domain.PowerZone> powerZoneRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _powerZoneRepository = powerZoneRepository;
         }
 
         public CommandResult Execute(RemovePowerZoneCommand command, CommandContext context)
         {
-            if (!context.ControllerState.PowerZoneIdToState.ContainsKey(command.PowerZoneId))
+            var powerZoneState = context.ControllerState.PowerZoneIdToState.GetValueOrDefault(command.PowerZoneId);
+
+            if (powerZoneState == null)
             {
                return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownPowerZoneId.FormatWith(command.PowerZoneId));
             }
@@ -28,8 +30,8 @@ namespace HeatingControl.Application.Commands
             context.ControllerState.PowerZoneIdToState.Remove(command.PowerZoneId);
             context.ControllerState.Model.PowerZones.Remove(x => x.PowerZoneId == command.PowerZoneId);
 
-            _buildingModelSaver.Save(context.ControllerState.Model);
-
+            _powerZoneRepository.Delete(powerZoneState.PowerZone);
+            
             return CommandResult.Empty;
         }
     }

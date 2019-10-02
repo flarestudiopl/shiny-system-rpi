@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Domain.BuildingModel
+namespace Domain
 {
     public class ScheduleItem
     {
         public int ScheduleItemId { get; set; }
+
+        public int ZoneId { get;set;}
 
         public ICollection<DayOfWeek> DaysOfWeek { get; set; }
 

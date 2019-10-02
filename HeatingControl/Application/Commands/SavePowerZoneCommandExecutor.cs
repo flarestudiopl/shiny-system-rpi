@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 using HeatingControl.Models;
-using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
@@ -21,11 +21,14 @@ namespace HeatingControl.Application.Commands
 
     public class SavePowerZoneCommandExecutor : ICommandExecutor<SavePowerZoneCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<PowerZone> _powerZoneRepository;
+        private readonly IRepository<Heater> _heaterRepository;
 
-        public SavePowerZoneCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public SavePowerZoneCommandExecutor(IRepository<PowerZone> powerZoneRepository,
+                                            IRepository<Heater> heaterRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _powerZoneRepository = powerZoneRepository;
+            _heaterRepository = heaterRepository;
         }
 
         public CommandResult Execute(SavePowerZoneCommand command, CommandContext context)
@@ -48,7 +51,23 @@ namespace HeatingControl.Application.Commands
                 context.ControllerState.Model.PowerZones.Remove(x => x.PowerZoneId == existingPowerZoneId);
             }
 
-            var powerZone = BuildNewPowerZone(command, existingPowerZone, context.ControllerState);
+            var powerZone = new PowerZone
+            {
+                Name = command.Name,
+                UsageUnit = command.PowerLimitUnit,
+                MaxUsage = command.PowerLimitValue,
+                RoundRobinIntervalMinutes = command.RoundRobinIntervalMinutes
+            };
+
+            powerZone = _powerZoneRepository.Create(powerZone);
+
+            foreach (var heaterId in command.AffectedHeatersIds)
+            {
+                var heater = _heaterRepository.ReadSingle(x=>x.HeaterId == heaterId);
+                heater.PowerZone = powerZone;
+                heater.PowerZoneId = powerZone.PowerZoneId;
+                _heaterRepository.Update(heater);
+            }
 
             context.ControllerState.PowerZoneIdToState.Add(powerZone.PowerZoneId,
                                                            new PowerZoneState
@@ -57,7 +76,6 @@ namespace HeatingControl.Application.Commands
                                                            });
 
             context.ControllerState.Model.PowerZones.Add(powerZone);
-            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return CommandResult.Empty;
         }
@@ -104,7 +122,7 @@ namespace HeatingControl.Application.Commands
                 if (controllerState.PowerZoneIdToState
                                    .Select(z => z.Value.PowerZone)
                                    .Where(x => !command.PowerZoneId.HasValue || command.PowerZoneId.Value != x.PowerZoneId)
-                                   .Any(z => z.HeaterIds.Contains(heaterId)))
+                                   .Any(z => z.Heaters.Contains(heater.Heater)))
                 {
                     return CommandResult.WithValidationError(Localization.ValidationMessage.HeaterAlreadyInUseByAnotherPowerZone.FormatWith(heaterId));
                 }
@@ -118,22 +136,6 @@ namespace HeatingControl.Application.Commands
             }
 
             return null;
-        }
-
-        private static PowerZone BuildNewPowerZone(SavePowerZoneCommand input, PowerZone existingPowerZone, ControllerState controllerState)
-        {
-            var powerZone = new PowerZone
-                            {
-                                Name = input.Name,
-                                HeaterIds = input.AffectedHeatersIds.ToHashSet(),
-                                UsageUnit = input.PowerLimitUnit,
-                                MaxUsage = input.PowerLimitValue,
-                                RoundRobinIntervalMinutes = input.RoundRobinIntervalMinutes,
-                                PowerZoneId = existingPowerZone?.PowerZoneId ??
-                                              (controllerState.PowerZoneIdToState.Keys.Any() ? controllerState.PowerZoneIdToState.Keys.Max() : 0) + 1
-                            };
-
-            return powerZone;
         }
     }
 }

@@ -2,7 +2,7 @@
 using Commons;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application

@@ -1,7 +1,8 @@
-﻿using System.Linq;
-using Commons.Extensions;
+﻿using Commons.Extensions;
 using Commons.Localization;
-using Storage.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
+using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
 {
@@ -12,26 +13,28 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveHeaterCommandExecutor : ICommandExecutor<RemoveHeaterCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<Heater> _heaterRepository;
 
-        public RemoveHeaterCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public RemoveHeaterCommandExecutor(IRepository<Heater> heaterRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _heaterRepository = heaterRepository;
         }
 
         public CommandResult Execute(RemoveHeaterCommand command, CommandContext context)
         {
-            if (!context.ControllerState.HeaterIdToState.ContainsKey(command.HeaterId))
+            HeaterState heaterState;
+
+            if (!context.ControllerState.HeaterIdToState.TryGetValue(command.HeaterId, out heaterState))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownHeaterId.FormatWith(command.HeaterId));
             }
 
-            if (context.ControllerState.ZoneIdToState.Values.Any(x => x.Zone.HeaterIds.Contains(command.HeaterId)))
+            if (heaterState.Heater.ZoneId.HasValue)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.CantDeleteHeaterAssignedToZone);
             }
 
-            if (context.ControllerState.PowerZoneIdToState.Values.Any(x => x.PowerZone.HeaterIds.Contains(command.HeaterId)))
+            if (heaterState.Heater.PowerZoneId.HasValue)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.CantDeleteHeaterAssignedToPowerZone);
             }
@@ -39,7 +42,7 @@ namespace HeatingControl.Application.Commands
             context.ControllerState.HeaterIdToState.Remove(command.HeaterId);
             context.ControllerState.Model.Heaters.Remove(x=>x.HeaterId == command.HeaterId);
 
-            _buildingModelSaver.Save(context.ControllerState.Model);
+            _heaterRepository.Delete(heaterState.Heater);
 
             return CommandResult.Empty;
         }

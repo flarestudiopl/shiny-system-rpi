@@ -4,9 +4,10 @@ using Commons;
 using Commons.Extensions;
 using Commons.Localization;
 using HeatingControl.Application.Loops.Processing;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
+using System.Linq;
 
 namespace HeatingControl.Application.Loops
 {
@@ -135,7 +136,7 @@ namespace HeatingControl.Application.Loops
         {
             foreach (var zone in controllerState.ZoneIdToState.Values)
             {
-                foreach (var heater in zone.Zone.HeaterIds)
+                foreach (var heater in zone.Zone.Heaters.Select(x => x.HeaterId))
                 {
                     controllerState.HeaterIdToState[heater].OutputState = zone.EnableOutputs;
                 }

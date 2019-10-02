@@ -3,10 +3,10 @@ using System.Linq;
 using Commons;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
-using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
@@ -20,11 +20,14 @@ namespace HeatingControl.Application.Commands
 
     public class SaveZoneCommandExecutor : ICommandExecutor<SaveZoneCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<Zone> _zoneRepository;
+        private readonly IRepository<Heater> _heaterRepository;
 
-        public SaveZoneCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public SaveZoneCommandExecutor(IRepository<Zone> zoneRepository,
+                                       IRepository<Heater> heaterRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _zoneRepository = zoneRepository;
+            _heaterRepository = heaterRepository;
         }
 
         public CommandResult Execute(SaveZoneCommand command, CommandContext context)
@@ -44,36 +47,41 @@ namespace HeatingControl.Application.Commands
                 var zoneState = context.ControllerState.ZoneIdToState[existingZoneId];
                 existingZone = zoneState.Zone;
 
-                context.ControllerState.ZoneIdToState.Remove(existingZoneId);
-
-                foreach (var heaterToDisable in zoneState.Zone
-                                                         .HeaterIds
-                                                         .Except(command.HeaterIds))
+                foreach (var heaterToDisable in zoneState.Zone.Heaters)
                 {
-                    context.ControllerState.HeaterIdToState[heaterToDisable].OutputState = false;
-                }
+                    if (command.HeaterIds.Contains(heaterToDisable.HeaterId))
+                    {
+                        continue;
+                    }
 
-                context.ControllerState.Model.Zones.Remove(x => x.ZoneId == existingZoneId);
+                    context.ControllerState.HeaterIdToState[heaterToDisable.HeaterId].OutputState = false;
+                }
             }
 
-            var zone = BuildNewZone(command, existingZone, context.ControllerState);
+            if (existingZone == null)
+            {
+                var zone = BuildNewZone(command, existingZone);
 
-            context.ControllerState.Model.Zones.Add(zone);
+                existingZone = _zoneRepository.Create(zone);
+                context.ControllerState.Model.Zones.Add(existingZone);
 
-            _buildingModelSaver.Save(context.ControllerState.Model);
-
-            context.ControllerState.ZoneIdToState.Add(zone.ZoneId,
-                                                      new ZoneState
-                                                      {
-                                                          Zone = zone,
-                                                          ControlMode = ZoneControlMode.LowOrDisabled,
-                                                          EnableOutputs = false,
-                                                          ScheduleState = new ScheduleState
-                                                                          {
-                                                                              DesiredTemperature = 0.0f,
-                                                                              HeatingEnabled = false
-                                                                          }
-                                                      });
+                context.ControllerState.ZoneIdToState.Add(zone.ZoneId,
+                                          new ZoneState
+                                          {
+                                              Zone = zone,
+                                              ControlMode = ZoneControlMode.LowOrDisabled,
+                                              EnableOutputs = false,
+                                              ScheduleState = new ScheduleState
+                                              {
+                                                  DesiredTemperature = 0.0f,
+                                                  HeatingEnabled = false
+                                              }
+                                          });
+            }
+            else
+            {
+                _zoneRepository.Update(existingZone);
+            }
 
             return CommandResult.Empty;
         }
@@ -100,7 +108,7 @@ namespace HeatingControl.Application.Commands
                 if (controllerState.ZoneIdToState
                                    .Select(z => z.Value.Zone)
                                    .Where(x => !command.ZoneId.HasValue || command.ZoneId.Value != x.ZoneId)
-                                   .Any(z => z.HeaterIds.Contains(heaterId)))
+                                   .Any(z => z.Heaters.FirstOrDefault(h => h.HeaterId == heaterId) != null))
                 {
                     return CommandResult.WithValidationError(Localization.ValidationMessage.HeaterAlreadyInUseByAnotherZone.FormatWith(heaterId));
                 }
@@ -109,13 +117,12 @@ namespace HeatingControl.Application.Commands
             return null;
         }
 
-        private static Zone BuildNewZone(SaveZoneCommand command, Zone existingZone, ControllerState controllerState)
+        private static Zone BuildNewZone(SaveZoneCommand command, Zone existingZone)
         {
             var zone = new Zone
-                       {
-                           Name = command.Name,
-                           HeaterIds = command.HeaterIds.ToHashSet()
-                       };
+            {
+                Name = command.Name
+            };
 
             if (command.TemperatureSensorId.HasValue)
             {
@@ -126,12 +133,12 @@ namespace HeatingControl.Application.Commands
                 else
                 {
                     zone.TemperatureControlledZone = new TemperatureControlledZone
-                                                     {
-                                                         LowSetPoint = 4.0f,
-                                                         HighSetPoint = 20.0f,
-                                                         Hysteresis = 0.5f,
-                                                         ScheduleDefaultSetPoint = 4.0f
-                                                     };
+                    {
+                        LowSetPoint = 4.0f,
+                        HighSetPoint = 20.0f,
+                        Hysteresis = 0.5f,
+                        ScheduleDefaultSetPoint = 4.0f
+                    };
                 }
 
                 zone.TemperatureControlledZone.TemperatureSensorId = command.TemperatureSensorId.Value;
@@ -139,8 +146,6 @@ namespace HeatingControl.Application.Commands
 
             if (existingZone != null)
             {
-                zone.ZoneId = existingZone.ZoneId;
-
                 if (existingZone.IsTemperatureControlled() == zone.IsTemperatureControlled())
                 {
                     zone.Schedule = existingZone.Schedule;
@@ -149,10 +154,6 @@ namespace HeatingControl.Application.Commands
                 {
                     Logger.Info(Localization.NotificationMessage.ScheduledRemovedDueToControlTypeChange.FormatWith(command.Name));
                 }
-            }
-            else
-            {
-                zone.ZoneId = (controllerState.ZoneIdToState.Keys.Any() ? controllerState.ZoneIdToState.Keys.Max() : 0) + 1;
             }
 
             return zone;

@@ -16,7 +16,7 @@ namespace HeatingControl.Application.Loops.Processing
             var availablePower = powerZoneState.PowerZone.MaxUsage;
 
             var requiredHeaterIdToUsage = controllerState.HeaterIdToState
-                                                         .Where(x => powerZoneState.PowerZone.HeaterIds.Contains(x.Key) &&
+                                                         .Where(x => powerZoneState.PowerZone.Heaters.Contains(x.Value.Heater) &&
                                                                      controllerState.HeaterIdToState[x.Key].OutputState)
                                                          .ToDictionary(x => x.Key,
                                                                        x => x.Value.Heater.UsagePerHour);

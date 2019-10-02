@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -50,7 +50,7 @@ namespace HeatingControl.Application.Queries
                        PowerLimitValue = powerZoneModel.MaxUsage,
                        PowerLimitUnit = powerZoneModel.UsageUnit,
                        PowerLimitUnits = EnumExtensions.AsDictionary<UsageUnit>(),
-                       AffectedHeatersIds = powerZoneModel.HeaterIds,
+                       AffectedHeatersIds = powerZoneModel.Heaters.Select(x => x.HeaterId).ToArray(),
                        Heaters = controllerState.HeaterIdToState
                                                 .Values
                                                 .Select(x => new PowerZoneSettingsProviderResult.AffectedHeaterData
@@ -59,7 +59,7 @@ namespace HeatingControl.Application.Queries
                                                                  Name = x.Heater.Name,
                                                                  Assignment = controllerState.PowerZoneIdToState
                                                                                              .Select(z => z.Value.PowerZone)
-                                                                                             .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId) &&
+                                                                                             .Where(z => z.Heaters.Contains(x.Heater) &&
                                                                                                          z.PowerZoneId != powerZoneId)
                                                                                              .Select(z => z.Name).JoinWith(", "),
                                                                  PowerUnit = x.Heater.UsageUnit,

@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 using HeatingControl.Models;
-using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
@@ -20,11 +20,11 @@ namespace HeatingControl.Application.Commands
 
     public class SaveHeaterCommandExecutor : ICommandExecutor<SaveHeaterCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<Heater> _heaterRepository;
 
-        public SaveHeaterCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public SaveHeaterCommandExecutor(IRepository<Heater> heaterRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _heaterRepository = heaterRepository;
         }
 
         public CommandResult Execute(SaveHeaterCommand command, CommandContext context)
@@ -44,24 +44,28 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.MinimumStateChangeIntervalCantBeNegative);
             }
 
-            if (context.ControllerState.Model.Heaters.Any(x => x.PowerOutputDeviceId == command.PowerOutputDeviceId &&
-                                                               x.PowerOutputChannel == command.PowerOutputChannel &&
-                                                               x.PowerOutputProtocolName == command.PowerOutputProtocolName))
+            if (context.ControllerState.Model.Heaters.Any(x => x.DigitalOutput.DeviceId == command.PowerOutputDeviceId &&
+                                                               x.DigitalOutput.OutputChannel == command.PowerOutputChannel &&
+                                                               x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDeviceId, command.PowerOutputChannel));
             }
 
             var heater = new Heater
             {
-                HeaterId = (context.ControllerState.HeaterIdToState.Keys.Any() ? context.ControllerState.HeaterIdToState.Keys.Max() : 0) + 1,
                 Name = command.Name,
-                PowerOutputDeviceId = command.PowerOutputDeviceId,
-                PowerOutputChannel = command.PowerOutputChannel,
-                PowerOutputProtocolName = command.PowerOutputProtocolName,
                 UsageUnit = command.UsageUnit,
                 UsagePerHour = command.UsagePerHour,
-                MinimumStateChangeIntervalSeconds = command.MinimumStateChangeIntervalSeconds
+                MinimumStateChangeIntervalSeconds = command.MinimumStateChangeIntervalSeconds,
+                DigitalOutput = new DigitalOutput
+                {
+                    DeviceId = command.PowerOutputDeviceId,
+                    OutputChannel = command.PowerOutputChannel,
+                    ProtocolName = command.PowerOutputProtocolName,
+                }
             };
+
+            heater = _heaterRepository.Create(heater);
 
             context.ControllerState.HeaterIdToState.Add(heater.HeaterId, new HeaterState
             {
@@ -69,7 +73,6 @@ namespace HeatingControl.Application.Commands
             });
 
             context.ControllerState.Model.Heaters.Add(heater);
-            _buildingModelSaver.Save(context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

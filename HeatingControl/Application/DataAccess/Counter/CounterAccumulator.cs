@@ -15,9 +15,9 @@ namespace HeatingControl.Application.DataAccess.Counter
 
     public class CounterAccumulator : ICounterAccumulator
     {
-        private readonly IRepository<Domain.StorageDatabase.Counter> _counterRepository;
+        private readonly IRepository<Domain.Counter> _counterRepository;
 
-        public CounterAccumulator(IRepository<Domain.StorageDatabase.Counter> counterRepository)
+        public CounterAccumulator(IRepository<Domain.Counter> counterRepository)
         {
             _counterRepository = counterRepository;
         }
@@ -34,7 +34,7 @@ namespace HeatingControl.Application.DataAccess.Counter
             }
             else
             {
-                var newCounter = new Domain.StorageDatabase.Counter
+                var newCounter = new Domain.Counter
                 {
                     CountedSeconds = input.SecondsToAccumulate,
                     HeaterId = input.HeaterId,

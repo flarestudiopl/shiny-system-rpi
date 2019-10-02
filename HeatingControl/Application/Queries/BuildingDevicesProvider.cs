@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries

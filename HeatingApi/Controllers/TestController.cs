@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Domain.StorageDatabase;
 using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
-using Storage.BuildingModel;
 using HeatingControl.Application.DataAccess.Counter;
-using HardwareAccess.Devices.PowerOutputs;
 
 namespace HeatingApi.Controllers
 {
@@ -20,8 +17,6 @@ namespace HeatingApi.Controllers
         private readonly II2c _i2C;
         private readonly IPowerOutputProvider _powerOutputProvider;
         private readonly IHeatingControl _heatingControl;
-        private readonly IBuildingModelProvider _buildingModelProvider;
-        private readonly IBuildingModelSaver _buildingModelSaver;
         private readonly ICounterAccumulator _counterAccumulator;
 
         public TestController(IOneWire oneWire, 
@@ -29,8 +24,6 @@ namespace HeatingApi.Controllers
                               II2c i2c,
                               IPowerOutputProvider powerOutputProvider,
                               IHeatingControl heatingControl,
-                              IBuildingModelProvider buildingModelProvider,
-                              IBuildingModelSaver buildingModelSaver,
                               ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
@@ -38,8 +31,6 @@ namespace HeatingApi.Controllers
             _i2C = i2c;
             _powerOutputProvider = powerOutputProvider;
             _heatingControl = heatingControl;
-            _buildingModelProvider = buildingModelProvider;
-            _buildingModelSaver = buildingModelSaver;
             _counterAccumulator = counterAccumulator;
         }
 
@@ -89,13 +80,6 @@ namespace HeatingApi.Controllers
             _heatingControl.State.TemperatureDeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
 
             return tempData;
-        }
-
-        [HttpGet("config/write")]
-        public void WriteConfig()
-        {
-            var model = _buildingModelProvider.Provide();
-            _buildingModelSaver.Save(model);
         }
 
         [HttpPut("counter/accumulate")]

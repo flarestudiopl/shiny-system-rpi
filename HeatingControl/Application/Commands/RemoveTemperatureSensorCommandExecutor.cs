@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Storage.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
 {
@@ -12,16 +13,18 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveTemperatureSensorCommandExecutor : ICommandExecutor<RemoveTemperatureSensorCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<TemperatureSensor> _temperatureSensorRepository;
 
-        public RemoveTemperatureSensorCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public RemoveTemperatureSensorCommandExecutor(IRepository<TemperatureSensor> temperatureSensorRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _temperatureSensorRepository = temperatureSensorRepository;
         }
 
         public CommandResult Execute(RemoveTemperatureSensorCommand command, CommandContext context)
         {
-            if (!context.ControllerState.TemperatureSensorIdToDeviceId.ContainsKey(command.SensorId))
+            var temperatureSensor = context.ControllerState.Model.TemperatureSensors.SingleOrDefault(x => x.TemperatureSensorId == command.SensorId);
+
+            if (temperatureSensor == null)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownTemperatureSensorId.FormatWith(command.SensorId));
             }
@@ -32,9 +35,8 @@ namespace HeatingControl.Application.Commands
             }
 
             context.ControllerState.TemperatureSensorIdToDeviceId.Remove(command.SensorId);
-            context.ControllerState.Model.TemperatureSensors.Remove(x => x.TemperatureSensorId == command.SensorId);
-
-            _buildingModelSaver.Save(context.ControllerState.Model);
+            context.ControllerState.Model.TemperatureSensors.Remove(temperatureSensor);
+            _temperatureSensorRepository.Delete(temperatureSensor);
 
             return CommandResult.Empty;
         }

@@ -1,6 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain.StorageDatabase;
+using Domain;
 using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands

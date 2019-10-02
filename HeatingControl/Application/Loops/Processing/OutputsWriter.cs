@@ -30,8 +30,8 @@ namespace HeatingControl.Application.Loops.Processing
                 if (CanSwitchState(now, heater, forceImmidiateAction) &&
                     StateShouldBeUpdated(heater))
                 {
-                    _powerOutputProvider.Provide(heater.Heater.PowerOutputProtocolName)
-                                        .SetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel, heater.OutputState);
+                    _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
+                                        .SetState(heater.Heater.DigitalOutput.DeviceId, heater.Heater.DigitalOutput.OutputChannel, heater.OutputState);
 
                     _usageCollector.Collect(heater, controllerState);
 
@@ -48,8 +48,8 @@ namespace HeatingControl.Application.Loops.Processing
 
         private bool StateShouldBeUpdated(HeaterState heater)
         {
-            return heater.OutputState != _powerOutputProvider.Provide(heater.Heater.PowerOutputProtocolName)
-                                                             .GetState(heater.Heater.PowerOutputDeviceId, heater.Heater.PowerOutputChannel);
+            return heater.OutputState != _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
+                                                             .GetState(heater.Heater.DigitalOutput.DeviceId, heater.Heater.DigitalOutput.OutputChannel);
         }
     }
 }

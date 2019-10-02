@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -21,7 +21,7 @@ namespace HeatingControl.Application.Queries
         private readonly IAvailableHeatersProvider _availableHeatersProvider;
 
         public AvailableDevicesProvider(IAvailableTemperatureSensorsProvider availableTemperatureSensorsProvider,
-                                       IAvailableHeatersProvider availableHeatersProvider)
+                                        IAvailableHeatersProvider availableHeatersProvider)
         {
             _availableTemperatureSensorsProvider = availableTemperatureSensorsProvider;
             _availableHeatersProvider = availableHeatersProvider;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -35,7 +35,7 @@ namespace HeatingControl.Application.Queries
                                                       {
                                                           Id = x.PowerZoneId,
                                                           Name = x.Name,
-                                                          AffectedHeatersNames = x.HeaterIds.Select(h => controllerState.HeaterIdToState[h].Heater.Name).ToList(),
+                                                          AffectedHeatersNames = x.Heaters.Select(h => h.Name).ToList(),
                                                           PowerLimitFormatted = $"{x.MaxUsage} {Enum.GetName(typeof(UsageUnit), x.UsageUnit)}"
                                                       })
                                          .OrderBy(x => x.Name)

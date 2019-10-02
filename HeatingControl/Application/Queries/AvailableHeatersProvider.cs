@@ -46,7 +46,7 @@ namespace HeatingControl.Application.Queries
 
                                               var assignedZones = controllerState.ZoneIdToState
                                                                                  .Select(z => z.Value.Zone)
-                                                                                 .Where(z => z.HeaterIds.Contains(x.Key));
+                                                                                 .Where(z => z.Heaters.Contains(x.Value.Heater));
 
                                               if (zoneIdToExcludeFromAssignment.HasValue)
                                               {

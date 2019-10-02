@@ -1,4 +1,4 @@
-﻿using Domain.BuildingModel;
+﻿using Domain;
 using System;
 
 namespace HeatingControl.Models
