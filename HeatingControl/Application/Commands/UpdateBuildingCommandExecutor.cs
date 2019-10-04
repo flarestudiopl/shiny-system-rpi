@@ -1,6 +1,7 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Storage.BuildingModel;
+using Domain;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
 {
@@ -11,11 +12,11 @@ namespace HeatingControl.Application.Commands
 
     public class UpdateBuildingCommandExecutor : ICommandExecutor<UpdateBuildingCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<Building> _buildingRepository;
 
-        public UpdateBuildingCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public UpdateBuildingCommandExecutor(IRepository<Building> buildingRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _buildingRepository = buildingRepository;
         }
 
         public CommandResult Execute(UpdateBuildingCommand command, CommandContext context)
@@ -27,7 +28,7 @@ namespace HeatingControl.Application.Commands
 
             context.ControllerState.Model.Name = command.Name;
 
-            _buildingModelSaver.Save(context.ControllerState.Model);
+            _buildingRepository.Update(context.ControllerState.Model, null);
 
             return CommandResult.Empty;
         }

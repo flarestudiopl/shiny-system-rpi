@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Application.Loops.Processing;
 using HeatingControl.Models;
 using Xunit;
@@ -17,21 +17,25 @@ namespace HeatingControl.Tests.Application.Loops.Processing
         public void iterates_over_available_heaters(byte iteration, bool state1, bool state2, bool state3, bool state4)
         {
             // Arrange
-            var powerZoneState = new PowerZoneState
-                                 {
-                                     NextIntervalOffset = iteration,
-                                     PowerZone = new PowerZone
-                                                 {
-                                                     MaxUsage = 2.1m,
-                                                     HeaterIds = new HashSet<int> { 1, 2, 3, 4 }
-                                                 }
-                                 };
+            var heater1 = new Heater { HeaterId = 1, UsagePerHour = 0.9m };
+            var heater2 = new Heater { HeaterId = 2, UsagePerHour = 0.9m };
+            var heater3 = new Heater { HeaterId = 3, UsagePerHour = 0.9m };
+            var heater4 = new Heater { HeaterId = 4, UsagePerHour = 0.9m };
 
-            var heater = new Heater { UsagePerHour = 0.9m };
-            var heaterState1 = new HeaterState { Heater = heater, OutputState = true };
-            var heaterState2 = new HeaterState { Heater = heater, OutputState = true };
-            var heaterState3 = new HeaterState { Heater = heater, OutputState = true };
-            var heaterState4 = new HeaterState { Heater = heater, OutputState = true };
+            var heaterState1 = new HeaterState { Heater = heater1, OutputState = true };
+            var heaterState2 = new HeaterState { Heater = heater2, OutputState = true };
+            var heaterState3 = new HeaterState { Heater = heater3, OutputState = true };
+            var heaterState4 = new HeaterState { Heater = heater4, OutputState = true };
+
+            var powerZoneState = new PowerZoneState
+            {
+                NextIntervalOffset = iteration,
+                PowerZone = new PowerZone
+                {
+                    MaxUsage = 2.1m,
+                    Heaters = new List<Heater> { heater1, heater2, heater3, heater4 }
+                }
+            };
 
             var controllerState = new ControllerState
                                   {

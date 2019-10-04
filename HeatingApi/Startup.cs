@@ -49,7 +49,7 @@ namespace HeatingApi
                                                         });
 
             services.AddMvc()
-                    .AddJsonOptions(x => x.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified);
+                    .AddJsonOptions(x => x.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind);
 
             services.AddSwaggerGen(c =>
                                    {

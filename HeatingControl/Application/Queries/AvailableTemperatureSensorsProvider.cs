@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries

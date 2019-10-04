@@ -1,4 +1,4 @@
-﻿namespace Domain.BuildingModel
+﻿namespace Domain
 {
     public enum ZoneControlMode : byte
     {

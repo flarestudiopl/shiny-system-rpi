@@ -8,12 +8,13 @@ namespace HeatingControl.Application.DataAccess
 {
     public interface IRepository<TItem> where TItem : class
     {
-        TItem Create(TItem item);
+        TItem Create(TItem item, Domain.Building building);
         TItem Read(int id);
         ICollection<TItem> Read(Expression<Func<TItem, bool>> filterPredicate);
         TItem ReadSingle(Expression<Func<TItem, bool>> filterPredicate);
         TItem ReadSingleOrDefault(Expression<Func<TItem, bool>> filterPredicate);
-        void Update(TItem item);
+        void Update(TItem item, Domain.Building building);
+        void Delete(TItem item, Domain.Building building);
     }
 
     public class Repository<TItem> : IRepository<TItem> where TItem : class
@@ -25,10 +26,15 @@ namespace HeatingControl.Application.DataAccess
             _dbExecutor = dbExecutor;
         }
 
-        public TItem Create(TItem item)
+        public TItem Create(TItem item, Domain.Building building)
         {
             _dbExecutor.Execute(c =>
             {
+                if (building != null)
+                {
+                    c.Attach(building);
+                }
+
                 c.Set<TItem>().Add(item);
                 c.SaveChanges();
             });
@@ -38,7 +44,7 @@ namespace HeatingControl.Application.DataAccess
 
         public TItem Read(int id)
         {
-           return _dbExecutor.Query(c => c.Set<TItem>().Find(id));
+            return _dbExecutor.Query(c => c.Set<TItem>().Find(id));
         }
 
         public ICollection<TItem> Read(Expression<Func<TItem, bool>> filterPredicate)
@@ -56,11 +62,30 @@ namespace HeatingControl.Application.DataAccess
             return _dbExecutor.Query(c => c.Set<TItem>().SingleOrDefault(filterPredicate));
         }
 
-        public void Update(TItem item)
+        public void Update(TItem item, Domain.Building building)
         {
             _dbExecutor.Execute(c =>
             {
+                if (building != null)
+                {
+                    c.Attach(building);
+                }
+
                 c.Set<TItem>().Update(item);
+                c.SaveChanges();
+            });
+        }
+
+        public void Delete(TItem item, Domain.Building building)
+        {
+            _dbExecutor.Execute(c =>
+            {
+                if (building != null)
+                {
+                    c.Attach(building);
+                }
+
+                c.Set<TItem>().Remove(item);
                 c.SaveChanges();
             });
         }

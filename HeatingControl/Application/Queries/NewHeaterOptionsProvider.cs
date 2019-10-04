@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HardwareAccess.Devices;
 
 namespace HeatingControl.Application.Queries

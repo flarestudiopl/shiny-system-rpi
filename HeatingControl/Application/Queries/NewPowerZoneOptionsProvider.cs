@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -30,10 +30,7 @@ namespace HeatingControl.Application.Queries
                                                              {
                                                                  Id = x.Heater.HeaterId,
                                                                  Name = x.Heater.Name,
-                                                                 Assignment = controllerState.PowerZoneIdToState
-                                                                                             .Select(z => z.Value.PowerZone)
-                                                                                             .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId))
-                                                                                             .Select(z => z.Name).JoinWith(", "),
+                                                                 Assignment = x.Heater.PowerZone?.Name,
                                                                  PowerUnit = x.Heater.UsageUnit,
                                                                  OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })

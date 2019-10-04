@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
 using HeatingControl.Application.Loops.Processing;
-using Domain.BuildingModel;
 using HeatingControl.Models;
+using Domain;
 
 namespace HeatingControl.Application.Queries
 {
@@ -51,8 +51,8 @@ namespace HeatingControl.Application.Queries
                                                                        Id = zone.ZoneId,
                                                                        Name = zone.Name,
                                                                        HeaterNames = zone
-                                                                                    .HeaterIds
-                                                                                    .Select(h => state.HeaterIdToState[h].Heater.Name)
+                                                                                    .Heaters
+                                                                                    .Select(h => h.Name)
                                                                                     .ToList(),
                                                                        TotalPowerFormatted = _zonePowerProvider.Provide(zone.ZoneId, state)
                                                                                                                .Select(h => $"{h.Value} {Enum.GetName(typeof(UsageUnit), h.Key)}")

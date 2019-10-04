@@ -1,6 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain.StorageDatabase;
+using Domain;
 using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Commands
@@ -44,7 +44,7 @@ namespace HeatingControl.Application.Commands
             user.PasswordHash = command.Password?.CalculateHash() ?? user.PasswordHash;
             user.QuickLoginPinHash = command.Pin?.CalculateHash() ?? user.QuickLoginPinHash;
 
-            _userRepository.Update(user);
+            _userRepository.Update(user, null);
 
             return CommandResult.Empty;
         }

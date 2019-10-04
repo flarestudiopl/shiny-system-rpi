@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HeatingControl.Application.Loops.Processing;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 using Commons.Extensions;

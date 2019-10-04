@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Loops.Processing
@@ -17,8 +17,8 @@ namespace HeatingControl.Application.Loops.Processing
         {
             var zone = controllerState.ZoneIdToState.GetValueOrDefault(zoneId);
 
-            return zone?.Zone.HeaterIds
-                        .Select(x => controllerState.HeaterIdToState[x].Heater)
+            return zone?.Zone
+                        .Heaters
                         .GroupBy(x => x.UsageUnit)
                         .ToDictionary(x => x.Key, x => x.Sum(u => u.UsagePerHour));
         }

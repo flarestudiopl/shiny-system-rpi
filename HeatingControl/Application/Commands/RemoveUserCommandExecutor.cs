@@ -1,4 +1,4 @@
-﻿using Domain.StorageDatabase;
+﻿using Domain;
 using HeatingControl.Application.DataAccess;
 using System;
 
@@ -30,7 +30,7 @@ namespace HeatingControl.Application.Commands
                 user.DisabledByUserId = context.UserId;
                 user.DisabledDate = DateTime.UtcNow;
 
-                _userRepository.Update(user);
+                _userRepository.Update(user, null);
             }
 
             return CommandResult.Empty;

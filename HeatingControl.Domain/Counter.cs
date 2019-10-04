@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Domain.StorageDatabase
+namespace Domain
 {
     public class Counter
     {

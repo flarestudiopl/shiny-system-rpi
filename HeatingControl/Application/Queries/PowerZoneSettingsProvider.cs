@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -50,18 +50,14 @@ namespace HeatingControl.Application.Queries
                        PowerLimitValue = powerZoneModel.MaxUsage,
                        PowerLimitUnit = powerZoneModel.UsageUnit,
                        PowerLimitUnits = EnumExtensions.AsDictionary<UsageUnit>(),
-                       AffectedHeatersIds = powerZoneModel.HeaterIds,
+                       AffectedHeatersIds = powerZoneModel.Heaters.Select(x => x.HeaterId).ToArray(),
                        Heaters = controllerState.HeaterIdToState
                                                 .Values
                                                 .Select(x => new PowerZoneSettingsProviderResult.AffectedHeaterData
                                                              {
                                                                  Id = x.Heater.HeaterId,
                                                                  Name = x.Heater.Name,
-                                                                 Assignment = controllerState.PowerZoneIdToState
-                                                                                             .Select(z => z.Value.PowerZone)
-                                                                                             .Where(z => z.HeaterIds.Contains(x.Heater.HeaterId) &&
-                                                                                                         z.PowerZoneId != powerZoneId)
-                                                                                             .Select(z => z.Name).JoinWith(", "),
+                                                                 Assignment = x.Heater.PowerZone == powerZoneModel ? null : x.Heater.PowerZone?.Name,
                                                                  PowerUnit = x.Heater.UsageUnit,
                                                                  OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })

@@ -1,4 +1,4 @@
-﻿using Domain.StorageDatabase;
+﻿using Domain;
 using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Queries

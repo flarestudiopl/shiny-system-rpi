@@ -1,11 +1,11 @@
-﻿using Domain.BuildingModel;
+﻿using Domain;
 using HeatingControl.Application.Commands;
 using NSubstitute;
-using Storage.BuildingModel;
 using System;
 using System.Collections.Generic;
 using HeatingControl.Models;
 using Xunit;
+using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Tests.Application.Commands
 {
@@ -23,7 +23,7 @@ namespace HeatingControl.Tests.Application.Commands
         public void ignore_when_dates_overlap_existing(int startHour, int endHour)
         {
             //Arrange
-            var buildingModelSaver = Substitute.For<IBuildingModelSaver>();
+            var buildingModelSaver = Substitute.For<IRepository<ScheduleItem>>();
 
             var schedule = new List<ScheduleItem>
             {
@@ -66,7 +66,7 @@ namespace HeatingControl.Tests.Application.Commands
                                                    });
 
             //Assert
-            buildingModelSaver.DidNotReceiveWithAnyArgs().Save(null);
+            buildingModelSaver.DidNotReceiveWithAnyArgs().Create(null, null);
             Assert.Equal(1, schedule.Count);
         }
     }

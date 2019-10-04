@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Commons.Extensions;
-using Domain.BuildingModel;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -47,7 +48,7 @@ namespace HeatingControl.Application.Queries
                        Name = zoneConfiguration.Name,
                        TemperatureSensorId = zoneConfiguration.TemperatureControlledZone?.TemperatureSensorId,
                        TemperatureSensors = _availableTemperatureSensorsProvider.Provide(controllerState, building),
-                       HeaterIds = zoneConfiguration.HeaterIds,
+                       HeaterIds = zoneConfiguration.Heaters.Select(x => x.HeaterId).ToArray(),
                        Heaters = _availableHeatersProvider.Provide(zoneConfiguration.ZoneId, controllerState)
                    };
         }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Domain.BuildingModel;
+using Domain;
 using HardwareAccess.Devices;
 
 namespace HeatingControl.Application.Queries
@@ -31,7 +31,7 @@ namespace HeatingControl.Application.Queries
 
             return allTemperatureSensors.Select(x =>
                                                 {
-                                                    var modelSensor = model.TemperatureSensors.FirstOrDefault(s => s.DeviceId == x);
+                                                    var modelSensor = model.TemperatureSensors?.FirstOrDefault(s => s.DeviceId == x);
 
                                                     return new ConnectedTemperatureSensor
                                                            {

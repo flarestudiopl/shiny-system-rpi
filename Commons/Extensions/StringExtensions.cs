@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,13 +19,6 @@ namespace Commons.Extensions
         public static bool ContainsDigitsOnly(this string value) => value.All(x => x > 47 && x < 58);
 
         public static bool HasLengthBetween(this string value, int from, int to) => value.Length >= from && value.Length <= to;
-
-        public static string JoinWith(this IEnumerable<string> values, string separator)
-        {
-            values = values.ToList();
-
-            return values.Any() ? string.Join(separator, values) : null;
-        }
 
         public static string CalculateHash(this string value)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.StorageDatabase;
+using Domain;
 using HeatingControl.Application.DataAccess;
 
 namespace HeatingControl.Application.Queries

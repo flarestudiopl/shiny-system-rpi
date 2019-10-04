@@ -1,7 +1,7 @@
 ﻿using System;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain.StorageDatabase;
+using Domain;
 using HeatingControl.Application.DataAccess;
 using HeatingControl.Application.DataAccess.Counter;
 
@@ -34,20 +34,20 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(command.ZoneId));
             }
 
-            foreach (var heaterId in zone.Zone.HeaterIds)
+            foreach (var heater in zone.Zone.Heaters)
             {
-                context.ControllerState.HeaterIdToState[heaterId].LastCounterStart = DateTime.UtcNow;
+                context.ControllerState.HeaterIdToState[heater.HeaterId].LastCounterStart = DateTime.UtcNow;
 
-                var counter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == heaterId && !x.ResetDate.HasValue);
+                var counter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == heater.HeaterId && !x.ResetDate.HasValue);
 
                 counter.ResetDate = DateTime.UtcNow;
                 counter.ResettedByUserId = command.UserId;
 
-                _counterRepository.Update(counter);
+                _counterRepository.Update(counter, null);
 
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
                 {
-                    HeaterId = heaterId,
+                    HeaterId = heater.HeaterId,
                     SecondsToAccumulate = 0
                 });
             }

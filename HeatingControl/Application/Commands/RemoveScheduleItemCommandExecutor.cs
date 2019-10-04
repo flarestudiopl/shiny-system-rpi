@@ -1,7 +1,8 @@
 ﻿using Commons.Extensions;
-using Storage.BuildingModel;
 using System.Linq;
 using Commons.Localization;
+using HeatingControl.Application.DataAccess;
+using Domain;
 
 namespace HeatingControl.Application.Commands
 {
@@ -13,11 +14,11 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveScheduleItemCommandExecutor : ICommandExecutor<RemoveScheduleItemCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<ScheduleItem> _scheduleItemRepository;
 
-        public RemoveScheduleItemCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public RemoveScheduleItemCommandExecutor(IRepository<ScheduleItem> scheduleItemRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _scheduleItemRepository = scheduleItemRepository;
         }
 
         public CommandResult Execute(RemoveScheduleItemCommand command, CommandContext context)
@@ -36,9 +37,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownScheduleItemId.FormatWith(command.ZoneId));
             }
 
-            zone.Zone.Schedule.Remove(scheduleItem);
-
-            _buildingModelSaver.Save(context.ControllerState.Model);
+            _scheduleItemRepository.Delete(scheduleItem, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

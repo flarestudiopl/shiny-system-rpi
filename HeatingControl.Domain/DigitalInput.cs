@@ -1,8 +1,10 @@
-﻿namespace Domain.BuildingModel
+﻿namespace Domain
 {
     public class DigitalInput
     {
         public int DigitalInputId { get; set; }
+        
+        public int BuildingId { get; set; }
 
         public string ProtocolName { get; set; }
 

@@ -2,8 +2,9 @@
 using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
+using Domain;
+using HeatingControl.Application.DataAccess;
 using HeatingControl.Extensions;
-using Storage.BuildingModel;
 
 namespace HeatingControl.Application.Commands
 {
@@ -24,11 +25,11 @@ namespace HeatingControl.Application.Commands
 
     public class SetTemperatureCommandExecutor : ICommandExecutor<SetTemperatureCommand>
     {
-        private readonly IBuildingModelSaver _buildingModelSaver;
+        private readonly IRepository<TemperatureControlledZone> _temperatureControlledZoneRepository;
 
-        public SetTemperatureCommandExecutor(IBuildingModelSaver buildingModelSaver)
+        public SetTemperatureCommandExecutor(IRepository<TemperatureControlledZone> temperatureControlledZoneRepository)
         {
-            _buildingModelSaver = buildingModelSaver;
+            _temperatureControlledZoneRepository = temperatureControlledZoneRepository;
         }
 
         public CommandResult Execute(SetTemperatureCommand command, CommandContext context)
@@ -60,7 +61,7 @@ namespace HeatingControl.Application.Commands
                     throw new ArgumentOutOfRangeException();
             }
 
-            _buildingModelSaver.Save(context.ControllerState.Model);
+            _temperatureControlledZoneRepository.Update(temperatureControlledZone, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.BuildingModel;
 using HeatingControl.Extensions;
 using HeatingControl.Models;
 using Commons.Extensions;
 using HeatingControl.Application.Loops.Processing;
-using Domain.StorageDatabase;
 using HeatingControl.Application.DataAccess;
+using Domain;
 
 namespace HeatingControl.Application.Queries
 {
@@ -75,7 +74,7 @@ namespace HeatingControl.Application.Queries
 
         private ZoneDetailsProviderResult.CountersData GetCountersData(ZoneState zone, ControllerState state, Building building)
         {
-            var heaterIds = zone.Zone.HeaterIds;
+            var heaterIds = zone.Zone.Heaters.Select(x => x.HeaterId).ToHashSet();
             var heatersCounters = _counterRepository.Read(x => heaterIds.Contains(x.HeaterId) &&
                                                                !x.ResetDate.HasValue)
                                                     .ToDictionary(x => x.HeaterId,
@@ -134,10 +133,10 @@ namespace HeatingControl.Application.Queries
             var scheduleSettings = new ZoneDetailsProviderResult.ScheduleSettings
             {
                 Items = zone.Zone
-                                                   .Schedule
-                                                   .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
-                                                   .ThenBy(x => x.BeginTime)
-                                                   .ToList()
+                            .Schedule
+                            .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
+                            .ThenBy(x => x.BeginTime)
+                            .ToList()
             };
 
             if (zone.Zone.IsTemperatureControlled())

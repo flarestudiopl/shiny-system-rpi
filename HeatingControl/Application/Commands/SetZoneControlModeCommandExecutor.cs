@@ -1,6 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain.BuildingModel;
+using Domain;
 
 namespace HeatingControl.Application.Commands
 {

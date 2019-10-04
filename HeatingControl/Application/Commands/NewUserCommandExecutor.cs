@@ -1,6 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain.StorageDatabase;
+using Domain;
 using HeatingControl.Application.DataAccess;
 using System;
 
@@ -55,7 +55,7 @@ namespace HeatingControl.Application.Commands
                 IsBrowseable = true
             };
 
-            _userRepository.Create(user);
+            _userRepository.Create(user, null);
 
             return CommandResult.Empty;
         }

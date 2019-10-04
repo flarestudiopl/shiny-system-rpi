@@ -16,9 +16,9 @@ namespace HeatingControl.Application.DataAccess.User
 
     public class UserLastLogonUpdater : IUserLastLogonUpdater
     {
-        private readonly IRepository<Domain.StorageDatabase.User> _userRepository;
+        private readonly IRepository<Domain.User> _userRepository;
 
-        public UserLastLogonUpdater(IRepository<Domain.StorageDatabase.User> userRepository)
+        public UserLastLogonUpdater(IRepository<Domain.User> userRepository)
         {
             _userRepository = userRepository;
         }
@@ -30,7 +30,7 @@ namespace HeatingControl.Application.DataAccess.User
             user.LastLogonDate = input.LastLogonDate;
             user.LastSeenIpAddress = input.LastSeenIpAddress;
 
-            _userRepository.Update(user);
+            _userRepository.Update(user, null);
         }
     }
 }

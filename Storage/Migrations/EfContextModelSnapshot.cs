@@ -16,7 +16,33 @@ namespace Storage.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
-            modelBuilder.Entity("Domain.StorageDatabase.Counter", b =>
+            modelBuilder.Entity("Domain.Building", b =>
+                {
+                    b.Property<int>("BuildingId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ControlLoopIntervalSecondsMilliseconds");
+
+                    b.Property<bool>("IsDefault");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("BuildingId");
+
+                    b.ToTable("Building");
+
+                    b.HasData(
+                        new
+                        {
+                            BuildingId = -1,
+                            ControlLoopIntervalSecondsMilliseconds = 5000,
+                            IsDefault = true,
+                            Name = "Budynek testowy"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Counter", b =>
                 {
                     b.Property<int>("CounterId")
                         .ValueGeneratedOnAdd();
@@ -42,7 +68,169 @@ namespace Storage.Migrations
                     b.ToTable("Counter");
                 });
 
-            modelBuilder.Entity("Domain.StorageDatabase.User", b =>
+            modelBuilder.Entity("Domain.DigitalInput", b =>
+                {
+                    b.Property<int>("DigitalInputId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BuildingId");
+
+                    b.Property<int>("DeviceId");
+
+                    b.Property<int>("Function");
+
+                    b.Property<string>("InputName");
+
+                    b.Property<bool>("Inverted");
+
+                    b.Property<string>("ProtocolName");
+
+                    b.HasKey("DigitalInputId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.ToTable("DigitalInput");
+                });
+
+            modelBuilder.Entity("Domain.DigitalOutput", b =>
+                {
+                    b.Property<int>("DigitalOutputId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("DeviceId");
+
+                    b.Property<string>("OutputChannel");
+
+                    b.Property<string>("ProtocolName");
+
+                    b.HasKey("DigitalOutputId");
+
+                    b.ToTable("DigitalOutput");
+                });
+
+            modelBuilder.Entity("Domain.Heater", b =>
+                {
+                    b.Property<int>("HeaterId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BuildingId");
+
+                    b.Property<int>("DigitalOutputId");
+
+                    b.Property<int>("MinimumStateChangeIntervalSeconds");
+
+                    b.Property<string>("Name");
+
+                    b.Property<int?>("PowerZoneId");
+
+                    b.Property<decimal>("UsagePerHour");
+
+                    b.Property<byte>("UsageUnit");
+
+                    b.Property<int?>("ZoneId");
+
+                    b.HasKey("HeaterId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.HasIndex("DigitalOutputId")
+                        .IsUnique();
+
+                    b.HasIndex("PowerZoneId");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("Heater");
+                });
+
+            modelBuilder.Entity("Domain.PowerZone", b =>
+                {
+                    b.Property<int>("PowerZoneId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BuildingId");
+
+                    b.Property<decimal>("MaxUsage");
+
+                    b.Property<string>("Name");
+
+                    b.Property<int>("RoundRobinIntervalMinutes");
+
+                    b.Property<byte>("UsageUnit");
+
+                    b.HasKey("PowerZoneId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.ToTable("PowerZone");
+                });
+
+            modelBuilder.Entity("Domain.ScheduleItem", b =>
+                {
+                    b.Property<int>("ScheduleItemId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<TimeSpan>("BeginTime");
+
+                    b.Property<string>("DaysOfWeek")
+                        .IsRequired();
+
+                    b.Property<TimeSpan>("EndTime");
+
+                    b.Property<float?>("SetPoint");
+
+                    b.Property<int>("ZoneId");
+
+                    b.HasKey("ScheduleItemId");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ScheduleItem");
+                });
+
+            modelBuilder.Entity("Domain.TemperatureControlledZone", b =>
+                {
+                    b.Property<int>("TemperatureControlledZoneId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<float>("HighSetPoint");
+
+                    b.Property<float>("Hysteresis");
+
+                    b.Property<float>("LowSetPoint");
+
+                    b.Property<float>("ScheduleDefaultSetPoint");
+
+                    b.Property<int>("TemperatureSensorId");
+
+                    b.HasKey("TemperatureControlledZoneId");
+
+                    b.HasIndex("TemperatureSensorId");
+
+                    b.ToTable("TemperatureControlledZone");
+                });
+
+            modelBuilder.Entity("Domain.TemperatureSensor", b =>
+                {
+                    b.Property<int>("TemperatureSensorId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BuildingId");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("TemperatureSensorId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.ToTable("TemperatureSensor");
+                });
+
+            modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd();
@@ -95,25 +283,121 @@ namespace Storage.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.StorageDatabase.Counter", b =>
+            modelBuilder.Entity("Domain.Zone", b =>
                 {
-                    b.HasOne("Domain.StorageDatabase.User", "ResettedBy")
+                    b.Property<int>("ZoneId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BuildingId");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<int?>("TemperatureControlledZoneId");
+
+                    b.HasKey("ZoneId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.HasIndex("TemperatureControlledZoneId")
+                        .IsUnique();
+
+                    b.ToTable("Zone");
+                });
+
+            modelBuilder.Entity("Domain.Counter", b =>
+                {
+                    b.HasOne("Domain.User", "ResettedBy")
                         .WithMany()
                         .HasForeignKey("ResettedByUserId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Domain.StorageDatabase.User", b =>
+            modelBuilder.Entity("Domain.DigitalInput", b =>
                 {
-                    b.HasOne("Domain.StorageDatabase.User", "CreatedBy")
+                    b.HasOne("Domain.Building")
+                        .WithMany("DigitalInputs")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Heater", b =>
+                {
+                    b.HasOne("Domain.Building")
+                        .WithMany("Heaters")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.DigitalOutput", "DigitalOutput")
+                        .WithOne()
+                        .HasForeignKey("Domain.Heater", "DigitalOutputId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.PowerZone", "PowerZone")
+                        .WithMany("Heaters")
+                        .HasForeignKey("PowerZoneId");
+
+                    b.HasOne("Domain.Zone", "Zone")
+                        .WithMany("Heaters")
+                        .HasForeignKey("ZoneId");
+                });
+
+            modelBuilder.Entity("Domain.PowerZone", b =>
+                {
+                    b.HasOne("Domain.Building")
+                        .WithMany("PowerZones")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.ScheduleItem", b =>
+                {
+                    b.HasOne("Domain.Zone")
+                        .WithMany("Schedule")
+                        .HasForeignKey("ZoneId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.TemperatureControlledZone", b =>
+                {
+                    b.HasOne("Domain.TemperatureSensor", "TemperatureSensor")
+                        .WithMany("TemperatureControlledZones")
+                        .HasForeignKey("TemperatureSensorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.TemperatureSensor", b =>
+                {
+                    b.HasOne("Domain.Building")
+                        .WithMany("TemperatureSensors")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.User", b =>
+                {
+                    b.HasOne("Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.StorageDatabase.User", "DisabledBy")
+                    b.HasOne("Domain.User", "DisabledBy")
                         .WithMany()
                         .HasForeignKey("DisabledByUserId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Domain.Zone", b =>
+                {
+                    b.HasOne("Domain.Building")
+                        .WithMany("Zones")
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.TemperatureControlledZone", "TemperatureControlledZone")
+                        .WithOne()
+                        .HasForeignKey("Domain.Zone", "TemperatureControlledZoneId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
