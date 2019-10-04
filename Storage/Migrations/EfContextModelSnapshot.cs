@@ -36,7 +36,7 @@ namespace Storage.Migrations
                         new
                         {
                             BuildingId = -1,
-                            ControlLoopIntervalSecondsMilliseconds = 5,
+                            ControlLoopIntervalSecondsMilliseconds = 5000,
                             IsDefault = true,
                             Name = "Budynek testowy"
                         });
@@ -307,11 +307,6 @@ namespace Storage.Migrations
 
             modelBuilder.Entity("Domain.Counter", b =>
                 {
-                    b.HasOne("Domain.Heater")
-                        .WithMany()
-                        .HasForeignKey("HeaterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Domain.User", "ResettedBy")
                         .WithMany()
                         .HasForeignKey("ResettedByUserId")

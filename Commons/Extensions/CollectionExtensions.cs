@@ -15,5 +15,7 @@ namespace Commons.Extensions
                 collection.Remove(itemToRemove);
             }
         }
+
+        public static string JoinWith<T>(this IEnumerable<T> values, string separator) => string.Join(separator, values);
     }
 }

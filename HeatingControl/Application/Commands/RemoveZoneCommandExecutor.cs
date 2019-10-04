@@ -1,7 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.Zone;
 
 namespace HeatingControl.Application.Commands
 {
@@ -12,11 +11,11 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveZoneCommandExecutor : ICommandExecutor<RemoveZoneCommand>
     {
-        private readonly IRepository<Zone> _zoneRepository;
+        private readonly IZoneRemover _zoneRemover;
 
-        public RemoveZoneCommandExecutor(IRepository<Zone> zoneRepository)
+        public RemoveZoneCommandExecutor(IZoneRemover zoneRemover)
         {
-            _zoneRepository = zoneRepository;
+            _zoneRemover = zoneRemover;
         }
 
         public CommandResult Execute(RemoveZoneCommand command, CommandContext context)
@@ -35,8 +34,7 @@ namespace HeatingControl.Application.Commands
                 context.ControllerState.HeaterIdToState[heaterToDisable.HeaterId].OutputState = false;
             }
 
-            context.ControllerState.Model.Zones.Remove(x => x.ZoneId == command.ZoneId);
-            _zoneRepository.Delete(zoneState.Zone);
+            _zoneRemover.Remove(zoneState.Zone, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

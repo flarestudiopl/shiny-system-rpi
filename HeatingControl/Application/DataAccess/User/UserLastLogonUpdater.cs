@@ -30,7 +30,7 @@ namespace HeatingControl.Application.DataAccess.User
             user.LastLogonDate = input.LastLogonDate;
             user.LastSeenIpAddress = input.LastSeenIpAddress;
 
-            _userRepository.Update(user);
+            _userRepository.Update(user, null);
         }
     }
 }

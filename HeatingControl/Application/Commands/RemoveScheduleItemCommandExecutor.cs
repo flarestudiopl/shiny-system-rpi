@@ -37,8 +37,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownScheduleItemId.FormatWith(command.ZoneId));
             }
 
-            zone.Zone.Schedule.Remove(scheduleItem);
-            _scheduleItemRepository.Delete(scheduleItem);
+            _scheduleItemRepository.Delete(scheduleItem, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

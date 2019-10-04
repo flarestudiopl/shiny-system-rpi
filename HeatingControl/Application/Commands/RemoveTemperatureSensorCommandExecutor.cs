@@ -35,8 +35,8 @@ namespace HeatingControl.Application.Commands
             }
 
             context.ControllerState.TemperatureSensorIdToDeviceId.Remove(command.SensorId);
-            context.ControllerState.Model.TemperatureSensors.Remove(temperatureSensor);
-            _temperatureSensorRepository.Delete(temperatureSensor);
+
+            _temperatureSensorRepository.Delete(temperatureSensor, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

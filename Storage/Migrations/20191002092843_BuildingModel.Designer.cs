@@ -9,7 +9,7 @@ using Storage.StorageDatabase;
 namespace Storage.Migrations
 {
     [DbContext(typeof(EfContext))]
-    [Migration("20191002090929_BuildingModel")]
+    [Migration("20191002092843_BuildingModel")]
     partial class BuildingModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace Storage.Migrations
                         new
                         {
                             BuildingId = -1,
-                            ControlLoopIntervalSecondsMilliseconds = 5,
+                            ControlLoopIntervalSecondsMilliseconds = 5000,
                             IsDefault = true,
                             Name = "Budynek testowy"
                         });
@@ -309,11 +309,6 @@ namespace Storage.Migrations
 
             modelBuilder.Entity("Domain.Counter", b =>
                 {
-                    b.HasOne("Domain.Heater")
-                        .WithMany()
-                        .HasForeignKey("HeaterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Domain.User", "ResettedBy")
                         .WithMany()
                         .HasForeignKey("ResettedByUserId")

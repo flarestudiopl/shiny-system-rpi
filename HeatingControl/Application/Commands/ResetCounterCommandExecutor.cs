@@ -43,7 +43,7 @@ namespace HeatingControl.Application.Commands
                 counter.ResetDate = DateTime.UtcNow;
                 counter.ResettedByUserId = command.UserId;
 
-                _counterRepository.Update(counter);
+                _counterRepository.Update(counter, null);
 
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
                 {

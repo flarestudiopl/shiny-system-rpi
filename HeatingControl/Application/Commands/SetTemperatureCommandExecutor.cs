@@ -61,7 +61,7 @@ namespace HeatingControl.Application.Commands
                     throw new ArgumentOutOfRangeException();
             }
 
-            _temperatureControlledZoneRepository.Update(temperatureControlledZone);
+            _temperatureControlledZoneRepository.Update(temperatureControlledZone, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

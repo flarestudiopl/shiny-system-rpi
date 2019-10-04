@@ -55,7 +55,7 @@ namespace HeatingControl.Application.Commands
                 IsBrowseable = true
             };
 
-            _userRepository.Create(user);
+            _userRepository.Create(user, null);
 
             return CommandResult.Empty;
         }

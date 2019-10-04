@@ -28,7 +28,7 @@ namespace HeatingControl.Application.Commands
 
             context.ControllerState.Model.Name = command.Name;
 
-            _buildingRepository.Update(context.ControllerState.Model);
+            _buildingRepository.Update(context.ControllerState.Model, null);
 
             return CommandResult.Empty;
         }

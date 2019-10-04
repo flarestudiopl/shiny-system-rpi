@@ -47,7 +47,7 @@ namespace Storage.StorageDatabase
                 x.HasData(new Domain.Building
                 {
                     BuildingId = -1,
-                    ControlLoopIntervalSecondsMilliseconds = 5,
+                    ControlLoopIntervalSecondsMilliseconds = 5000,
                     IsDefault = true,
                     Name = "Budynek testowy"
                 });
@@ -57,7 +57,6 @@ namespace Storage.StorageDatabase
             {
                 x.ToTable(nameof(Domain.Counter));
 
-                x.HasOne<Domain.Heater>().WithMany().HasForeignKey(c => c.HeaterId);
                 x.HasOne(c => c.ResettedBy).WithMany().HasForeignKey(c => c.ResettedByUserId).OnDelete(DeleteBehavior.Restrict);
 
                 x.HasIndex(c => new { c.HeaterId, c.ResetDate }).HasFilter($"[{nameof(Domain.Counter.ResetDate)}] IS NULL").IsUnique();
@@ -98,8 +97,8 @@ namespace Storage.StorageDatabase
 
                 const string daysOfWeekConversionSeparator = ",";
 
-                x.Property(si => si.DaysOfWeek).IsRequired().HasConversion(si => si.Select(dow => Enum.GetName(typeof(DayOfWeek), dow)).JoinWith(daysOfWeekConversionSeparator),
-                    str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow => (DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
+                x.Property(si => si.DaysOfWeek).IsRequired().HasConversion(si => si.Cast<int>().JoinWith(daysOfWeekConversionSeparator),
+                    str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow=>(DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
 
                 x.Property(si => si.BeginTime).IsRequired();
                 x.Property(si => si.EndTime).IsRequired();

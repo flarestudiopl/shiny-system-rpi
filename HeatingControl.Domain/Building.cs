@@ -12,14 +12,14 @@ namespace Domain
 
         public int ControlLoopIntervalSecondsMilliseconds { get; set; }
 
-        public ICollection<Zone> Zones { get; set; }
+        public ICollection<Zone> Zones { get; set; } = new List<Zone>();
 
-        public ICollection<Heater> Heaters { get; set; }
+        public ICollection<Heater> Heaters { get; set; } = new List<Heater>();
 
-        public ICollection<TemperatureSensor> TemperatureSensors { get; set; }
+        public ICollection<TemperatureSensor> TemperatureSensors { get; set; } = new List<TemperatureSensor>();
 
-        public ICollection<PowerZone> PowerZones { get; set; }
+        public ICollection<PowerZone> PowerZones { get; set; } = new List<PowerZone>();
 
-        public ICollection<DigitalInput> DigitalInputs { get; set; }
+        public ICollection<DigitalInput> DigitalInputs { get; set; } = new List<DigitalInput>();
     }
 }

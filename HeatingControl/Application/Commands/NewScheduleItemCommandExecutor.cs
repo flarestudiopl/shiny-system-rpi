@@ -72,8 +72,7 @@ namespace HeatingControl.Application.Commands
                 newScheduleItem.SetPoint = command.SetPoint;
             }
 
-            _scheduleItemRepository.Create(newScheduleItem);
-            zone.Schedule.Add(newScheduleItem);
+             _scheduleItemRepository.Create(newScheduleItem, context.ControllerState.Model);
 
             return new CommandResult();
         }

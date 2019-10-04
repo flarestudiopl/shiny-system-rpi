@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Storage.StorageDatabase;
+using System;
+using System.Linq;
 
 namespace HeatingControl.Application.DataAccess.Counter
 {
@@ -15,34 +17,37 @@ namespace HeatingControl.Application.DataAccess.Counter
 
     public class CounterAccumulator : ICounterAccumulator
     {
-        private readonly IRepository<Domain.Counter> _counterRepository;
+        private readonly IDbExecutor _dbExecutor;
 
-        public CounterAccumulator(IRepository<Domain.Counter> counterRepository)
+        public CounterAccumulator(IDbExecutor dbExecutor)
         {
-            _counterRepository = counterRepository;
+            _dbExecutor = dbExecutor;
         }
 
         public void Accumulate(CounterAccumulatorInput input)
         {
-            var existingCounter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == input.HeaterId && !x.ResetDate.HasValue);
-
-            if (existingCounter != null)
+            _dbExecutor.Execute(c =>
             {
-                existingCounter.CountedSeconds += input.SecondsToAccumulate;
+                var counter = c.Set<Domain.Counter>().SingleOrDefault(x => x.HeaterId == input.HeaterId && !x.ResetDate.HasValue);
 
-                _counterRepository.Update(existingCounter);
-            }
-            else
-            {
-                var newCounter = new Domain.Counter
+                if (counter != null)
                 {
-                    CountedSeconds = input.SecondsToAccumulate,
-                    HeaterId = input.HeaterId,
-                    StartDate = DateTime.UtcNow
-                };
+                    counter.CountedSeconds += input.SecondsToAccumulate;
+                }
+                else
+                {
+                    var newCounter = new Domain.Counter
+                    {
+                        CountedSeconds = input.SecondsToAccumulate,
+                        HeaterId = input.HeaterId,
+                        StartDate = DateTime.UtcNow
+                    };
 
-                _counterRepository.Create(newCounter);
-            }
+                    c.Set<Domain.Counter>().Add(newCounter);
+                }
+
+                c.SaveChanges();
+            });
         }
     }
 }

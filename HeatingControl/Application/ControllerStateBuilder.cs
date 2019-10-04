@@ -32,6 +32,11 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredHeaters(Building buildingModel, ControllerState state)
         {
+            if(buildingModel.Heaters == null)
+            {
+                return;
+            }
+
             foreach (var heater in buildingModel.Heaters)
             {
                 if (heater.Name.IsNullOrEmpty())
@@ -57,6 +62,11 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredSensors(Building buildingModel, ControllerState state)
         {
+            if(buildingModel.TemperatureSensors == null)
+            {
+                return;
+            }
+
             foreach (var sensor in buildingModel.TemperatureSensors)
             {
                 if (sensor.Name.IsNullOrEmpty())
@@ -72,6 +82,11 @@ namespace HeatingControl.Application
 
         private void MapConfiguredZones(Building buildingModel, ControllerState state)
         {
+            if(buildingModel.Zones == null)
+            {
+                return;
+            }
+
             foreach (var zone in buildingModel.Zones)
             {
                 if (zone.Name.IsNullOrEmpty())
@@ -93,6 +108,11 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredPowerZones(Building buildingModel, ControllerState state)
         {
+            if(buildingModel.PowerZones == null)
+            {
+                return;
+            }
+
             foreach (var powerZone in buildingModel.PowerZones)
             {
                 if (powerZone.Name.IsNullOrEmpty())

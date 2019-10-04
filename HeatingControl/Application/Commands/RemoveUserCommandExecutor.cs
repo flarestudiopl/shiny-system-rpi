@@ -30,7 +30,7 @@ namespace HeatingControl.Application.Commands
                 user.DisabledByUserId = context.UserId;
                 user.DisabledDate = DateTime.UtcNow;
 
-                _userRepository.Update(user);
+                _userRepository.Update(user, null);
             }
 
             return CommandResult.Empty;

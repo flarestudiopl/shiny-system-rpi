@@ -10,8 +10,7 @@ using HeatingControl.Models;
 using Microsoft.Extensions.Hosting;
 using Storage.StorageDatabase;
 using Microsoft.AspNetCore.Hosting;
-using HeatingControl.Application.DataAccess;
-using Domain;
+using HeatingControl.Application.DataAccess.Building;
 
 namespace HeatingApi
 {
@@ -26,7 +25,7 @@ namespace HeatingApi
     {
         private CancellationTokenSource _cancellationTokenSource;
         private readonly IApplicationLifetime _appLifetime;
-        private readonly IRepository<Building> _buildingRepository;
+        private readonly IBuildingProvider _buildingProvider;
         private readonly ICommandExecutor<DisableAllOutputsCommand> _disableAllOutputsCommandExecutor;
         private readonly ITemperatureReadingLoop _temperatureReadingLoop;
         private readonly IScheduleDeterminationLoop _scheduleDeterminationLoop;
@@ -37,7 +36,7 @@ namespace HeatingApi
 
         public HeatingControl(IApplicationLifetime appLifetime,
                               IMigrator migrator,
-                              IRepository<Building> buildingRepository,
+                              IBuildingProvider buildingProvider,
                               IControllerStateBuilder controllerStateBuilder,
                               ICommandExecutor<DisableAllOutputsCommand> disableAllOutputsCommandExecutor,
                               ITemperatureReadingLoop temperatureReadingLoop,
@@ -48,14 +47,14 @@ namespace HeatingApi
             migrator.Run();
 
             _appLifetime = appLifetime;
-            _buildingRepository = buildingRepository;
+            _buildingProvider = buildingProvider;
             _disableAllOutputsCommandExecutor = disableAllOutputsCommandExecutor;
             _temperatureReadingLoop = temperatureReadingLoop;
             _scheduleDeterminationLoop = scheduleDeterminationLoop;
             _outputStateProcessingLoop = outputStateProcessingLoop;
             _digitalInputReadingLoop = digitalInputReadingLoop;
 
-            var model = _buildingRepository.ReadSingle(x => x.IsDefault);
+            var model = _buildingProvider.ProvideDefault();
             State = controllerStateBuilder.Build(model);
         }
 

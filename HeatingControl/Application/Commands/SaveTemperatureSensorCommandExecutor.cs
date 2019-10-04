@@ -33,7 +33,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdCantBeEmpty);
             }
 
-            if (context.ControllerState.Model.TemperatureSensors.Any(x => x.DeviceId == command.DeviceId))
+            if (context.ControllerState.Model.TemperatureSensors?.Any(x => x.DeviceId == command.DeviceId) ?? false)
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdAlreadyInUse);
             }
@@ -41,13 +41,13 @@ namespace HeatingControl.Application.Commands
             var temperatureSensor = new TemperatureSensor
                                     {
                                         Name = command.Name,
+                                        BuildingId = context.ControllerState.Model.BuildingId,
                                         DeviceId = command.DeviceId
                                     };
 
-            temperatureSensor = _temperatureSensorRepository.Create(temperatureSensor);
+            temperatureSensor = _temperatureSensorRepository.Create(temperatureSensor, context.ControllerState.Model);
 
             context.ControllerState.TemperatureSensorIdToDeviceId.Add(temperatureSensor.TemperatureSensorId, command.DeviceId);
-            context.ControllerState.Model.TemperatureSensors.Add(temperatureSensor);
 
             return CommandResult.Empty;
         }

@@ -1,5 +1,4 @@
-﻿using Domain;
-using HardwareAccess.Devices.PowerOutputs;
+﻿using HardwareAccess.Devices.PowerOutputs;
 using System;
 using System.Collections.Generic;
 

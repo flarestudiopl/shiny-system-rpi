@@ -28,9 +28,8 @@ namespace HeatingControl.Application.Commands
             }
 
             context.ControllerState.PowerZoneIdToState.Remove(command.PowerZoneId);
-            context.ControllerState.Model.PowerZones.Remove(x => x.PowerZoneId == command.PowerZoneId);
 
-            _powerZoneRepository.Delete(powerZoneState.PowerZone);
+            _powerZoneRepository.Delete(powerZoneState.PowerZone, context.ControllerState.Model);
             
             return CommandResult.Empty;
         }

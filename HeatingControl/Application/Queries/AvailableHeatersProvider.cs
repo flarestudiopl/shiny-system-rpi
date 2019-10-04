@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Commons.Extensions;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -44,16 +43,14 @@ namespace HeatingControl.Application.Queries
                                                                    OutputState = controllerState.HeaterIdToState[x.Key].OutputState
                                                                };
 
-                                              var assignedZones = controllerState.ZoneIdToState
-                                                                                 .Select(z => z.Value.Zone)
-                                                                                 .Where(z => z.Heaters.Contains(x.Value.Heater));
-
-                                              if (zoneIdToExcludeFromAssignment.HasValue)
+                                              if (x.Value.Heater.ZoneId.HasValue)
                                               {
-                                                  assignedZones = assignedZones.Where(z => z.ZoneId != zoneIdToExcludeFromAssignment.Value);
+                                                  if (!zoneIdToExcludeFromAssignment.HasValue ||
+                                                      x.Value.Heater.ZoneId.Value != zoneIdToExcludeFromAssignment.Value)
+                                                  {
+                                                      heaterData.Assignment = x.Value.Heater.Zone.Name;
+                                                  }
                                               }
-
-                                              heaterData.Assignment = assignedZones.Select(z => z.Name).JoinWith(", ");
 
                                               return heaterData;
                                           })

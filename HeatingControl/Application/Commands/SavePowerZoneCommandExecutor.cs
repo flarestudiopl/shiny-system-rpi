@@ -3,32 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.PowerZone;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
 {
-    public class SavePowerZoneCommand
-    {
-        public int? PowerZoneId { get; set; }
-        public string Name { get; set; }
-        public ICollection<int> AffectedHeatersIds { get; set; }
-        public decimal PowerLimitValue { get; set; }
-        public UsageUnit PowerLimitUnit { get; set; }
-        public int RoundRobinIntervalMinutes { get; set; }
-    }
+    public class SavePowerZoneCommand : PowerZoneSaverInput { }
 
     public class SavePowerZoneCommandExecutor : ICommandExecutor<SavePowerZoneCommand>
     {
-        private readonly IRepository<PowerZone> _powerZoneRepository;
-        private readonly IRepository<Heater> _heaterRepository;
+        private readonly IPowerZoneSaver _powerZoneSaver;
 
-        public SavePowerZoneCommandExecutor(IRepository<PowerZone> powerZoneRepository,
-                                            IRepository<Heater> heaterRepository)
+        public SavePowerZoneCommandExecutor(IPowerZoneSaver powerZoneSaver)
         {
-            _powerZoneRepository = powerZoneRepository;
-            _heaterRepository = heaterRepository;
+            _powerZoneSaver = powerZoneSaver;
         }
 
         public CommandResult Execute(SavePowerZoneCommand command, CommandContext context)
@@ -40,42 +28,22 @@ namespace HeatingControl.Application.Commands
                 return validationResult;
             }
 
-            PowerZone existingPowerZone = null;
+            var powerZone = _powerZoneSaver.Save(command, context.ControllerState.Model);
 
-            if (command.PowerZoneId.HasValue)
+            var powerZoneState = context.ControllerState.PowerZoneIdToState.GetValueOrDefault(powerZone.PowerZoneId);
+
+            if (powerZoneState == null)
             {
-                var existingPowerZoneId = command.PowerZoneId.Value;
-                existingPowerZone = context.ControllerState.PowerZoneIdToState[existingPowerZoneId].PowerZone;
-
-                context.ControllerState.PowerZoneIdToState.Remove(existingPowerZoneId);
-                context.ControllerState.Model.PowerZones.Remove(x => x.PowerZoneId == existingPowerZoneId);
+                context.ControllerState.PowerZoneIdToState.Add(powerZone.PowerZoneId,
+                                                               new PowerZoneState
+                                                               {
+                                                                   PowerZone = powerZone
+                                                               });
             }
-
-            var powerZone = new PowerZone
+            else
             {
-                Name = command.Name,
-                UsageUnit = command.PowerLimitUnit,
-                MaxUsage = command.PowerLimitValue,
-                RoundRobinIntervalMinutes = command.RoundRobinIntervalMinutes
-            };
-
-            powerZone = _powerZoneRepository.Create(powerZone);
-
-            foreach (var heaterId in command.AffectedHeatersIds)
-            {
-                var heater = _heaterRepository.ReadSingle(x=>x.HeaterId == heaterId);
-                heater.PowerZone = powerZone;
-                heater.PowerZoneId = powerZone.PowerZoneId;
-                _heaterRepository.Update(heater);
+                powerZoneState.PowerZone = powerZone;
             }
-
-            context.ControllerState.PowerZoneIdToState.Add(powerZone.PowerZoneId,
-                                                           new PowerZoneState
-                                                           {
-                                                               PowerZone = powerZone
-                                                           });
-
-            context.ControllerState.Model.PowerZones.Add(powerZone);
 
             return CommandResult.Empty;
         }

@@ -1,7 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.Heater;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
@@ -13,11 +12,11 @@ namespace HeatingControl.Application.Commands
 
     public class RemoveHeaterCommandExecutor : ICommandExecutor<RemoveHeaterCommand>
     {
-        private readonly IRepository<Heater> _heaterRepository;
+        private readonly IHeaterRemover _heaterRemover;
 
-        public RemoveHeaterCommandExecutor(IRepository<Heater> heaterRepository)
+        public RemoveHeaterCommandExecutor(IHeaterRemover heaterRemover)
         {
-            _heaterRepository = heaterRepository;
+            _heaterRemover = heaterRemover;
         }
 
         public CommandResult Execute(RemoveHeaterCommand command, CommandContext context)
@@ -40,9 +39,8 @@ namespace HeatingControl.Application.Commands
             }
 
             context.ControllerState.HeaterIdToState.Remove(command.HeaterId);
-            context.ControllerState.Model.Heaters.Remove(x=>x.HeaterId == command.HeaterId);
 
-            _heaterRepository.Delete(heaterState.Heater);
+            _heaterRemover.Remove(heaterState.Heater, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

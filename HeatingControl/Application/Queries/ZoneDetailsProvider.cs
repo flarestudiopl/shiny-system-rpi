@@ -133,10 +133,10 @@ namespace HeatingControl.Application.Queries
             var scheduleSettings = new ZoneDetailsProviderResult.ScheduleSettings
             {
                 Items = zone.Zone
-                                                   .Schedule
-                                                   .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
-                                                   .ThenBy(x => x.BeginTime)
-                                                   .ToList()
+                            .Schedule
+                            .OrderBy(x => x.DaysOfWeek.FirstOrDefault())
+                            .ThenBy(x => x.BeginTime)
+                            .ToList()
             };
 
             if (zone.Zone.IsTemperatureControlled())

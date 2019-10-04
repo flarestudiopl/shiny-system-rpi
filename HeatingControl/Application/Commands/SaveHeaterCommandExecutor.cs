@@ -54,6 +54,7 @@ namespace HeatingControl.Application.Commands
             var heater = new Heater
             {
                 Name = command.Name,
+                BuildingId = context.ControllerState.Model.BuildingId,
                 UsageUnit = command.UsageUnit,
                 UsagePerHour = command.UsagePerHour,
                 MinimumStateChangeIntervalSeconds = command.MinimumStateChangeIntervalSeconds,
@@ -65,14 +66,12 @@ namespace HeatingControl.Application.Commands
                 }
             };
 
-            heater = _heaterRepository.Create(heater);
+            heater = _heaterRepository.Create(heater, context.ControllerState.Model);
 
             context.ControllerState.HeaterIdToState.Add(heater.HeaterId, new HeaterState
             {
                 Heater = heater
             });
-
-            context.ControllerState.Model.Heaters.Add(heater);
 
             return CommandResult.Empty;
         }

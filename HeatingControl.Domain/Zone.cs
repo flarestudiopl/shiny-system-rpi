@@ -14,8 +14,8 @@ namespace Domain
 
         public TemperatureControlledZone TemperatureControlledZone { get; set; }
 
-        public ICollection<Heater> Heaters { get; set; }
+        public ICollection<Heater> Heaters { get; set; } = new List<Heater>();
 
-        public ICollection<ScheduleItem> Schedule { get; set; }
+        public ICollection<ScheduleItem> Schedule { get; set; } = new List<ScheduleItem>();
     }
 }

@@ -66,7 +66,7 @@ namespace HeatingControl.Tests.Application.Commands
                                                    });
 
             //Assert
-            buildingModelSaver.DidNotReceiveWithAnyArgs().Create(null);
+            buildingModelSaver.DidNotReceiveWithAnyArgs().Create(null, null);
             Assert.Equal(1, schedule.Count);
         }
     }

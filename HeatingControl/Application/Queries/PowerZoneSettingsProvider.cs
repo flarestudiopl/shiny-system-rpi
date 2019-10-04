@@ -57,11 +57,7 @@ namespace HeatingControl.Application.Queries
                                                              {
                                                                  Id = x.Heater.HeaterId,
                                                                  Name = x.Heater.Name,
-                                                                 Assignment = controllerState.PowerZoneIdToState
-                                                                                             .Select(z => z.Value.PowerZone)
-                                                                                             .Where(z => z.Heaters.Contains(x.Heater) &&
-                                                                                                         z.PowerZoneId != powerZoneId)
-                                                                                             .Select(z => z.Name).JoinWith(", "),
+                                                                 Assignment = x.Heater.PowerZone == powerZoneModel ? null : x.Heater.PowerZone?.Name,
                                                                  PowerUnit = x.Heater.UsageUnit,
                                                                  OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })

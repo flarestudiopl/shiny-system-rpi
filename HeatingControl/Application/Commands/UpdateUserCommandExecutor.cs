@@ -44,7 +44,7 @@ namespace HeatingControl.Application.Commands
             user.PasswordHash = command.Password?.CalculateHash() ?? user.PasswordHash;
             user.QuickLoginPinHash = command.Pin?.CalculateHash() ?? user.QuickLoginPinHash;
 
-            _userRepository.Update(user);
+            _userRepository.Update(user, null);
 
             return CommandResult.Empty;
         }

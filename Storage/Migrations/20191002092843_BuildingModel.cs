@@ -225,7 +225,7 @@ namespace Storage.Migrations
             migrationBuilder.InsertData(
                 table: "Building",
                 columns: new[] { "BuildingId", "ControlLoopIntervalSecondsMilliseconds", "IsDefault", "Name" },
-                values: new object[] { -1, 5, true, "Budynek testowy" });
+                values: new object[] { -1, 5000, true, "Budynek testowy" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DigitalInput_BuildingId",
@@ -283,22 +283,10 @@ namespace Storage.Migrations
                 table: "Zone",
                 column: "TemperatureControlledZoneId",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Counter_Heater_HeaterId",
-                table: "Counter",
-                column: "HeaterId",
-                principalTable: "Heater",
-                principalColumn: "HeaterId",
-                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Counter_Heater_HeaterId",
-                table: "Counter");
-
             migrationBuilder.DropTable(
                 name: "DigitalInput");
 

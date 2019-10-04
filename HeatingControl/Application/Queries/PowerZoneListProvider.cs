@@ -30,12 +30,12 @@ namespace HeatingControl.Application.Queries
         {
             return new PowerZoneListProviderResult
                    {
-                       PowerZones = model.PowerZones
+                       PowerZones = model.PowerZones?
                                          .Select(x => new PowerZoneListProviderResult.PowerZoneListItem
                                                       {
                                                           Id = x.PowerZoneId,
                                                           Name = x.Name,
-                                                          AffectedHeatersNames = x.Heaters.Select(h => h.Name).ToList(),
+                                                          AffectedHeatersNames = x.Heaters?.Select(h => h.Name).ToList(),
                                                           PowerLimitFormatted = $"{x.MaxUsage} {Enum.GetName(typeof(UsageUnit), x.UsageUnit)}"
                                                       })
                                          .OrderBy(x => x.Name)
