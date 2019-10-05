@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -17,6 +18,7 @@ namespace HeatingControl.Application.Queries
         public string Name { get; set; }
         public string Assignment { get; set; }
         public bool OutputState { get; set; }
+        public DigitalOutput DigitalOutput { get;set;}
     }
 
     public class AvailableHeatersProvider : IAvailableHeatersProvider
@@ -40,7 +42,8 @@ namespace HeatingControl.Application.Queries
                                                                {
                                                                    Id = x.Key,
                                                                    Name = x.Value.Heater.Name,
-                                                                   OutputState = controllerState.HeaterIdToState[x.Key].OutputState
+                                                                   OutputState = controllerState.HeaterIdToState[x.Key].OutputState,
+                                                                   DigitalOutput = x.Value.Heater.DigitalOutput
                                                                };
 
                                               if (x.Value.Heater.ZoneId.HasValue)

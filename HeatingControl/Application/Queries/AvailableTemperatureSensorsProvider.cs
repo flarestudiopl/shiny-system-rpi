@@ -17,6 +17,7 @@ namespace HeatingControl.Application.Queries
         public string Name { get; set; }
         public double? Readout { get; set; }
         public string Assignment { get; set; }
+        public string DeviceId { get; set; }
     }
 
     public class AvailableTemperatureSensorsProvider : IAvailableTemperatureSensorsProvider
@@ -43,13 +44,19 @@ namespace HeatingControl.Application.Queries
                                               if (sensorConfiguration != null)
                                               {
                                                   sensorData.Name = sensorConfiguration.Name;
+                                                  sensorData.DeviceId = sensorConfiguration.DeviceId;
                                               }
 
                                               var assignedZones = controllerState.ZoneIdToState
                                                                                  .Select(z => z.Value.Zone)
-                                                                                 .Where(z => z.TemperatureControlledZone?.TemperatureSensorId == x.Key);
+                                                                                 .Where(z => z.TemperatureControlledZone?.TemperatureSensorId == x.Key)
+                                                                                 .Select(z => z.Name)
+                                                                                 .ToList();
 
-                                              sensorData.Assignment = assignedZones.Select(z => z.Name).JoinWith(", ");
+                                              if (assignedZones.Count > 0)
+                                              {
+                                                sensorData.Assignment = assignedZones.JoinWith(", ");
+                                              }
 
                                               return sensorData;
                                           })

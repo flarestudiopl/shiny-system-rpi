@@ -1,24 +1,19 @@
 ﻿using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.TemperatureSensor;
 
 namespace HeatingControl.Application.Commands
 {
-    public class SaveTemperatureSensorCommand
-    {
-        public string Name { get; set; }
-        public string DeviceId { get; set; }
-    }
+    public class SaveTemperatureSensorCommand : TemperatureSensorSaverInput { }
 
     public class SaveTemperatureSensorCommandExecutor : ICommandExecutor<SaveTemperatureSensorCommand>
     {
-        private readonly IRepository<TemperatureSensor> _temperatureSensorRepository;
+        private readonly ITemperatureSensorSaver _temperatureSensorSaver;
 
-        public SaveTemperatureSensorCommandExecutor(IRepository<TemperatureSensor> temperatureSensorRepository)
+        public SaveTemperatureSensorCommandExecutor(ITemperatureSensorSaver temperatureSensorSaver)
         {
-            _temperatureSensorRepository = temperatureSensorRepository;
+            _temperatureSensorSaver = temperatureSensorSaver;
         }
 
         public CommandResult Execute(SaveTemperatureSensorCommand command, CommandContext context)
@@ -33,21 +28,19 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdCantBeEmpty);
             }
 
-            if (context.ControllerState.Model.TemperatureSensors?.Any(x => x.DeviceId == command.DeviceId) ?? false)
+            var existingTemperatureSensor = context.ControllerState.Model.TemperatureSensors?.FirstOrDefault(x => x.DeviceId == command.DeviceId);
+
+            if (existingTemperatureSensor != null)
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdAlreadyInUse);
+                if (!command.Id.HasValue || command.Id.Value != existingTemperatureSensor.TemperatureSensorId)
+                {
+                    return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdAlreadyInUse);
+                }
             }
 
-            var temperatureSensor = new TemperatureSensor
-                                    {
-                                        Name = command.Name,
-                                        BuildingId = context.ControllerState.Model.BuildingId,
-                                        DeviceId = command.DeviceId
-                                    };
+            var temperatureSensor = _temperatureSensorSaver.Save(command, context.ControllerState.Model);
 
-            temperatureSensor = _temperatureSensorRepository.Create(temperatureSensor, context.ControllerState.Model);
-
-            context.ControllerState.TemperatureSensorIdToDeviceId.Add(temperatureSensor.TemperatureSensorId, command.DeviceId);
+            context.ControllerState.TemperatureSensorIdToDeviceId[temperatureSensor.TemperatureSensorId] = temperatureSensor.DeviceId;
 
             return CommandResult.Empty;
         }
