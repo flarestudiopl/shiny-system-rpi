@@ -17,6 +17,7 @@ namespace HeatingApi.Controllers
         private readonly IConnectedTemperatureSensorsProvider _connectedTemperatureSensorsProvider;
         private readonly INewHeaterOptionsProvider _newHeaterOptionsProvider;
         private readonly ITemperatureSensorSettingsProvider _temperatureSensorSettingsProvider;
+        private readonly IHeaterSettingsProvider _heaterSettingsProvider;
         private readonly ICommandHandler _commandHandler;
 
         public DeviceSetupController(IHeatingControl heatingControl,
@@ -24,6 +25,7 @@ namespace HeatingApi.Controllers
                                      IConnectedTemperatureSensorsProvider connectedTemperatureSensorsProvider,
                                      INewHeaterOptionsProvider newHeaterOptionsProvider,
                                      ITemperatureSensorSettingsProvider temperatureSensorSettingsProvider,
+                                     IHeaterSettingsProvider heaterSettingsProvider,
                                      ICommandHandler commandHandler)
         {
             _heatingControl = heatingControl;
@@ -31,6 +33,7 @@ namespace HeatingApi.Controllers
             _connectedTemperatureSensorsProvider = connectedTemperatureSensorsProvider;
             _newHeaterOptionsProvider = newHeaterOptionsProvider;
             _temperatureSensorSettingsProvider = temperatureSensorSettingsProvider;
+            _heaterSettingsProvider = heaterSettingsProvider;
             _commandHandler = commandHandler;
         }
 
@@ -96,6 +99,12 @@ namespace HeatingApi.Controllers
         public async Task<NewHeaterOptionsProviderResult> GetNewHeaterOptions()
         {
             return await _newHeaterOptionsProvider.Provide();
+        }
+
+        [HttpGet("heater/{heaterId}")]
+        public HeaterSettings GetHeater(int heaterId)
+        {
+            return _heaterSettingsProvider.Provide(heaterId, _heatingControl.State);
         }
 
         [HttpPost("heater")]

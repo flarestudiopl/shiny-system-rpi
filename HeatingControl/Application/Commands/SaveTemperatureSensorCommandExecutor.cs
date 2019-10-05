@@ -32,7 +32,7 @@ namespace HeatingControl.Application.Commands
 
             if (existingTemperatureSensor != null)
             {
-                if (!command.Id.HasValue || command.Id.Value != existingTemperatureSensor.TemperatureSensorId)
+                if (!command.SensorId.HasValue || command.SensorId.Value != existingTemperatureSensor.TemperatureSensorId)
                 {
                     return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdAlreadyInUse);
                 }

@@ -9,7 +9,7 @@ namespace HeatingControl.Application.DataAccess.TemperatureSensor
 
     public class TemperatureSensorSaverInput
     {
-        public int? Id { get; set; }
+        public int? SensorId { get; set; }
         public string Name { get; set; }
         public string DeviceId { get; set; }
     }
@@ -31,9 +31,9 @@ namespace HeatingControl.Application.DataAccess.TemperatureSensor
 
                 Domain.TemperatureSensor temperatureSensor = null;
 
-                if (input.Id.HasValue)
+                if (input.SensorId.HasValue)
                 {
-                    temperatureSensor = c.TemperatureSensors.Find(input.Id.Value);
+                    temperatureSensor = c.TemperatureSensors.Find(input.SensorId.Value);
                 }
 
                 if(temperatureSensor == null)
