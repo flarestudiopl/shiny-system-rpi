@@ -15,6 +15,7 @@
         string LoopFailed { get; }
         string SensorCrcError { get; }
         string PowerOffRequested { get; }
+        string HeaterRemovedFromPowerZoneDueToUsageUnitChange { get; }
     }
 
     public class NotificationMessagePl : INotificationMessage
@@ -32,6 +33,7 @@
         public string LoopFailed => "Awaria pętli '{0}'! Ponowna próba za {0} sekund.";
         public string SensorCrcError => "Błąd CRC czujnika '{0}'. Pomijam odczyt.";
         public string PowerOffRequested => "Rozpoczęto procedurę wyłączania sterownika...";
+        public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Ogrzewacz '{0}' został odłączony od strefy zasilania z powodu zmiany jednostki zużycia.";
     }
 
     public class NotificationMessageEn : INotificationMessage
@@ -49,5 +51,6 @@
         public string LoopFailed => "{0} loop failed! Retrying in {0} seconds.";
         public string SensorCrcError => "Sensor '{0}' CRC error. Skipping readout.";
         public string PowerOffRequested => "Shutdown sequence started...";
+        public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Heater '{0}' was removed from power zone due to usage unit change.";
     }
 }

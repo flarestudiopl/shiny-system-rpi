@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Domain;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Queries
@@ -16,7 +17,11 @@ namespace HeatingControl.Application.Queries
         public int Id { get; set; }
         public string Name { get; set; }
         public string Assignment { get; set; }
+        public string PowerLimitAssignment { get; set; }
         public bool OutputState { get; set; }
+        public decimal UsagePerHour { get; set; }
+        public UsageUnit UsageUnit { get; set; }
+        public DigitalOutput DigitalOutput { get;set;}
     }
 
     public class AvailableHeatersProvider : IAvailableHeatersProvider
@@ -40,7 +45,10 @@ namespace HeatingControl.Application.Queries
                                                                {
                                                                    Id = x.Key,
                                                                    Name = x.Value.Heater.Name,
-                                                                   OutputState = controllerState.HeaterIdToState[x.Key].OutputState
+                                                                   OutputState = controllerState.HeaterIdToState[x.Key].OutputState,
+                                                                   UsagePerHour = x.Value.Heater.UsagePerHour,
+                                                                   UsageUnit = x.Value.Heater.UsageUnit,
+                                                                   DigitalOutput = x.Value.Heater.DigitalOutput
                                                                };
 
                                               if (x.Value.Heater.ZoneId.HasValue)
@@ -50,6 +58,11 @@ namespace HeatingControl.Application.Queries
                                                   {
                                                       heaterData.Assignment = x.Value.Heater.Zone.Name;
                                                   }
+                                              }
+
+                                              if (x.Value.Heater.PowerZoneId.HasValue)
+                                              {
+                                                  heaterData.PowerLimitAssignment = x.Value.Heater.PowerZone.Name;
                                               }
 
                                               return heaterData;
