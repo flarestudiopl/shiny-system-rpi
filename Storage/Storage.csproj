@@ -5,10 +5,18 @@
 	<RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1705</NoWarn>
     <WarningsAsErrors>NU1605</WarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\config\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />

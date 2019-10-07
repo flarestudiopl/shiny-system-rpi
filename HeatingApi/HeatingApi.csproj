@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+   <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.0\HeatingApi.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
@@ -11,6 +15,10 @@
 
   <ItemGroup>
     <None Remove="storage.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\config\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

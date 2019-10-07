@@ -20,6 +20,7 @@ namespace HeatingControl.Application.Queries
         public DateTime ControllerDateTime { get; set; }
         public bool ControlEnabled { get; set; }
         public bool BatteryMode { get;set;}
+        public string SoftwareVersion { get; set; }
         public IDictionary<UsageUnit, decimal> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
 
@@ -49,11 +50,15 @@ namespace HeatingControl.Application.Queries
 
     public class DashboardSnapshotProvider : IDashboardSnapshotProvider
     {
+        private readonly string AssemblyVersion;
+
         private readonly IZoneTemperatureProvider _zoneTemperatureProvider;
 
         public DashboardSnapshotProvider(IZoneTemperatureProvider zoneTemperatureProvider)
         {
             _zoneTemperatureProvider = zoneTemperatureProvider;
+
+            AssemblyVersion = typeof(DashboardSnapshotProvider).Assembly.GetName().Version.ToString();
         }
 
         public DashboardSnapshotProviderOutput Provide(Building model, ControllerState state)
@@ -62,6 +67,7 @@ namespace HeatingControl.Application.Queries
                          {
                              BuildingName = model.Name,
                              ControllerDateTime = DateTime.UtcNow,
+                             SoftwareVersion = AssemblyVersion,
                              ControlEnabled = state.ControlEnabled,
                              BatteryMode = state.DigitalInputFunctionToState.GetValueOrDefault(DigitalInputFunction.BatteryMode)?.State ?? false,
                              InstantUsage = state.InstantUsage,

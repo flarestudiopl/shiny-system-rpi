@@ -6,4 +6,12 @@
     <RootNamespace>Domain</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\config\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
+  </ItemGroup>
+
 </Project>
