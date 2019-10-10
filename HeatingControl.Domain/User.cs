@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain
 {
@@ -31,6 +32,7 @@ namespace Domain
         public DateTime? DisabledDate { get; set; }
 
         public string QuickLoginPinHash { get; set; }
-        
+
+        public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
     }
 }

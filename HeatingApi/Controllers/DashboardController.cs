@@ -1,4 +1,5 @@
 ﻿using Domain;
+using HeatingApi.Attributes;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,7 @@ namespace HeatingApi.Controllers
         /// </summary>
         /// <returns>Building state and notifications</returns>
         [HttpGet]
+        [RequiredPermission(Permission.Dashboard)]
         public DashboardSnapshotProviderOutput GetSnapshot()
         {
             return _dashboardSnapshotProvider.Provide(_heatingControl.State.Model, _heatingControl.State);

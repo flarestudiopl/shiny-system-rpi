@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Collections.Generic;
 using Commons.Localization;
 using HeatingControl.Application.DataAccess.User;
+using System.Linq;
 
 namespace HeatingControl.Application.Commands
 {
@@ -21,22 +22,22 @@ namespace HeatingControl.Application.Commands
     {
         private const int TokenLifetimeMinutes = 15;
         
-        private readonly IActiveUserByLoginProvider _activeUserByLoginProvider;
+        private readonly IActiveUserProvider _activeUserProvider;
         private readonly IUserLastLogonUpdater _userUpdater;
         private readonly IConfiguration _configuration;
 
-        public AuthenticateUserByPinCommandExecutor(IActiveUserByLoginProvider activeUserByLoginProvider,
+        public AuthenticateUserByPinCommandExecutor(IActiveUserProvider activeUserProvider,
                                                     IUserLastLogonUpdater userUpdater,
                                                     IConfiguration configuration)
         {
-            _activeUserByLoginProvider = activeUserByLoginProvider;
+            _activeUserProvider = activeUserProvider;
             _userUpdater = userUpdater;
             _configuration = configuration;
         }
 
         public CommandResult Execute(AuthenticateUserByPinCommand command, CommandContext context)
         {
-            var user = _activeUserByLoginProvider.Provide(command.Login);
+            var user = _activeUserProvider.Provide(x => x.Login == command.Login);
 
             if (user == null || command.Pin.IsNullOrEmpty() || user.QuickLoginPinHash != command.Pin.CalculateHash())
             {
@@ -53,9 +54,12 @@ namespace HeatingControl.Application.Commands
             var signingCredentials = new SigningCredentials(AuthenticateUserCommandExecutor.JwtSigningKey, SecurityAlgorithms.HmacSha256);
             var issuer = _configuration["Jwt:Issuer"];
 
+            var claims = new List<Claim> { new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()) };
+            claims.AddRange(user.UserPermissions.Select(x => new Claim(ClaimTypes.Role, x.Permission.ToString())));
+
             var token = new JwtSecurityToken(issuer,
                                              issuer,
-                                             new List<Claim> { new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()) },
+                                             claims,
                                              expires: DateTime.UtcNow.AddMinutes(TokenLifetimeMinutes),
                                              signingCredentials: signingCredentials);
 
