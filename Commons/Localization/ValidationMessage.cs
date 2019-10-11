@@ -9,6 +9,7 @@
         string ScheduleItemOverlaps { get; }
         string UnknownScheduleItemId { get; }
         string UnknownUserOrWrongPassword { get; }
+        string PinOrPasswordRequired { get; }
         string UserAlreadyExists { get; }
         string UserNameAndLoginShallNotBeEmpty { get; }
         string UnknownHeaterId { get; }
@@ -42,6 +43,7 @@
         public string ScheduleItemOverlaps => "Wybrane parametry nachodzą na istniejący już wpis w kalendarzu.";
         public string UnknownScheduleItemId => "Nieznana wpis kalendarza o identyfikatorze '{0}'.";
         public string UnknownUserOrWrongPassword => "Nieznany użytkownik lub błędne hasło.";
+        public string PinOrPasswordRequired => "PIN lub hasło jest wymagane.";
         public string UserAlreadyExists => "Użytkownik '{0}' już istnieje.";
         public string UserNameAndLoginShallNotBeEmpty => "Login i hasło nie mogą być puste.";
         public string UnknownHeaterId => "Nieznany ogrzewacza o identyfikatorze '{0}'.";
@@ -75,6 +77,7 @@
         public string ScheduleItemOverlaps => "Given schedule parameters overlaps existing item.";
         public string UnknownScheduleItemId => "Unknown schedule item with id '{0}'.";
         public string UnknownUserOrWrongPassword => "Unknown user or wrong password.";
+        public string PinOrPasswordRequired => "Either PIN or password is required.";
         public string UserAlreadyExists => "User with login '{0}' already exists.";
         public string UserNameAndLoginShallNotBeEmpty => "User login and password shall not be empty.";
         public string UnknownHeaterId => "Unknown heater with id '{0}'.";

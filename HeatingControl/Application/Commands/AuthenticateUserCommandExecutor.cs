@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Commons.Localization;
 using HeatingControl.Application.DataAccess.User;
 using System.Linq;
+using Domain;
 
 namespace HeatingControl.Application.Commands
 {
@@ -15,13 +16,20 @@ namespace HeatingControl.Application.Commands
     {
         public string Login { get; set; }
         public string Password { get; set; }
+        public string Pin { get; set; }
         public string IpAddress { get; set; }
+    }
+
+    public class AuthenticateUserCommandResult
+    {
+        public string Token { get; set; }
+        public ICollection<Permission> Permissions { get; set; }
     }
 
     public class AuthenticateUserCommandExecutor : ICommandExecutor<AuthenticateUserCommand>
     {
-        private const int TokenLifetimeMinutes = 60;
-        
+        private const int TokenLifetimeMinutes = 15;
+
         public static SecurityKey JwtSigningKey = new SymmetricSecurityKey(Guid.NewGuid().ToByteArray());
 
         private readonly IActiveUserProvider _activeUserProvider;
@@ -39,19 +47,26 @@ namespace HeatingControl.Application.Commands
 
         public CommandResult Execute(AuthenticateUserCommand command, CommandContext context)
         {
+            if (command.Pin.IsNullOrEmpty() && command.Password.IsNullOrEmpty())
+            {
+                return CommandResult.WithValidationError(Localization.ValidationMessage.PinOrPasswordRequired);
+            }
+
             var user = _activeUserProvider.Provide(x => x.Login == command.Login);
 
-            if (user == null || command.Password.IsNullOrEmpty() || user.PasswordHash != command.Password.CalculateHash())
+            if (user == null ||
+                (!command.Pin.IsNullOrEmpty() && user.QuickLoginPinHash != command.Pin.CalculateHash()) ||
+                (!command.Password.IsNullOrEmpty() && user.PasswordHash != command.Password.CalculateHash()))
             {
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownUserOrWrongPassword);
             }
 
             _userUpdater.Update(new UserLastLogonUpdaterInput
-                                {
-                                    UserId = user.UserId,
-                                    LastLogonDate = DateTime.UtcNow,
-                                    LastSeenIpAddress = command.IpAddress
-                                });
+            {
+                UserId = user.UserId,
+                LastLogonDate = DateTime.UtcNow,
+                LastSeenIpAddress = command.IpAddress
+            });
 
             var signingCredentials = new SigningCredentials(JwtSigningKey, SecurityAlgorithms.HmacSha256);
             var issuer = _configuration["Jwt:Issuer"];
@@ -65,7 +80,13 @@ namespace HeatingControl.Application.Commands
                                              expires: DateTime.UtcNow.AddMinutes(TokenLifetimeMinutes),
                                              signingCredentials: signingCredentials);
 
-            return CommandResult.WithResponse(new JwtSecurityTokenHandler().WriteToken(token));
+            var response = new AuthenticateUserCommandResult
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Permissions = user.UserPermissions.Select(x => x.Permission).ToArray()
+            };
+
+            return CommandResult.WithResponse(response);
         }
     }
 }
