@@ -1,4 +1,6 @@
-﻿using HeatingControl.Application.Commands;
+﻿using Domain;
+using HeatingApi.Attributes;
+using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +10,7 @@ namespace HeatingApi.Controllers
     /// Controller for settings views
     /// </summary>
     [Route("/api/setup/zone")]
+    [RequiredPermission(Permission.Configuration_Users)]
     public class ZoneSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;

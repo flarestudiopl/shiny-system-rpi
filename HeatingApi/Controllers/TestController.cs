@@ -5,11 +5,14 @@ using HardwareAccess.Buses;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
 using HeatingControl.Application.DataAccess.Counter;
+using HeatingApi.Attributes;
+using Domain;
 
 namespace HeatingApi.Controllers
 {
     [Produces("application/json")]
     [Route("/api/[controller]")]
+    [RequiredPermission(Permission.Configuration_Devices)]
     public class TestController : Controller
     {
         private readonly IOneWire _oneWire;

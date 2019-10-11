@@ -1,8 +1,8 @@
 ﻿using Domain;
+using HeatingApi.Attributes;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace HeatingApi.Controllers
 {
@@ -10,6 +10,7 @@ namespace HeatingApi.Controllers
     /// Controller for settings views
     /// </summary>
     [Route("/api/setup/user")]
+    [RequiredPermission(Permission.Configuration_Users)]
     public class UserSetupController : BaseController
     {
         private readonly IUserListProvider _userListProvider;

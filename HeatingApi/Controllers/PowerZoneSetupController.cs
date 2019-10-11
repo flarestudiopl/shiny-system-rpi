@@ -1,10 +1,13 @@
-﻿using HeatingControl.Application.Commands;
+﻿using Domain;
+using HeatingApi.Attributes;
+using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers
 {
     [Route("/api/setup/powerZone")]
+    [RequiredPermission(Permission.Configuration_PowerZones)]
     public class PowerZoneSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;

@@ -43,6 +43,7 @@ namespace HeatingApi.Controllers
         /// Returns data about timers, setpoints and schedule. To be used by zone details.
         /// </summary>
         [HttpGet("zone/{zoneId}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public ZoneDetailsProviderResult GetDetails(int zoneId)
         {
             return _zoneDetailsProvider.Provide(zoneId, _heatingControl.State, _heatingControl.State.Model);
@@ -52,6 +53,7 @@ namespace HeatingApi.Controllers
         /// Switches zone control mode(0 - off/lo, 1 - on/high, 2 - schedule). To be used by zone tile on dashboard.
         /// </summary>
         [HttpPost("zone/{zoneId}/setMode/{controlMode}")]
+        [RequiredPermission(Permission.Dashboard)]
         public IActionResult SetControlMode(int zoneId, ZoneControlMode controlMode)
         {
             var command = new SetZoneControlModeCommand
@@ -67,6 +69,7 @@ namespace HeatingApi.Controllers
         /// Clears zone counters. To be used by zone counters view.
         /// </summary>
         [HttpDelete("zone/{zoneId}/resetCounters")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult ResetCounters(int zoneId)
         {
             var command = new ResetCounterCommand
@@ -82,6 +85,7 @@ namespace HeatingApi.Controllers
         /// Allows to set zone low setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setLowSetPoint/{value}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult SetLowSetPoint(int zoneId, float value)
         {
             return SetSetPoint(zoneId, value, SetPointType.Low);
@@ -91,6 +95,7 @@ namespace HeatingApi.Controllers
         /// Allows to set zone high setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setHighSetPoint/{value}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult SetHighSetPoint(int zoneId, float value)
         {
             return SetSetPoint(zoneId, value, SetPointType.High);
@@ -100,6 +105,7 @@ namespace HeatingApi.Controllers
         /// Allows to set zone schedule default setpoint. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setScheduleSetPoint/{value}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult SetScheduleSetPoint(int zoneId, float value)
         {
             return SetSetPoint(zoneId, value, SetPointType.Schedule);
@@ -109,6 +115,7 @@ namespace HeatingApi.Controllers
         /// Allows to set zone hysteresis. To be used by zone temperature setpoints view.
         /// </summary>
         [HttpPost("zone/{zoneId}/setHysteresisSetPoint/{value}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult SetHysteresisSetPoint(int zoneId, float value)
         {
             return SetSetPoint(zoneId, value, SetPointType.Hysteresis);
@@ -118,12 +125,14 @@ namespace HeatingApi.Controllers
         /// Adds new schedule item to zone. To be used by zone schedule editor.
         /// </summary>
         [HttpPost("zone/schedule")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult NewScheduleItem([FromBody] NewScheduleItemCommand command)
         {
             return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpDelete("zone/{zoneId}/schedule/{scheduleItemId}")]
+        [RequiredPermission(Permission.Dashboard_ZoneSettings)]
         public IActionResult RemoveScheduleItem(int zoneId, int scheduleItemId)
         {
             var command = new RemoveScheduleItemCommand
