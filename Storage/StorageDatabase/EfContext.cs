@@ -98,7 +98,7 @@ namespace Storage.StorageDatabase
                 const string daysOfWeekConversionSeparator = ",";
 
                 x.Property(si => si.DaysOfWeek).IsRequired().HasConversion(si => si.Cast<int>().JoinWith(daysOfWeekConversionSeparator),
-                    str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow=>(DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
+                    str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow => (DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
 
                 x.Property(si => si.BeginTime).IsRequired();
                 x.Property(si => si.EndTime).IsRequired();
@@ -143,6 +143,22 @@ namespace Storage.StorageDatabase
                     IsBrowseable = true,
                     CreatedDate = new DateTime(2019, 7, 10, 18, 4, 28, 876, DateTimeKind.Utc).AddTicks(8468)
                 });
+            });
+
+            modelBuilder.Entity<Domain.UserPermission>(x =>
+            {
+                x.ToTable(nameof(Domain.UserPermission));
+
+                x.HasKey(up => new { up.UserId, up.Permission });
+
+                x.HasOne(up => up.User).WithMany(u => u.UserPermissions).HasForeignKey(up => up.UserId);
+
+                x.HasData(new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Dashboard },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Dashboard_ZoneSettings },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Zones },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_PowerZones },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Devices },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Users });
             });
 
             modelBuilder.Entity<Domain.Zone>(x =>

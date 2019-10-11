@@ -3,6 +3,8 @@ using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using HeatingApi.Attributes;
+using Domain;
 
 namespace HeatingApi.Controllers
 {
@@ -10,6 +12,7 @@ namespace HeatingApi.Controllers
     /// Controller for settings views
     /// </summary>
     [Route("/api/setup/device")]
+    [RequiredPermission(Permission.Configuration_Devices)]
     public class DeviceSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;

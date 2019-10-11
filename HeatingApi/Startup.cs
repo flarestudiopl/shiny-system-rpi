@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeatingApi
 {
@@ -95,6 +96,8 @@ namespace HeatingApi
                                                                                    .AllowCredentials()
                                                                                    .Build());
                              });
+
+            services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

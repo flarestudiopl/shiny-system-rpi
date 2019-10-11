@@ -13,7 +13,7 @@ namespace HeatingApi.Controllers
         private readonly IPinAllowedUserListProvider _pinAllowedUserListProvider;
 
         public UserController(ICommandHandler commandHandler,
-            IPinAllowedUserListProvider pinAllowedUserListProvider)
+                              IPinAllowedUserListProvider pinAllowedUserListProvider)
         {
             _commandHandler = commandHandler;
             _pinAllowedUserListProvider = pinAllowedUserListProvider;
@@ -21,42 +21,17 @@ namespace HeatingApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult IssueToken(string login, string password)
+        public IActionResult IssueToken([FromBody] AuthenticateUserParams authenticateUserParams)
         {
             var command = new AuthenticateUserCommand
                           {
-                              Login = login,
-                              Password = password,
+                              Login = authenticateUserParams.Login,
+                              Password = authenticateUserParams.Password,
+                              Pin = authenticateUserParams.Pin,
                               IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
                           };
 
-            return _commandHandler.ExecuteCommand(command, -1, result => Ok(new
-                                                                            {
-                                                                                token = result
-                                                                            }));
-        }
-
-        [AllowAnonymous]
-        [HttpPost("authenticate-by-pin")]
-        public IActionResult IssueTokenByPin(string login, string pin)
-        {
-            // TODO - list of allowed hosts stored in configuration
-            if (!IPAddress.IsLoopback(Request.HttpContext.Connection.RemoteIpAddress))
-            {
-                return null;
-            }
-
-            var command = new AuthenticateUserByPinCommand
-                          {
-                              Login = login,
-                              Pin = pin,
-                              IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
-                          };
-
-            return _commandHandler.ExecuteCommand(command, -1, result => Ok(new
-                                                                            {
-                                                                                token = result
-                                                                            }));
+            return _commandHandler.ExecuteCommand(command, -1);
         }
 
         [AllowAnonymous]
@@ -70,6 +45,13 @@ namespace HeatingApi.Controllers
             }
 
            return _pinAllowedUserListProvider.Provide();
+        }
+
+        public class AuthenticateUserParams
+        {
+            public string Login { get; set; }
+            public string Password { get; set; }
+            public string Pin { get; set; }
         }
     }
 }

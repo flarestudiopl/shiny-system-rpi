@@ -3,6 +3,8 @@ using Commons.Localization;
 using Domain;
 using HeatingControl.Application.DataAccess;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HeatingControl.Application.Commands
 {
@@ -11,6 +13,7 @@ namespace HeatingControl.Application.Commands
         public string Login { get; set; }
         public string Password { get; set; }
         public string Pin { get; set; }
+        public ICollection<Permission> Permissions { get; set; }
     }
 
     public class NewUserCommandExecutor : ICommandExecutor<NewUserCommand>
@@ -52,7 +55,8 @@ namespace HeatingControl.Application.Commands
                 CreatedByUserId = context.UserId,
                 CreatedDate = DateTime.UtcNow,
                 IsActive = true,
-                IsBrowseable = true
+                IsBrowseable = true,
+                UserPermissions = command.Permissions.Select(x => new UserPermission { Permission = x }).ToList()
             };
 
             _userRepository.Create(user, null);

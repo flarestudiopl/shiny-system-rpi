@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Storage.StorageDatabase;
+using System;
 
 namespace HeatingControl.Application.DataAccess.User
 {
@@ -16,21 +17,27 @@ namespace HeatingControl.Application.DataAccess.User
 
     public class UserLastLogonUpdater : IUserLastLogonUpdater
     {
-        private readonly IRepository<Domain.User> _userRepository;
+        private readonly IDbExecutor _dbExecutor;
 
-        public UserLastLogonUpdater(IRepository<Domain.User> userRepository)
+        public UserLastLogonUpdater(IDbExecutor dbExecutor)
         {
-            _userRepository = userRepository;
+            _dbExecutor = dbExecutor;
         }
 
         public void Update(UserLastLogonUpdaterInput input)
         {
-            var user = _userRepository.Read(input.UserId);
+            _dbExecutor.Execute(c =>
+            {
+                var user = c.Users.Find(input.UserId);
 
-            user.LastLogonDate = input.LastLogonDate;
-            user.LastSeenIpAddress = input.LastSeenIpAddress;
+                if (user != null)
+                {
+                    user.LastLogonDate = input.LastLogonDate;
+                    user.LastSeenIpAddress = input.LastSeenIpAddress;
 
-            _userRepository.Update(user, null);
+                    c.SaveChanges();
+                }
+            });
         }
     }
 }
