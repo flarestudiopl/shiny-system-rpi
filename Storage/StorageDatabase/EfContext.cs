@@ -157,7 +157,8 @@ namespace Storage.StorageDatabase
                           new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Dashboard_ZoneSettings },
                           new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Zones },
                           new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_PowerZones },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Devices });
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Devices },
+                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Users });
             });
 
             modelBuilder.Entity<Domain.Zone>(x =>

@@ -9,6 +9,8 @@
 
         Configuration_PowerZones = 300,
 
-        Configuration_Devices = 400
+        Configuration_Devices = 400,
+
+        Configuration_Users = 500
     }
 }

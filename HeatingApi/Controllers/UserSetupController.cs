@@ -1,6 +1,8 @@
-﻿using HeatingControl.Application.Commands;
+﻿using Domain;
+using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace HeatingApi.Controllers
 {
@@ -11,13 +13,17 @@ namespace HeatingApi.Controllers
     public class UserSetupController : BaseController
     {
         private readonly IUserListProvider _userListProvider;
+        private readonly IPermissionsProvider _permissionsProvider;
         private readonly IUserProvider _userProvider;
         private readonly ICommandHandler _commandHandler;
 
-        public UserSetupController(IUserListProvider userListProvider, IUserProvider userProvider,
+        public UserSetupController(IUserListProvider userListProvider,
+                                   IPermissionsProvider permissionsProvider,
+                                   IUserProvider userProvider,
                                    ICommandHandler commandHandler)
         {
             _userListProvider = userListProvider;
+            _permissionsProvider = permissionsProvider;
             _userProvider = userProvider;
             _commandHandler = commandHandler;
         }
@@ -26,6 +32,12 @@ namespace HeatingApi.Controllers
         public UserListProviderResult GetUserList()
         {
             return _userListProvider.Provide();
+        }
+
+        [HttpGet("permissions")]
+        public PermissionsProviderResult GetPermissions()
+        {
+            return _permissionsProvider.Provide();
         }
 
         [HttpGet("{userId}")]
