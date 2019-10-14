@@ -14,11 +14,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="run-shiny.sh" />
     <None Remove="storage.db" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\config\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="run-shiny.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
