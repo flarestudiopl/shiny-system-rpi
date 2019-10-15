@@ -75,7 +75,7 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
 
             // Devices/DigitalInputs
-            builder.RegisterType<ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
+            builder.RegisterType<HardwareAccess.Dummy.Devices.DigitalInputs.ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
 
             // Devices/PowerOutputs
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
