@@ -1,4 +1,5 @@
 ﻿using Commons.Extensions;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -9,15 +10,15 @@ namespace Storage.StorageDatabase
     {
         private readonly string _connectionString;
 
-        public DbSet<Domain.Building> Buildings { get; set; }
-        public DbSet<Domain.Counter> Counters { get; set; }
-        public DbSet<Domain.DigitalInput> DigitalInputs { get; set; }
-        public DbSet<Domain.DigitalOutput> DigitalOutputs { get; set; }
-        public DbSet<Domain.Heater> Heaters { get; set; }
-        public DbSet<Domain.PowerZone> PowerZones { get; set; }
-        public DbSet<Domain.TemperatureSensor> TemperatureSensors { get; set; }
-        public DbSet<Domain.User> Users { get; set; }
-        public DbSet<Domain.Zone> Zones { get; set; }
+        public DbSet<Building> Buildings { get; set; }
+        public DbSet<Counter> Counters { get; set; }
+        public DbSet<DigitalInput> DigitalInputs { get; set; }
+        public DbSet<DigitalOutput> DigitalOutputs { get; set; }
+        public DbSet<Heater> Heaters { get; set; }
+        public DbSet<PowerZone> PowerZones { get; set; }
+        public DbSet<TemperatureSensor> TemperatureSensors { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Zone> Zones { get; set; }
 
         public EfContext()
         {
@@ -36,15 +37,15 @@ namespace Storage.StorageDatabase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Domain.Building>(x =>
+            modelBuilder.Entity<Building>(x =>
             {
-                x.ToTable(nameof(Domain.Building));
+                x.ToTable(nameof(Building));
 
                 x.Property(b => b.Name).IsRequired();
                 x.Property(b => b.IsDefault).IsRequired();
                 x.Property(b => b.ControlLoopIntervalSecondsMilliseconds).IsRequired();
 
-                x.HasData(new Domain.Building
+                x.HasData(new Building
                 {
                     BuildingId = -1,
                     ControlLoopIntervalSecondsMilliseconds = 5000,
@@ -53,78 +54,81 @@ namespace Storage.StorageDatabase
                 });
             });
 
-            modelBuilder.Entity<Domain.Counter>(x =>
+            modelBuilder.Entity<Counter>(x =>
             {
-                x.ToTable(nameof(Domain.Counter));
+                x.ToTable(nameof(Counter));
 
                 x.HasOne(c => c.ResettedBy).WithMany().HasForeignKey(c => c.ResettedByUserId).OnDelete(DeleteBehavior.Restrict);
 
-                x.HasIndex(c => new { c.HeaterId, c.ResetDate }).HasFilter($"[{nameof(Domain.Counter.ResetDate)}] IS NULL").IsUnique();
+                x.HasIndex(c => new { c.HeaterId, c.ResetDate }).HasFilter($"[{nameof(Counter.ResetDate)}] IS NULL").IsUnique();
             });
 
-            modelBuilder.Entity<Domain.DigitalInput>(x =>
+            modelBuilder.Entity<DigitalInput>(x =>
             {
-                x.ToTable(nameof(Domain.DigitalInput));
+                x.ToTable(nameof(DigitalInput));
 
-                x.HasOne<Domain.Building>().WithMany(b => b.DigitalInputs).HasForeignKey(di => di.BuildingId);
+                x.HasOne<Building>().WithMany(b => b.DigitalInputs).HasForeignKey(di => di.BuildingId);
+
+                x.HasData(new DigitalInput { DigitalInputId = -1, BuildingId = -1, ProtocolName = ProtocolNames.ShinyBoard, DeviceId = 0, InputName = "AC OK", Function = DigitalInputFunction.BatteryMode, Inverted = true},
+                          new DigitalInput { DigitalInputId = -2, BuildingId = -1, ProtocolName = ProtocolNames.ShinyBoard, DeviceId = 0, InputName = "Low bat", Function = DigitalInputFunction.BeginShutdown, Inverted = false });
             });
 
-            modelBuilder.Entity<Domain.DigitalOutput>(x =>
+            modelBuilder.Entity<DigitalOutput>(x =>
             {
-                x.ToTable(nameof(Domain.DigitalOutput));
+                x.ToTable(nameof(DigitalOutput));
             });
 
-            modelBuilder.Entity<Domain.Heater>(x =>
+            modelBuilder.Entity<Heater>(x =>
             {
-                x.ToTable(nameof(Domain.Heater));
+                x.ToTable(nameof(Heater));
 
-                x.HasOne<Domain.Building>().WithMany(b => b.Heaters).HasForeignKey(h => h.BuildingId);
-                x.HasOne(h => h.DigitalOutput).WithOne().HasForeignKey<Domain.Heater>(h => h.DigitalOutputId).OnDelete(DeleteBehavior.Cascade);
+                x.HasOne<Building>().WithMany(b => b.Heaters).HasForeignKey(h => h.BuildingId);
+                x.HasOne(h => h.DigitalOutput).WithOne().HasForeignKey<Heater>(h => h.DigitalOutputId).OnDelete(DeleteBehavior.Cascade);
                 x.HasOne(h => h.Zone).WithMany(z => z.Heaters).HasForeignKey(h => h.ZoneId);
                 x.HasOne(h => h.PowerZone).WithMany(pz => pz.Heaters).HasForeignKey(h => h.PowerZoneId);
             });
 
-            modelBuilder.Entity<Domain.PowerZone>(x =>
+            modelBuilder.Entity<PowerZone>(x =>
             {
-                x.ToTable(nameof(Domain.PowerZone));
+                x.ToTable(nameof(PowerZone));
 
-                x.HasOne<Domain.Building>().WithMany(b => b.PowerZones).HasForeignKey(pz => pz.BuildingId);
+                x.HasOne<Building>().WithMany(b => b.PowerZones).HasForeignKey(pz => pz.BuildingId);
             });
 
-            modelBuilder.Entity<Domain.ScheduleItem>(x =>
+            modelBuilder.Entity<ScheduleItem>(x =>
             {
-                x.ToTable(nameof(Domain.ScheduleItem));
+                x.ToTable(nameof(ScheduleItem));
 
                 const string daysOfWeekConversionSeparator = ",";
 
                 x.Property(si => si.DaysOfWeek).IsRequired().HasConversion(si => si.Cast<int>().JoinWith(daysOfWeekConversionSeparator),
-                    str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow => (DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
+                        str => str.Split(daysOfWeekConversionSeparator, StringSplitOptions.RemoveEmptyEntries).Select(dow => (DayOfWeek)Enum.Parse(typeof(DayOfWeek), dow)).ToArray());
 
                 x.Property(si => si.BeginTime).IsRequired();
                 x.Property(si => si.EndTime).IsRequired();
 
-                x.HasOne<Domain.Zone>().WithMany(z => z.Schedule).HasForeignKey(si => si.ZoneId);
+                x.HasOne<Zone>().WithMany(z => z.Schedule).HasForeignKey(si => si.ZoneId);
             });
 
-            modelBuilder.Entity<Domain.TemperatureControlledZone>(x =>
+            modelBuilder.Entity<TemperatureControlledZone>(x =>
             {
-                x.ToTable(nameof(Domain.TemperatureControlledZone));
+                x.ToTable(nameof(TemperatureControlledZone));
             });
 
-            modelBuilder.Entity<Domain.TemperatureSensor>(x =>
+            modelBuilder.Entity<TemperatureSensor>(x =>
             {
-                x.ToTable(nameof(Domain.TemperatureSensor));
+                x.ToTable(nameof(TemperatureSensor));
 
                 x.Property(ts => ts.Name).IsRequired();
                 x.Property(ts => ts.DeviceId).IsRequired();
 
-                x.HasOne<Domain.Building>().WithMany(b => b.TemperatureSensors).HasForeignKey(ts => ts.BuildingId);
+                x.HasOne<Building>().WithMany(b => b.TemperatureSensors).HasForeignKey(ts => ts.BuildingId);
                 x.HasMany(ts => ts.TemperatureControlledZones).WithOne(tcz => tcz.TemperatureSensor).HasForeignKey(tcz => tcz.TemperatureSensorId);
             });
 
-            modelBuilder.Entity<Domain.User>(x =>
+            modelBuilder.Entity<User>(x =>
             {
-                x.ToTable(nameof(Domain.User));
+                x.ToTable(nameof(User));
 
                 x.Property(u => u.Login).IsRequired();
                 x.Property(u => u.PasswordHash).IsRequired();
@@ -132,9 +136,9 @@ namespace Storage.StorageDatabase
                 x.HasOne(u => u.CreatedBy).WithMany().HasForeignKey(u => u.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
                 x.HasOne(u => u.DisabledBy).WithMany().HasForeignKey(u => u.DisabledByUserId).OnDelete(DeleteBehavior.Restrict);
 
-                x.HasIndex(u => new { u.Login, u.IsActive }).HasFilter($"[{nameof(Domain.User.IsActive)}] = 1").IsUnique();
+                x.HasIndex(u => new { u.Login, u.IsActive }).HasFilter($"[{nameof(User.IsActive)}] = 1").IsUnique();
 
-                x.HasData(new Domain.User
+                x.HasData(new User
                 {
                     UserId = -1,
                     Login = "user",
@@ -145,30 +149,30 @@ namespace Storage.StorageDatabase
                 });
             });
 
-            modelBuilder.Entity<Domain.UserPermission>(x =>
+            modelBuilder.Entity<UserPermission>(x =>
             {
-                x.ToTable(nameof(Domain.UserPermission));
+                x.ToTable(nameof(UserPermission));
 
                 x.HasKey(up => new { up.UserId, up.Permission });
 
                 x.HasOne(up => up.User).WithMany(u => u.UserPermissions).HasForeignKey(up => up.UserId);
 
-                x.HasData(new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Dashboard },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Dashboard_ZoneSettings },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Zones },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_PowerZones },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Devices },
-                          new Domain.UserPermission { UserId = -1, Permission = Domain.Permission.Configuration_Users });
+                x.HasData(new UserPermission { UserId = -1, Permission = Permission.Dashboard },
+                          new UserPermission { UserId = -1, Permission = Permission.Dashboard_ZoneSettings },
+                          new UserPermission { UserId = -1, Permission = Permission.Configuration_Zones },
+                          new UserPermission { UserId = -1, Permission = Permission.Configuration_PowerZones },
+                          new UserPermission { UserId = -1, Permission = Permission.Configuration_Devices },
+                          new UserPermission { UserId = -1, Permission = Permission.Configuration_Users });
             });
 
-            modelBuilder.Entity<Domain.Zone>(x =>
+            modelBuilder.Entity<Zone>(x =>
             {
-                x.ToTable(nameof(Domain.Zone));
+                x.ToTable(nameof(Zone));
 
                 x.Property(z => z.Name).IsRequired();
 
-                x.HasOne<Domain.Building>().WithMany(b => b.Zones).HasForeignKey(z => z.BuildingId);
-                x.HasOne(z => z.TemperatureControlledZone).WithOne().HasForeignKey<Domain.Zone>(z => z.TemperatureControlledZoneId).OnDelete(DeleteBehavior.Cascade);
+                x.HasOne<Building>().WithMany(b => b.Zones).HasForeignKey(z => z.BuildingId);
+                x.HasOne(z => z.TemperatureControlledZone).WithOne().HasForeignKey<Zone>(z => z.TemperatureControlledZoneId).OnDelete(DeleteBehavior.Cascade);
                 x.HasMany(z => z.Heaters).WithOne(h => h.Zone).HasForeignKey(h => h.ZoneId);
                 x.HasMany(z => z.Schedule).WithOne().HasForeignKey(si => si.ZoneId);
             });

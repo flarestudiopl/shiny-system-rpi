@@ -1,4 +1,5 @@
 ﻿using HardwareAccess.Devices;
+using HeatingControl.Application.Loops.Processing;
 using HeatingControl.Models;
 using System;
 using System.Threading;
@@ -14,10 +15,13 @@ namespace HeatingControl.Application.Loops
     public class DigitalInputReadingLoop : IDigitalInputReadingLoop
     {
         private readonly IDigitalInputProvider _digitalInputProvider;
+        private readonly IPowerSupplySignalProcessor _powerSupplySignalProcessor;
 
-        public DigitalInputReadingLoop(IDigitalInputProvider digitalInputProvider)
+        public DigitalInputReadingLoop(IDigitalInputProvider digitalInputProvider,
+                                       IPowerSupplySignalProcessor powerSupplySignalProcessor)
         {
             _digitalInputProvider = digitalInputProvider;
+            _powerSupplySignalProcessor = powerSupplySignalProcessor;
         }
 
         public void Start(ControllerState controllerState, CancellationToken cancellationToken)
@@ -44,6 +48,8 @@ namespace HeatingControl.Application.Loops
 
                    x.LastRead = DateTime.UtcNow;
                });
+
+            _powerSupplySignalProcessor.Process(controllerState);
         }
     }
 }

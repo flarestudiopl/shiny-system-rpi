@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Domain;
 
 namespace HeatingControl.Models
@@ -22,5 +23,9 @@ namespace HeatingControl.Models
         public IDictionary<int, PowerZoneState> PowerZoneIdToState { get; set; } = new Dictionary<int, PowerZoneState>();
 
         public IDictionary<DigitalInputFunction, DigitalInputState> DigitalInputFunctionToState { get; set; } = new Dictionary<DigitalInputFunction, DigitalInputState>();
+
+        public DateTime? ScheduledShutdownUtcTime { get; set; }
+
+        public bool ShutdownRequested { get; set; }
     }
 }

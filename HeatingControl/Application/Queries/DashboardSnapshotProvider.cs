@@ -19,7 +19,8 @@ namespace HeatingControl.Application.Queries
         public string BuildingName { get; set; }
         public DateTime ControllerDateTime { get; set; }
         public bool ControlEnabled { get; set; }
-        public bool BatteryMode { get;set;}
+        public bool BatteryMode { get; set; }
+        public DateTime? ScheduledShutdownUtcTime { get; set; }
         public string SoftwareVersion { get; set; }
         public IDictionary<UsageUnit, decimal> InstantUsage { get; set; }
         public ICollection<ZoneSnapshot> Zones { get; set; }
@@ -70,6 +71,7 @@ namespace HeatingControl.Application.Queries
                              SoftwareVersion = AssemblyVersion,
                              ControlEnabled = state.ControlEnabled,
                              BatteryMode = state.DigitalInputFunctionToState.GetValueOrDefault(DigitalInputFunction.BatteryMode)?.State ?? false,
+                             ScheduledShutdownUtcTime = state.ScheduledShutdownUtcTime,
                              InstantUsage = state.InstantUsage,
                              Zones = state.ZoneIdToState
                                           .Values
