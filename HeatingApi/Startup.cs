@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authorization;
+using HardwareAccess.PlatformIntegration;
+using Commons.Extensions;
 
 namespace HeatingApi
 {
@@ -76,16 +78,16 @@ namespace HeatingApi
                     .AddJwtBearer(options =>
                                   {
                                       options.TokenValidationParameters = new TokenValidationParameters
-                                                                          {
-                                                                              ValidateIssuer = true,
-                                                                              ValidateAudience = true,
-                                                                              RequireExpirationTime = true,
-                                                                              ValidateLifetime = true,
-                                                                              ValidateIssuerSigningKey = true,
-                                                                              ValidIssuer = Configuration["Jwt:Issuer"],
-                                                                              ValidAudience = Configuration["Jwt:Issuer"],
-                                                                              IssuerSigningKey = AuthenticateUserCommandExecutor.JwtSigningKey
-                                                                          };
+                                      {
+                                          ValidateIssuer = true,
+                                          ValidateAudience = true,
+                                          RequireExpirationTime = true,
+                                          ValidateLifetime = true,
+                                          ValidateIssuerSigningKey = true,
+                                          ValidIssuer = Configuration["Jwt:Issuer"],
+                                          ValidAudience = Configuration["Jwt:Issuer"],
+                                          IssuerSigningKey = AuthenticateUserCommandExecutor.JwtSigningKey
+                                      };
                                   });
 
             services.AddCors(options =>
@@ -106,22 +108,36 @@ namespace HeatingApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime, IHostingEnvironment env)
         {
+            applicationLifetime.ApplicationStarted.Register(() => OnApplicationStarted(app));
+
             app.UseCors("CorsPolicy");
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "HeatingAPI v1"); });
-            
+
             app.UseExceptionHandler(ExceptionHandler);
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseAuthentication();
-            
+
             var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(options.Value);
 
             app.UseMvc(routes => { routes.MapRoute("Spa", "{*url}", new { controller = "Home", action = "Spa" }); });
+        }
+
+        private void OnApplicationStarted(IApplicationBuilder app)
+        {
+            var command = Configuration["PlatformIntegration:RunWhenApiReadyCommand"];
+            var arguments = Configuration["PlatformIntegration:RunWhenApiReadyArguments"];
+
+            if (!command.IsNullOrEmpty())
+            {
+                var processRunner = app.ApplicationServices.GetService<IProcessRunner>();
+                processRunner.Run(command, arguments);
+            }
         }
 
         private static void ExceptionHandler(IApplicationBuilder options)
