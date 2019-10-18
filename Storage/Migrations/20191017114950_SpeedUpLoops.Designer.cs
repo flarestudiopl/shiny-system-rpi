@@ -2,39 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.StorageDatabase;
 
 namespace Storage.Migrations
 {
     [DbContext(typeof(EfContext))]
-    partial class EfContextModelSnapshot : ModelSnapshot
+    [Migration("20191017114950_SpeedUpLoops")]
+    partial class SpeedUpLoops
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
-
-            modelBuilder.Entity("Domain.AuditLog", b =>
-                {
-                    b.Property<int>("AuditLogId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("EventTs");
-
-                    b.Property<string>("KeyValues");
-
-                    b.Property<string>("NewValues");
-
-                    b.Property<string>("OldValues");
-
-                    b.Property<string>("TableName");
-
-                    b.HasKey("AuditLogId");
-
-                    b.ToTable("AuditLog");
-                });
 
             modelBuilder.Entity("Domain.Building", b =>
                 {

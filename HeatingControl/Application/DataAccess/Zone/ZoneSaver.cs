@@ -77,7 +77,7 @@ namespace HeatingControl.Application.DataAccess.Zone
         {
             if (input.TemperatureSensorId.HasValue)
             {
-                zone.TemperatureControlledZone = zone.TemperatureControlledZone ?? new TemperatureControlledZone
+                zone.TemperatureControlledZone = zone.TemperatureControlledZone ?? new Domain.TemperatureControlledZone
                 {
                     LowSetPoint = 4.0f,
                     HighSetPoint = 20.0f,

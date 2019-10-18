@@ -2,6 +2,7 @@
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Storage.StorageDatabase
@@ -19,6 +20,7 @@ namespace Storage.StorageDatabase
         public DbSet<TemperatureSensor> TemperatureSensors { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Zone> Zones { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         public EfContext()
         {
@@ -35,6 +37,19 @@ namespace Storage.StorageDatabase
             optionsBuilder.UseSqlite(_connectionString);
         }
 
+        public override int SaveChanges()
+        {
+            var result = base.SaveChanges(false);
+
+            var auditLogs = GetAuditLogs().ToList();
+            ChangeTracker.AcceptAllChanges();
+
+            AuditLogs.AddRange(auditLogs);
+            base.SaveChanges();
+
+            return result;
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Building>(x =>
@@ -48,7 +63,7 @@ namespace Storage.StorageDatabase
                 x.HasData(new Building
                 {
                     BuildingId = -1,
-                    ControlLoopIntervalSecondsMilliseconds = 5000,
+                    ControlLoopIntervalSecondsMilliseconds = 3000,
                     IsDefault = true,
                     Name = "Budynek testowy"
                 });
@@ -69,7 +84,7 @@ namespace Storage.StorageDatabase
 
                 x.HasOne<Building>().WithMany(b => b.DigitalInputs).HasForeignKey(di => di.BuildingId);
 
-                x.HasData(new DigitalInput { DigitalInputId = -1, BuildingId = -1, ProtocolName = ProtocolNames.ShinyBoard, DeviceId = 0, InputName = "AC OK", Function = DigitalInputFunction.BatteryMode, Inverted = true},
+                x.HasData(new DigitalInput { DigitalInputId = -1, BuildingId = -1, ProtocolName = ProtocolNames.ShinyBoard, DeviceId = 0, InputName = "AC OK", Function = DigitalInputFunction.BatteryMode, Inverted = true },
                           new DigitalInput { DigitalInputId = -2, BuildingId = -1, ProtocolName = ProtocolNames.ShinyBoard, DeviceId = 0, InputName = "Low bat", Function = DigitalInputFunction.BeginShutdown, Inverted = false });
             });
 
@@ -176,6 +191,72 @@ namespace Storage.StorageDatabase
                 x.HasMany(z => z.Heaters).WithOne(h => h.Zone).HasForeignKey(h => h.ZoneId);
                 x.HasMany(z => z.Schedule).WithOne().HasForeignKey(si => si.ZoneId);
             });
+
+            modelBuilder.Entity<AuditLog>(x =>
+            {
+                x.ToTable(nameof(AuditLog));
+
+                x.Property(al => al.KeyValues).HasConversion(al => Newtonsoft.Json.JsonConvert.SerializeObject(al),
+                                                             str => Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(str));
+
+                x.Property(al => al.OldValues).HasConversion(al => Newtonsoft.Json.JsonConvert.SerializeObject(al),
+                                                             str => Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(str));
+
+                x.Property(al => al.NewValues).HasConversion(al => Newtonsoft.Json.JsonConvert.SerializeObject(al),
+                                                             str => Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(str));
+            });
+        }
+
+        private IEnumerable<AuditLog> GetAuditLogs()
+        {
+            ChangeTracker.DetectChanges();
+
+            var currentDate = DateTime.UtcNow;
+
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is AuditLog || entry.Entity is Counter || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                {
+                    continue;
+                }
+
+                var auditLog = new AuditLog
+                {
+                    TableName = entry.Metadata.Relational().TableName,
+                    EventTs = currentDate
+                };
+
+                foreach (var property in entry.Properties)
+                {
+                    string propertyName = property.Metadata.Name;
+                    if (property.Metadata.IsPrimaryKey())
+                    {
+                        auditLog.KeyValues[propertyName] = property.CurrentValue;
+                        continue;
+                    }
+
+                    switch (entry.State)
+                    {
+                        case EntityState.Added:
+                            auditLog.NewValues[propertyName] = property.CurrentValue;
+                            break;
+
+                        case EntityState.Deleted:
+                            auditLog.OldValues[propertyName] = property.OriginalValue;
+                            break;
+
+                        case EntityState.Modified:
+                            if (property.IsModified)
+                            {
+                                auditLog.OldValues[propertyName] = property.OriginalValue;
+                                auditLog.NewValues[propertyName] = property.CurrentValue;
+                            }
+                            break;
+                    }
+                }
+
+                yield return auditLog;
+            }
         }
     }
 }

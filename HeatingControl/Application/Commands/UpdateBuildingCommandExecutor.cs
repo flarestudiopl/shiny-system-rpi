@@ -1,7 +1,6 @@
 ﻿using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.Building;
 
 namespace HeatingControl.Application.Commands
 {
@@ -12,11 +11,11 @@ namespace HeatingControl.Application.Commands
 
     public class UpdateBuildingCommandExecutor : ICommandExecutor<UpdateBuildingCommand>
     {
-        private readonly IRepository<Building> _buildingRepository;
+        private readonly IBuildingNameUpdater _buildingNameUpdater;
 
-        public UpdateBuildingCommandExecutor(IRepository<Building> buildingRepository)
+        public UpdateBuildingCommandExecutor(IBuildingNameUpdater buildingNameUpdater)
         {
-            _buildingRepository = buildingRepository;
+            _buildingNameUpdater = buildingNameUpdater;
         }
 
         public CommandResult Execute(UpdateBuildingCommand command, CommandContext context)
@@ -26,9 +25,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.NameCantBeEmpty);
             }
 
-            context.ControllerState.Model.Name = command.Name;
-
-            _buildingRepository.Update(context.ControllerState.Model, null);
+            _buildingNameUpdater.Update(command.Name, context.ControllerState.Model);
 
             return CommandResult.Empty;
         }

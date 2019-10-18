@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Commons.Extensions;
 using Commons.Localization;
-using Domain;
-using HeatingControl.Application.DataAccess;
+using HeatingControl.Application.DataAccess.TemperatureControlledZone;
 using HeatingControl.Extensions;
+using HeatingControl.Models;
 
 namespace HeatingControl.Application.Commands
 {
@@ -15,21 +14,13 @@ namespace HeatingControl.Application.Commands
         public float Value { get; set; }
     }
 
-    public enum SetPointType
-    {
-        Low,
-        High,
-        Schedule,
-        Hysteresis
-    }
-
     public class SetTemperatureCommandExecutor : ICommandExecutor<SetTemperatureCommand>
     {
-        private readonly IRepository<TemperatureControlledZone> _temperatureControlledZoneRepository;
+        private readonly ITemperatureControlledZoneUpdater _temperatureControlledZoneUpdater;
 
-        public SetTemperatureCommandExecutor(IRepository<TemperatureControlledZone> temperatureControlledZoneRepository)
+        public SetTemperatureCommandExecutor(ITemperatureControlledZoneUpdater temperatureControlledZoneUpdater)
         {
-            _temperatureControlledZoneRepository = temperatureControlledZoneRepository;
+            _temperatureControlledZoneUpdater = temperatureControlledZoneUpdater;
         }
 
         public CommandResult Execute(SetTemperatureCommand command, CommandContext context)
@@ -41,27 +32,19 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(command.ZoneId));
             }
 
-            var temperatureControlledZone = zone.TemperatureControlledZone;
-
-            switch (command.SetPointType)
+            if (command.SetPointType == SetPointType.Hysteresis && command.Value < 0.2f)
             {
-                case SetPointType.Low:
-                    temperatureControlledZone.LowSetPoint = command.Value;
-                    break;
-                case SetPointType.High:
-                    temperatureControlledZone.HighSetPoint = command.Value;
-                    break;
-                case SetPointType.Schedule:
-                    temperatureControlledZone.ScheduleDefaultSetPoint = command.Value;
-                    break;
-                case SetPointType.Hysteresis:
-                    temperatureControlledZone.Hysteresis = command.Value;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                return CommandResult.WithValidationError(Localization.ValidationMessage.HysteresisTooLow);
             }
 
-            _temperatureControlledZoneRepository.Update(temperatureControlledZone, context.ControllerState.Model);
+            var temperatureControlledZone = zone.TemperatureControlledZone;
+
+            _temperatureControlledZoneUpdater.Update(new TemperatureControlledZoneUpdaterInput
+            {
+                TemperatureControlledZone = zone.TemperatureControlledZone,
+                SetPointType = command.SetPointType,
+                Value = command.Value
+            });
 
             return CommandResult.Empty;
         }

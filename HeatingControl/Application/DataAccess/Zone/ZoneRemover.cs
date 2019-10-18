@@ -29,7 +29,7 @@ namespace HeatingControl.Application.DataAccess.Zone
 
                 if (zone.TemperatureControlledZone != null)
                 {
-                    c.Set<TemperatureControlledZone>().Remove(zone.TemperatureControlledZone);
+                    c.Set<Domain.TemperatureControlledZone>().Remove(zone.TemperatureControlledZone);
                 }
 
                 if (zone.Schedule.Count > 0)

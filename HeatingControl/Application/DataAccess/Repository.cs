@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 
 namespace HeatingControl.Application.DataAccess
 {
+    [Obsolete]
     public interface IRepository<TItem> where TItem : class
     {
         TItem Create(TItem item, Domain.Building building);
@@ -17,6 +18,7 @@ namespace HeatingControl.Application.DataAccess
         void Delete(TItem item, Domain.Building building);
     }
 
+    [Obsolete]
     public class Repository<TItem> : IRepository<TItem> where TItem : class
     {
         private readonly IDbExecutor _dbExecutor;

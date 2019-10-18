@@ -2,6 +2,7 @@
 using HeatingApi.Attributes;
 using HeatingControl.Application.Commands;
 using HeatingControl.Application.Queries;
+using HeatingControl.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatingApi.Controllers

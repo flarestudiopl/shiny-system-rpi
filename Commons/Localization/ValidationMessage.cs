@@ -32,6 +32,7 @@
         string MinimumStateChangeIntervalCantBeNegative { get; }
         string IncorrectPinError { get; }
         string PasswordCannotBeEmpty { get; }
+        string HysteresisTooLow { get; }
     }
 
     public class ValidationMessagePl : IValidationMessage
@@ -66,6 +67,7 @@
         public string MinimumStateChangeIntervalCantBeNegative => "Minimalny czas przełączania nie może być ujemny.";
         public string IncorrectPinError => "Pin powinien zawierać między 4 a 8 cyfr.";
         public string PasswordCannotBeEmpty => "Hasło nie może być puste.";
+        public string HysteresisTooLow => "Za niska histereza.";
     }
 
     public class ValidationMessageEn : IValidationMessage
@@ -100,5 +102,6 @@
         public string MinimumStateChangeIntervalCantBeNegative => "Minimum state change interval can't be negative.";
         public string IncorrectPinError => "Pin should be a number and contain between 4 and 8 digits.";
         public string PasswordCannotBeEmpty => "Password cannot be empty string.";
+        public string HysteresisTooLow => "Hysteresis is too low.";
     }
 }
