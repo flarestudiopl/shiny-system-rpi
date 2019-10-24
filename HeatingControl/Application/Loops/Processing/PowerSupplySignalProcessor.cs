@@ -28,6 +28,14 @@ namespace HeatingControl.Application.Loops.Processing
             var batteryMode = controllerState.DigitalInputFunctionToState.GetValueOrDefault(DigitalInputFunction.BatteryMode)?.State ?? false;
             var beginShutdown = controllerState.DigitalInputFunctionToState.GetValueOrDefault(DigitalInputFunction.BeginShutdown)?.State ?? false;
 
+            if (batteryMode)
+            {
+                foreach(var zone in controllerState.ZoneIdToState)
+                {
+                    zone.Value.ControlMode = ZoneControlMode.LowOrDisabled;
+                }
+            }
+
             if (!batteryMode)
             {
                 controllerState.ScheduledShutdownUtcTime = null;
