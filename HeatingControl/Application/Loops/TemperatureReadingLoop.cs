@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,12 +40,22 @@ namespace HeatingControl.Application.Loops
 
         private void ProcessReads(ControllerState controllerState)
         {
-            foreach(var availableDeviceId in _temperatureSensor.GetAvailableSensors())
+            var availableDeviceIds = _temperatureSensor.GetAvailableSensors();
+            var lostDeviceIds = new HashSet<string>(controllerState.TemperatureDeviceIdToTemperatureData.Keys);
+
+            foreach (var availableDeviceId in availableDeviceIds)
             {
                 if (!controllerState.TemperatureDeviceIdToTemperatureData.ContainsKey(availableDeviceId))
                 {
                     controllerState.TemperatureDeviceIdToTemperatureData.Add(availableDeviceId, new TemperatureData());
                 }
+
+                lostDeviceIds.Remove(availableDeviceId);
+            }
+
+            foreach(var lostDeviceId in lostDeviceIds)
+            {
+                controllerState.TemperatureDeviceIdToTemperatureData.Remove(lostDeviceId);
             }
 
             Parallel.ForEach(controllerState.TemperatureDeviceIdToTemperatureData,

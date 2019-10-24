@@ -6,14 +6,15 @@ using Xunit;
 
 namespace HeatingControl.Tests.Application.Loops.Processing
 {
-    public class PowerZoneOutputAllowanceCalculatorTests
+    public class PowerZoneOutputLimiterTests
     {
         [Theory]
-        [InlineData(0, true, true, false, false)]
-        [InlineData(1, false, true, true, false)]
-        [InlineData(2, false, false, true, true)]
-        [InlineData(3, true, false, false, true)]
-        [InlineData(4, true, true, false, false)]
+        [InlineData(255, true, true, false, false)]
+        [InlineData(0, false, true, true, false)]
+        [InlineData(1, false, false, true, true)]
+        [InlineData(2, true, false, false, true)]
+        [InlineData(3, true, true, false, false)]
+        [InlineData(4, false, true, true, false)]
         public void iterates_over_available_heaters(byte iteration, bool state1, bool state2, bool state3, bool state4)
         {
             // Arrange
