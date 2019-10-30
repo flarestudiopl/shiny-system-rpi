@@ -13,7 +13,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
     public class InvertedPcfOutput : IInvertedPcfOutput
     {
-        private readonly static int[] I2C_ADDRESSES = new int[] { 56, 57, 58, 59, 60, 61, 62, 63 };
+        private readonly static int[] I2C_ADDRESSES = new int[] { 32, 56, 57, 58, 59, 60, 61, 62, 63 };
 
         private readonly static IDictionary<string, int> OUTPUT_NAME_TO_CHANNEL = new Dictionary<string, int>
         {

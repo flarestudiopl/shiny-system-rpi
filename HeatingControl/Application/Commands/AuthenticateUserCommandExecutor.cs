@@ -28,7 +28,7 @@ namespace HeatingControl.Application.Commands
 
     public class AuthenticateUserCommandExecutor : ICommandExecutor<AuthenticateUserCommand>
     {
-        private const int TokenLifetimeMinutes = 15;
+        private const int TokenLifetimeMinutes = 8 * 60;
 
         public static SecurityKey JwtSigningKey = new SymmetricSecurityKey(Guid.NewGuid().ToByteArray());
 
