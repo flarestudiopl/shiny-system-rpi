@@ -63,7 +63,7 @@ namespace Storage.StorageDatabase
                 x.HasData(new Building
                 {
                     BuildingId = -1,
-                    ControlLoopIntervalSecondsMilliseconds = 3000,
+                    ControlLoopIntervalSecondsMilliseconds = 2500,
                     IsDefault = true,
                     Name = "Budynek testowy"
                 });
@@ -185,6 +185,7 @@ namespace Storage.StorageDatabase
                 x.ToTable(nameof(Zone));
 
                 x.Property(z => z.Name).IsRequired();
+                x.Property(z => z.SwitchDelayBetweenOutputsSeconds).ValueGeneratedNever().HasDefaultValue(2);
 
                 x.HasOne<Building>().WithMany(b => b.Zones).HasForeignKey(z => z.BuildingId);
                 x.HasOne(z => z.TemperatureControlledZone).WithOne().HasForeignKey<Zone>(z => z.TemperatureControlledZoneId).OnDelete(DeleteBehavior.Cascade);

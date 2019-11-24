@@ -18,6 +18,7 @@ namespace HeatingControl.Application.DataAccess.Zone
     {
         public int? ZoneId { get; set; }
         public string Name { get; set; }
+        public int SwitchDelay { get; set; }
         public int? TemperatureSensorId { get; set; }
         public ICollection<int> HeaterIds { get; set; }
     }
@@ -53,6 +54,7 @@ namespace HeatingControl.Application.DataAccess.Zone
                 }
 
                 zone.Name = input.Name;
+                zone.SwitchDelayBetweenOutputsSeconds = input.SwitchDelay;
 
                 MergeTemperatureControlledZone(input, c, zone);
                 MergeHeaters(input, c, zone);

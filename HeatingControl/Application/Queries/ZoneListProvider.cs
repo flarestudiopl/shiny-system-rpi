@@ -21,6 +21,7 @@ namespace HeatingControl.Application.Queries
         {
             public int Id { get; set; }
             public string Name { get; set; }
+            public int SwitchDelay { get; set; }
             public string TemperatureSensorName { get; set; }
             public ICollection<string> HeaterNames { get; set; }
             public string TotalPowerFormatted { get; set; }
@@ -50,6 +51,7 @@ namespace HeatingControl.Application.Queries
                                                                    {
                                                                        Id = zone.ZoneId,
                                                                        Name = zone.Name,
+                                                                       SwitchDelay = zone.SwitchDelayBetweenOutputsSeconds,
                                                                        HeaterNames = zone
                                                                                     .Heaters
                                                                                     .Select(h => h.Name)
