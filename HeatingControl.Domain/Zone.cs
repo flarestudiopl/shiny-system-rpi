@@ -10,8 +10,6 @@ namespace Domain
 
         public string Name { get; set; }
 
-        public int SwitchDelayBetweenOutputsSeconds { get; set; }
-
         public int? TemperatureControlledZoneId { get; set; }
 
         public TemperatureControlledZone TemperatureControlledZone { get; set; }

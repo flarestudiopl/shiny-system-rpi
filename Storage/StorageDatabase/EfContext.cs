@@ -107,6 +107,8 @@ namespace Storage.StorageDatabase
             {
                 x.ToTable(nameof(PowerZone));
 
+                x.Property(z => z.SwitchDelayBetweenOutputsSeconds).ValueGeneratedNever().HasDefaultValue(2);
+
                 x.HasOne<Building>().WithMany(b => b.PowerZones).HasForeignKey(pz => pz.BuildingId);
             });
 
@@ -185,7 +187,6 @@ namespace Storage.StorageDatabase
                 x.ToTable(nameof(Zone));
 
                 x.Property(z => z.Name).IsRequired();
-                x.Property(z => z.SwitchDelayBetweenOutputsSeconds).ValueGeneratedNever().HasDefaultValue(2);
 
                 x.HasOne<Building>().WithMany(b => b.Zones).HasForeignKey(z => z.BuildingId);
                 x.HasOne(z => z.TemperatureControlledZone).WithOne().HasForeignKey<Zone>(z => z.TemperatureControlledZoneId).OnDelete(DeleteBehavior.Cascade);

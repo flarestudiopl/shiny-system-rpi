@@ -10,5 +10,7 @@ namespace HeatingControl.Models
         public DateTime NextIntervalIncrementationDateTime { get; set; }
 
         public byte NextIntervalOffset { get; set; }
+
+        public DateTime LastOutputStateChange { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace HeatingControl.Application.Queries
             public string Name { get; set; }
             public ICollection<string> AffectedHeatersNames { get; set; }
             public string PowerLimitFormatted { get; set; }
+            public int SwitchDelay { get; set; }
         }
     }
 
@@ -36,8 +37,9 @@ namespace HeatingControl.Application.Queries
                                                           Id = x.PowerZoneId,
                                                           Name = x.Name,
                                                           AffectedHeatersNames = x.Heaters?.Select(h => h.Name).ToList(),
-                                                          PowerLimitFormatted = $"{x.MaxUsage} {Enum.GetName(typeof(UsageUnit), x.UsageUnit)}"
-                                                      })
+                                                          PowerLimitFormatted = $"{x.MaxUsage} {Enum.GetName(typeof(UsageUnit), x.UsageUnit)}",
+                                                          SwitchDelay = x.SwitchDelayBetweenOutputsSeconds
+                                         })
                                          .OrderBy(x => x.Name)
                                          .ToList()
                    };

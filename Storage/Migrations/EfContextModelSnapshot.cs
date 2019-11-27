@@ -198,6 +198,9 @@ namespace Storage.Migrations
 
                     b.Property<int>("RoundRobinIntervalMinutes");
 
+                    b.Property<int>("SwitchDelayBetweenOutputsSeconds")
+                        .HasDefaultValue(2);
+
                     b.Property<byte>("UsageUnit");
 
                     b.HasKey("PowerZoneId");
@@ -377,9 +380,6 @@ namespace Storage.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
-
-                    b.Property<int>("SwitchDelayBetweenOutputsSeconds")
-                        .HasDefaultValue(2);
 
                     b.Property<int?>("TemperatureControlledZoneId");
 

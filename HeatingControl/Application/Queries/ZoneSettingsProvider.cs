@@ -15,7 +15,6 @@ namespace HeatingControl.Application.Queries
     {
         public string Name { get; set; }
         public int? TemperatureSensorId { get; set; }
-        public int SwitchDelay { get; set; }
         public ICollection<SensorData> TemperatureSensors { get; set; }
         public ICollection<int> HeaterIds { get; set; }
         public ICollection<HeaterData> Heaters { get; set; }
@@ -47,7 +46,6 @@ namespace HeatingControl.Application.Queries
             return new ZoneSettingsProviderResult
                    {
                        Name = zoneConfiguration.Name,
-                       SwitchDelay = zoneConfiguration.SwitchDelayBetweenOutputsSeconds,
                        TemperatureSensorId = zoneConfiguration.TemperatureControlledZone?.TemperatureSensorId,
                        TemperatureSensors = _availableTemperatureSensorsProvider.Provide(controllerState, building),
                        HeaterIds = zoneConfiguration.Heaters.Select(x => x.HeaterId).ToArray(),

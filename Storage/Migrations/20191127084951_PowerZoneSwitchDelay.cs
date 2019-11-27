@@ -2,13 +2,13 @@
 
 namespace Storage.Migrations
 {
-    public partial class ZoneSwitchDelay : Migration
+    public partial class PowerZoneSwitchDelay : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
                 name: "SwitchDelayBetweenOutputsSeconds",
-                table: "Zone",
+                table: "PowerZone",
                 nullable: false,
                 defaultValue: 2);
 
@@ -24,7 +24,7 @@ namespace Storage.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "SwitchDelayBetweenOutputsSeconds",
-                table: "Zone");
+                table: "PowerZone");
 
             migrationBuilder.UpdateData(
                 table: "Building",

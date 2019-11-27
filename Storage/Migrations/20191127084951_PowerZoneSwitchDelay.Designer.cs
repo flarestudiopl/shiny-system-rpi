@@ -9,8 +9,8 @@ using Storage.StorageDatabase;
 namespace Storage.Migrations
 {
     [DbContext(typeof(EfContext))]
-    [Migration("20191124130725_ZoneSwitchDelay")]
-    partial class ZoneSwitchDelay
+    [Migration("20191127084951_PowerZoneSwitchDelay")]
+    partial class PowerZoneSwitchDelay
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -200,6 +200,9 @@ namespace Storage.Migrations
 
                     b.Property<int>("RoundRobinIntervalMinutes");
 
+                    b.Property<int>("SwitchDelayBetweenOutputsSeconds")
+                        .HasDefaultValue(2);
+
                     b.Property<byte>("UsageUnit");
 
                     b.HasKey("PowerZoneId");
@@ -379,9 +382,6 @@ namespace Storage.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
-
-                    b.Property<int>("SwitchDelayBetweenOutputsSeconds")
-                        .HasDefaultValue(2);
 
                     b.Property<int?>("TemperatureControlledZoneId");
 
