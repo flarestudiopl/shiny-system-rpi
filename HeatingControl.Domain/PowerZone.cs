@@ -15,7 +15,9 @@ namespace Domain
         public UsageUnit UsageUnit { get; set; }
 
         public int RoundRobinIntervalMinutes { get; set; }
-        
+
+        public int SwitchDelayBetweenOutputsSeconds { get; set; }
+
         public ICollection<Heater> Heaters { get; set; } = new List<Heater>();
     }
 }

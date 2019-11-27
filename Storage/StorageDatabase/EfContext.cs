@@ -63,7 +63,7 @@ namespace Storage.StorageDatabase
                 x.HasData(new Building
                 {
                     BuildingId = -1,
-                    ControlLoopIntervalSecondsMilliseconds = 3000,
+                    ControlLoopIntervalSecondsMilliseconds = 2500,
                     IsDefault = true,
                     Name = "Budynek testowy"
                 });
@@ -106,6 +106,8 @@ namespace Storage.StorageDatabase
             modelBuilder.Entity<PowerZone>(x =>
             {
                 x.ToTable(nameof(PowerZone));
+
+                x.Property(z => z.SwitchDelayBetweenOutputsSeconds).ValueGeneratedNever().HasDefaultValue(2);
 
                 x.HasOne<Building>().WithMany(b => b.PowerZones).HasForeignKey(pz => pz.BuildingId);
             });

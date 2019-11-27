@@ -27,7 +27,14 @@ namespace HeatingControl.Application.Loops.Processing
 
             foreach (var heater in controllerState.HeaterIdToState.Values)
             {
-                if (CanSwitchState(now, heater, forceImmidiateAction) &&
+                PowerZoneState heaterPowerZoneState = null;
+
+                if (heater.Heater.PowerZoneId.HasValue)
+                {
+                    heaterPowerZoneState = controllerState.PowerZoneIdToState[heater.Heater.PowerZoneId.Value];
+                }
+
+                if (CanSwitchState(now, heater, heaterPowerZoneState, forceImmidiateAction) &&
                     StateShouldBeUpdated(heater))
                 {
                     _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
@@ -36,14 +43,24 @@ namespace HeatingControl.Application.Loops.Processing
                     _usageCollector.Collect(heater, controllerState);
 
                     heater.LastStateChange = now;
+
+                    if (heaterPowerZoneState != null)
+                    {
+                        heaterPowerZoneState.LastOutputStateChange = now;
+                    }
                 }
             }
         }
 
-        private static bool CanSwitchState(DateTime now, HeaterState heater, bool forceImmidiateAction)
+        private static bool CanSwitchState(DateTime now, HeaterState heater, PowerZoneState heaterPowerZoneState, bool forceImmidiateAction)
         {
-            return forceImmidiateAction ||
-                   (now - heater.LastStateChange).TotalSeconds > heater.Heater.MinimumStateChangeIntervalSeconds;
+            if (forceImmidiateAction)
+            {
+                return true;
+            }
+
+            return (now - heater.LastStateChange).TotalSeconds >= heater.Heater.MinimumStateChangeIntervalSeconds &&
+                   (heaterPowerZoneState == null || (now - heaterPowerZoneState.LastOutputStateChange).TotalSeconds >= heaterPowerZoneState.PowerZone.SwitchDelayBetweenOutputsSeconds);
         }
 
         private bool StateShouldBeUpdated(HeaterState heater)

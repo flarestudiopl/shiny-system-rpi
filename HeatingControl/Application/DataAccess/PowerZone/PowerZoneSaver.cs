@@ -18,6 +18,7 @@ namespace HeatingControl.Application.DataAccess.PowerZone
         public decimal PowerLimitValue { get; set; }
         public UsageUnit PowerLimitUnit { get; set; }
         public int RoundRobinIntervalMinutes { get; set; }
+        public int SwitchDelay { get; set; }
     }
 
     public class PowerZoneSaver : IPowerZoneSaver
@@ -52,6 +53,7 @@ namespace HeatingControl.Application.DataAccess.PowerZone
                 powerZone.MaxUsage = input.PowerLimitValue;
                 powerZone.UsageUnit = input.PowerLimitUnit;
                 powerZone.RoundRobinIntervalMinutes = input.RoundRobinIntervalMinutes;
+                powerZone.SwitchDelayBetweenOutputsSeconds = input.SwitchDelay;
 
                 MergeHeaters(input, c, powerZone);
 

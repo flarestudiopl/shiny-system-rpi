@@ -20,6 +20,7 @@ namespace HeatingControl.Application.Queries
         public ICollection<int> AffectedHeatersIds { get; set; }
         public ICollection<AffectedHeaterData> Heaters { get; set; }
         public int RoundRobinIntervalMinutes { get; set; }
+        public int SwitchDelay { get; set; }
 
         public class AffectedHeaterData
         {
@@ -62,8 +63,9 @@ namespace HeatingControl.Application.Queries
                                                                  OutputState = controllerState.HeaterIdToState[x.Heater.HeaterId].OutputState
                                                              })
                                                 .ToList(),
-                       RoundRobinIntervalMinutes = powerZoneModel.RoundRobinIntervalMinutes
-                   };
+                       RoundRobinIntervalMinutes = powerZoneModel.RoundRobinIntervalMinutes,
+                       SwitchDelay = powerZoneModel.SwitchDelayBetweenOutputsSeconds
+                  };
         }
     }
 }

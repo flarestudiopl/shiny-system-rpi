@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Commons;
+using Domain;
 using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,8 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public void SetState(int deviceId, string outputName, bool newState)
         {
+            Logger.DebugWithData("New output state: ", new { deviceId, outputName, newState });
+
             var channel = GetChannel(outputName);
 
             lock (_lock)
