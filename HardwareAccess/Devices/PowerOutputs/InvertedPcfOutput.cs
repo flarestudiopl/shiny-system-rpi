@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Commons;
+using Domain;
 using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,8 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public void SetState(int deviceId, string outputName, bool state)
         {
+            Logger.DebugWithData("New output state: ", new { deviceId, outputName, state });
+
             if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(outputName, out var channel))
             {
                 throw new ArgumentException(nameof(outputName));
