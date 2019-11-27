@@ -1,5 +1,4 @@
 ﻿using Domain;
-using System;
 
 namespace HeatingControl.Models
 {

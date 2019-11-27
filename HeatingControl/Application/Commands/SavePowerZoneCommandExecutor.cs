@@ -70,6 +70,11 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.PowerZoneIntervalCantBeLessThan1Minute);
             }
 
+            if (command.SwitchDelay < 0)
+            {
+                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerZoneSwitchDelayCantBeNegative);
+            }
+
             var highestHeaterPower = 0m;
 
             foreach (var heaterId in command.AffectedHeatersIds)
