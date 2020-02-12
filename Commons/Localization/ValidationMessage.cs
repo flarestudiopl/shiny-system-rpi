@@ -55,7 +55,7 @@
         public string UnknownTemperatureSensorId => "Nieznany czujnik temperatury o identyfikatorze '{0}'.";
         public string CantDeleteSensorAssignedToZone => "Nie można usunąć czujnika temperatury przypisanego do strefy.";
         public string NameCantBeEmpty => "Nazwa nie może być pusta.";
-        public string PowerOutputParametersAlreadyAssigned => "Ogrzewacz o wskazanych parametrach wyjściowych ({0}/{1}) już istnieje.";
+        public string PowerOutputParametersAlreadyAssigned => "Ogrzewacz o wskazanych parametrach wyjściowych ({0}) już istnieje.";
         public string PowerZoneIntervalCantBeLessThan1Minute => "Czas przełączania strefy zasilania nie może być krótszy niż 1 minuta.";
         public string PowerZoneSwitchDelayCantBeNegative => "Opóźnienie przełącznia strefy zasilania nie może być ujemne.";
         public string PowerZoneHeaterUnitMismatch => "Niezgodna jednostka zużycia dla ogrzewacza o identyfikatorze '{0}'.";
@@ -91,7 +91,7 @@
         public string UnknownTemperatureSensorId => "Unknown temperature sensor with id '{0}'.";
         public string CantDeleteSensorAssignedToZone => "Can't delete temperature sensor assigned to zone.";
         public string NameCantBeEmpty => "Name can't be empty.";
-        public string PowerOutputParametersAlreadyAssigned => "Heater with the same power output parameters ({0}/{1}) already exists.";
+        public string PowerOutputParametersAlreadyAssigned => "Heater with the same power output parameters ({0}) already exists.";
         public string PowerZoneIntervalCantBeLessThan1Minute => "Cannot set power zone interval to less than 1 minute.";
         public string PowerZoneSwitchDelayCantBeNegative => "Power zone switch delay cannot be negative.";
         public string PowerZoneHeaterUnitMismatch => "Power unit missmatch for heater of id '{0}' when creating new power zone.";

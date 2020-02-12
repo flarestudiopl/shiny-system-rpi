@@ -4,7 +4,6 @@ using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace HardwareAccess.Devices.PowerOutputs
 {
@@ -15,6 +14,12 @@ namespace HardwareAccess.Devices.PowerOutputs
     public class InvertedPcfOutput : IInvertedPcfOutput
     {
         private readonly static int[] I2C_ADDRESSES = new int[] { 32, 56, 57, 58, 59, 60, 61, 62, 63 };
+
+        public struct OutputDescriptor
+        {
+            public int DeviceId { get; set; }
+            public string OutputName { get; set; }
+        }
 
         private readonly static IDictionary<string, int> OUTPUT_NAME_TO_CHANNEL = new Dictionary<string, int>
         {
@@ -35,41 +40,63 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public string ProtocolName => ProtocolNames.InvertedPcf;
 
-        public ICollection<string> OutputNames => OUTPUT_NAME_TO_CHANNEL.Keys;
+        public object ConfigurationOptions => new { OutputNames = OUTPUT_NAME_TO_CHANNEL.Keys, DeviceIds = GetDeviceIds() };
+
+        public Type OutputDescriptorType => typeof(OutputDescriptor);
 
         public InvertedPcfOutput(II2c i2c)
         {
             _i2c = i2c;
         }
 
-        public async Task<ICollection<int>> GetDeviceIds()
+        public void SetState(object outputDescriptor, bool state)
         {
-            var i2cDevices = await _i2c.GetI2cDevices();
+            var output = CastOutputDescriptorOrThrow(outputDescriptor);
 
-            return i2cDevices.Intersect(I2C_ADDRESSES)
-                             .ToArray();
-        }
+            Logger.DebugWithData("New output state: ", new { output.DeviceId, output.OutputName, state });
 
-        public void SetState(int deviceId, string outputName, bool state)
-        {
-            Logger.DebugWithData("New output state: ", new { deviceId, outputName, state });
-
-            if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(outputName, out var channel))
+            if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(output.OutputName, out var channel))
             {
-                throw new ArgumentException(nameof(outputName));
+                throw new ArgumentException(nameof(output.OutputName));
             }
 
-            SetChannelState(deviceId, channel, state);
+            SetChannelState(output.DeviceId, channel, state);
         }
 
-        public bool GetState(int deviceId, string outputName)
+        public bool GetState(object outputDescriptor)
         {
-            if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(outputName, out var channel))
+            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+
+            if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(output.OutputName, out var channel))
             {
-                throw new ArgumentException(nameof(outputName));
+                throw new ArgumentException(nameof(output.OutputName));
             }
 
-            return GetChannelState(deviceId, channel);
+            return GetChannelState(output.DeviceId, channel);
+        }
+
+        private ICollection<int> GetDeviceIds()
+        {
+            var i2cDevices = _i2c.GetI2cDevices();
+
+            if (i2cDevices.Wait(500))
+            {
+                return i2cDevices.Result
+                                 .Intersect(I2C_ADDRESSES)
+                                 .ToArray();
+            }
+
+            return new int[0];
+        }
+
+        private OutputDescriptor CastOutputDescriptorOrThrow(object outputDescriptor)
+        {
+            if (outputDescriptor is OutputDescriptor)
+            {
+                return (OutputDescriptor)outputDescriptor;
+            }
+
+            throw new ArgumentException("Output descriptor -- protocol mismatch.");
         }
 
         private void SetChannelState(int deviceId, int channel, bool state)
@@ -113,5 +140,6 @@ namespace HardwareAccess.Devices.PowerOutputs
 
             return (_deviceToOutputState[deviceId] & bitToCheck) == bitToCheck;
         }
+
     }
 }

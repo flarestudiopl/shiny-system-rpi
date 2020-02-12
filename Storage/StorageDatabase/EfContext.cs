@@ -91,6 +91,8 @@ namespace Storage.StorageDatabase
             modelBuilder.Entity<DigitalOutput>(x =>
             {
                 x.ToTable(nameof(DigitalOutput));
+
+                x.Property(o => o.OutputDescriptor).IsRequired();
             });
 
             modelBuilder.Entity<Heater>(x =>

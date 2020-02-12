@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Commons.Extensions;
 using Domain;
 using HardwareAccess.Devices;
@@ -9,7 +8,7 @@ namespace HeatingControl.Application.Queries
 {
     public interface INewHeaterOptionsProvider
     {
-        Task<NewHeaterOptionsProviderResult> Provide();
+        NewHeaterOptionsProviderResult Provide();
     }
 
     public class NewHeaterOptionsProviderResult
@@ -20,8 +19,7 @@ namespace HeatingControl.Application.Queries
         public class SupportedOutputProtocol
         {
             public string ProtocolName { get; set; }
-            public ICollection<string> OutputNames { get; set; }
-            public ICollection<int> AvailableDeviceIds { get; set; }
+            public object ConfigurationOptions { get; set; }
         }
     }
 
@@ -34,20 +32,20 @@ namespace HeatingControl.Application.Queries
             _powerOutputProvider = powerOutputProvider;
         }
 
-        public async Task<NewHeaterOptionsProviderResult> Provide()
+        public NewHeaterOptionsProviderResult Provide()
         {
-            var availableHeaterModules = await Task.WhenAll(_powerOutputProvider.GetAvailableProtocolNames()
-                                                                                .Select(async x =>
-                                                                                {
-                                                                                    var powerOutput = _powerOutputProvider.Provide(x);
-                                                                                
-                                                                                    return new NewHeaterOptionsProviderResult.SupportedOutputProtocol
-                                                                                    {
-                                                                                        ProtocolName = x,
-                                                                                        OutputNames = powerOutput.OutputNames,
-                                                                                        AvailableDeviceIds = await powerOutput.GetDeviceIds()
-                                                                                    };
-                                                                                }));
+            var availableHeaterModules = _powerOutputProvider.GetAvailableProtocolNames()
+                                                             .Select(x =>
+                                                             {
+                                                                 var powerOutput = _powerOutputProvider.Provide(x);
+                                                             
+                                                                 return new NewHeaterOptionsProviderResult.SupportedOutputProtocol
+                                                                 {
+                                                                     ProtocolName = x,
+                                                                     ConfigurationOptions = powerOutput.ConfigurationOptions
+                                                                 };
+                                                             })
+                                                             .ToList();
 
             return new NewHeaterOptionsProviderResult
             {

@@ -44,6 +44,7 @@ namespace HeatingApi.DependencyResolution
 
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
+            builder.RegisterType<ModbusTcp>().As<IModbusTcp>().SingleInstance();
             builder.RegisterType<I2c>().As<II2c>().SingleInstance();
 
             // Devices
@@ -57,6 +58,7 @@ namespace HeatingApi.DependencyResolution
             // Devices/PowerOutputs
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
             builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
+            builder.RegisterType<FlowairTBox>().As<IFlowairTBox>().SingleInstance();
         }
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
@@ -67,6 +69,7 @@ namespace HeatingApi.DependencyResolution
 
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
+            builder.RegisterType<ModbusTcp>().As<IModbusTcp>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
 
             // Devices
@@ -80,6 +83,7 @@ namespace HeatingApi.DependencyResolution
             // Devices/PowerOutputs
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
             builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
+            builder.RegisterType<FlowairTBox>().As<IFlowairTBox>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)

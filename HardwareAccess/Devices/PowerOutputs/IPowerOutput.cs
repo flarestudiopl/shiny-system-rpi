@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace HardwareAccess.Devices.PowerOutputs
 {
@@ -7,12 +6,12 @@ namespace HardwareAccess.Devices.PowerOutputs
     {
         string ProtocolName { get; }
 
-        ICollection<string> OutputNames { get; }
+        object ConfigurationOptions { get; }
 
-        Task<ICollection<int>> GetDeviceIds();
+        Type OutputDescriptorType { get; }
 
-        void SetState(int deviceId, string outputName, bool state);
+        void SetState(object outputDescriptor, bool state);
 
-        bool GetState(int deviceId, string outputName);
+        bool GetState(object outputDescriptor);
     }
 }

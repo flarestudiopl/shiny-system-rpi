@@ -18,21 +18,18 @@ namespace HeatingApi.Controllers
         private readonly IOneWire _oneWire;
         private readonly ITemperatureSensor _temperatureSensor;
         private readonly II2c _i2C;
-        private readonly IPowerOutputProvider _powerOutputProvider;
         private readonly IHeatingControl _heatingControl;
         private readonly ICounterAccumulator _counterAccumulator;
 
-        public TestController(IOneWire oneWire, 
-                              ITemperatureSensor temperatureSensor, 
+        public TestController(IOneWire oneWire,
+                              ITemperatureSensor temperatureSensor,
                               II2c i2c,
-                              IPowerOutputProvider powerOutputProvider,
                               IHeatingControl heatingControl,
                               ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
             _temperatureSensor = temperatureSensor;
             _i2C = i2c;
-            _powerOutputProvider = powerOutputProvider;
             _heatingControl = heatingControl;
             _counterAccumulator = counterAccumulator;
         }
@@ -71,12 +68,6 @@ namespace HeatingApi.Controllers
             _i2C.WriteToDevice(device, value);
         }
 
-        [HttpPost("i2c/power")]
-        public void SetPowerOutput(string protocolName, int deviceId, string channel, bool state)
-        {
-            _powerOutputProvider.Provide(protocolName).SetState(deviceId, channel, state);
-        }
-
         [HttpGet("control/temp/{deviceId}")]
         public TemperatureData ControlTemp(string deviceId)
         {
@@ -89,10 +80,10 @@ namespace HeatingApi.Controllers
         public void AccumulateCounter(int heaterId, int value)
         {
             _counterAccumulator.Accumulate(new CounterAccumulatorInput
-                                           {
-                                               HeaterId = heaterId,
-                                              SecondsToAccumulate = value
-                                           });
+            {
+                HeaterId = heaterId,
+                SecondsToAccumulate = value
+            });
         }
     }
 }

@@ -16,6 +16,12 @@ namespace HardwareAccess.Devices.PowerOutputs
     {
         private readonly static HashSet<int> I2C_ADDRESSES = new HashSet<int>(new int[] { 32, 33, 34, 35 });
 
+        public struct OutputDescriptor
+        {
+            public int DeviceId { get; set; }
+            public string OutputName { get; set; }
+        }
+
         private readonly static IDictionary<string, Channel> OUTPUT_NAME_TO_CHANNEL = new Dictionary<string, Channel>
         {
             ["O1"] = Channel.Create(Bank.B, 7),
@@ -43,35 +49,33 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public string ProtocolName => ProtocolNames.ShinyBoard;
 
-        public ICollection<string> OutputNames => OUTPUT_NAME_TO_CHANNEL.Keys;
+        public object ConfigurationOptions => new { OutputNames = OUTPUT_NAME_TO_CHANNEL.Keys, DeviceIds = GetDeviceIds() };
+
+        public Type OutputDescriptorType => typeof(OutputDescriptor);
 
         public ShinyMcpExpander(II2c i2c)
         {
             _i2c = i2c;
         }
 
-        public async Task<ICollection<int>> GetDeviceIds()
+        public void SetState(object outputDescriptor, bool newState)
         {
-            var i2cDevices = await _i2c.GetI2cDevices();
+            var output = CastOutputDescriptorOrThrow(outputDescriptor);
 
-            return i2cDevices.Intersect(I2C_ADDRESSES)
-                             .ToArray();
-        }
+            Logger.DebugWithData("New output state: ", new { output.DeviceId, output.OutputName, newState });
 
-        public void SetState(int deviceId, string outputName, bool newState)
-        {
-            Logger.DebugWithData("New output state: ", new { deviceId, outputName, newState });
-
-            var channel = GetChannel(outputName);
+            var channel = GetChannel(output.OutputName);
 
             lock (_lock)
             {
-                var chipState = GetChipState(deviceId);
+                var chipState = GetChipState(output.DeviceId);
 
                 if (!chipState.InitializedAsOutput)
                 {
-                    _i2c.WriteToDevice(deviceId, 0x00, 0x00);
-                    _i2c.WriteToDevice(deviceId, 0x01, 0x00);
+                    _i2c.WriteToDevice(output.DeviceId, 0x00, 0x00);
+                    _i2c.WriteToDevice(output.DeviceId, 0x01, 0x00);
+
+                    chipState.InitializedAsOutput = true;
                 }
 
                 var bitToFlip = 1 << channel.Pin;
@@ -89,18 +93,44 @@ namespace HardwareAccess.Devices.PowerOutputs
 
                 chipState.BankToValue[channel.Bank] = currentState;
 
-                _i2c.WriteToDevice(deviceId, (byte)channel.Bank, (byte)currentState);
+                _i2c.WriteToDevice(output.DeviceId, (byte)channel.Bank, (byte)currentState);
             }
         }
 
-        public bool GetState(int deviceId, string outputName)
+        public bool GetState(object outputDescriptor)
         {
-            var channel = GetChannel(outputName);
-            var chipState = GetChipState(deviceId);
+            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+
+            var channel = GetChannel(output.OutputName);
+            var chipState = GetChipState(output.DeviceId);
 
             var bitToCheck = 1 << channel.Pin;
 
             return (chipState.BankToValue[channel.Bank] & bitToCheck) == bitToCheck;
+        }
+
+        private ICollection<int> GetDeviceIds()
+        {
+            var i2cDevices = _i2c.GetI2cDevices();
+
+            if (i2cDevices.Wait(500))
+            {
+                return i2cDevices.Result
+                                 .Intersect(I2C_ADDRESSES)
+                                 .ToArray();
+            }
+
+            return new int[0];
+        }
+
+        private OutputDescriptor CastOutputDescriptorOrThrow(object outputDescriptor)
+        {
+            if (outputDescriptor is OutputDescriptor)
+            {
+                return (OutputDescriptor)outputDescriptor;
+            }
+
+            throw new ArgumentException("Output descriptor -- protocol mismatch.");
         }
 
         private Channel GetChannel(string outputName)

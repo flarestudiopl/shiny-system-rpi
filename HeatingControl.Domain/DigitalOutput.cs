@@ -6,8 +6,6 @@
 
         public string ProtocolName { get; set; }
 
-        public int DeviceId { get; set; }
-
-        public string OutputChannel { get; set; }
+        public string OutputDescriptor { get; set; }
     }
 }

@@ -39,14 +39,12 @@ namespace HeatingControl.Application.Commands
 
                 if (existingHeater != null &&
                     (existingHeater.Heater.DigitalOutput.ProtocolName != command.PowerOutputProtocolName ||
-                     existingHeater.Heater.DigitalOutput.DeviceId != command.PowerOutputDeviceId ||
-                     existingHeater.Heater.DigitalOutput.OutputChannel != command.PowerOutputChannel))
+                     existingHeater.Heater.DigitalOutput.OutputDescriptor != command.PowerOutputDescriptor)) // TODO - fix PowerOutputDescriptor comparison
                 {
                     outputToDisable = new DigitalOutput
                     {
                         ProtocolName = existingHeater.Heater.DigitalOutput.ProtocolName,
-                        DeviceId = existingHeater.Heater.DigitalOutput.DeviceId,
-                        OutputChannel = existingHeater.Heater.DigitalOutput.OutputChannel
+                        OutputDescriptor = existingHeater.Heater.DigitalOutput.OutputDescriptor
                     };
                 }
             }
@@ -69,7 +67,7 @@ namespace HeatingControl.Application.Commands
             if (outputToDisable != null)
             {
                 _powerOutputProvider.Provide(outputToDisable.ProtocolName)
-                                    .SetState(outputToDisable.DeviceId, outputToDisable.OutputChannel, false);
+                                    .SetState(outputToDisable.OutputDescriptor, false);
             }
 
             return CommandResult.Empty;
@@ -92,14 +90,13 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.MinimumStateChangeIntervalCantBeNegative);
             }
 
-            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.DeviceId == command.PowerOutputDeviceId &&
-                                                                                                 x.DigitalOutput.OutputChannel == command.PowerOutputChannel &&
+            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.OutputDescriptor == command.PowerOutputDescriptor && // TODO - fix PowerOutputDescriptor comparison
                                                                                                  x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName);
 
             if (heaterWithSameOutput != null &&
                 (!command.HeaterId.HasValue || command.HeaterId.Value != heaterWithSameOutput.HeaterId))
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDeviceId, command.PowerOutputChannel));
+                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDescriptor));
             }
 
             return null;

@@ -107,7 +107,7 @@ namespace HeatingControl.Application.Queries
             {
                 zoneSnapshot.OnOffControl = new DashboardSnapshotProviderOutput.ZoneSnapshot.OnOffControlSnapshot
                                             {
-                                                ScheduleState = zoneState.ScheduleState.HeatingEnabled.Value
+                                                ScheduleState = zoneState.ScheduleState.HeatingEnabled ?? false
                                             };
             }
 

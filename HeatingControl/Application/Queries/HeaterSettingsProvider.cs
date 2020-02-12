@@ -13,9 +13,8 @@ namespace HeatingControl.Application.Queries
     public class HeaterSettings
     {
         public string Name { get; set; }
-        public int PowerOutputDeviceId { get; set; }
-        public string PowerOutputChannel { get; set; }
         public string PowerOutputProtocolName { get; set; }
+        public object PowerOutputDescriptor { get; set; }
         public UsageUnit UsageUnit { get; set; }
         public decimal UsagePerHour { get; set; }
         public int MinimumStateChangeIntervalSeconds { get; set; }
@@ -35,9 +34,8 @@ namespace HeatingControl.Application.Queries
             return new HeaterSettings
             {
                 Name = heater.Heater.Name,
-                PowerOutputDeviceId = heater.Heater.DigitalOutput.DeviceId,
-                PowerOutputChannel = heater.Heater.DigitalOutput.OutputChannel,
                 PowerOutputProtocolName = heater.Heater.DigitalOutput.ProtocolName,
+                PowerOutputDescriptor = heater.Heater.DigitalOutput.OutputDescriptor,
                 UsageUnit = heater.Heater.UsageUnit,
                 UsagePerHour = heater.Heater.UsagePerHour,
                 MinimumStateChangeIntervalSeconds = heater.Heater.MinimumStateChangeIntervalSeconds

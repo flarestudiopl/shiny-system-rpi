@@ -38,7 +38,7 @@ namespace HeatingControl.Application.Loops.Processing
                     StateShouldBeUpdated(heater))
                 {
                     _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
-                                        .SetState(heater.Heater.DigitalOutput.DeviceId, heater.Heater.DigitalOutput.OutputChannel, heater.OutputState);
+                                        .SetState(heater.Heater.DigitalOutput.OutputDescriptor, heater.OutputState);
 
                     _usageCollector.Collect(heater, controllerState);
 
@@ -66,7 +66,7 @@ namespace HeatingControl.Application.Loops.Processing
         private bool StateShouldBeUpdated(HeaterState heater)
         {
             return heater.OutputState != _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
-                                                             .GetState(heater.Heater.DigitalOutput.DeviceId, heater.Heater.DigitalOutput.OutputChannel);
+                                                             .GetState(heater.Heater.DigitalOutput.OutputDescriptor);
         }
     }
 }
