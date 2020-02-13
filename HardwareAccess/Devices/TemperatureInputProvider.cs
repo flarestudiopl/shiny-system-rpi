@@ -52,9 +52,11 @@ namespace HardwareAccess.Devices
     {
         private static readonly IDictionary<string, ITemperatureInput> _availableTemperatureInputs = new Dictionary<string, ITemperatureInput>();
 
-        public TemperatureInputProvider(IDs1820 ds1820)
+        public TemperatureInputProvider(IDs1820 ds1820,
+                                        IFlowairTBox flowairTBox)
         {
             _availableTemperatureInputs.Add(ds1820.ProtocolName, ds1820);
+            _availableTemperatureInputs.Add(flowairTBox.ProtocolName, flowairTBox);
         }
 
         public ICollection<string> GetAvailableProtocolNames()

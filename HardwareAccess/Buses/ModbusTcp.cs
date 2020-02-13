@@ -7,6 +7,7 @@ namespace HardwareAccess.Buses
 {
     public interface IModbusTcp
     {
+        int ReadInputRegister(string ip, int port, int address);
         int ReadHoldingRegister(string ip, int port, int address);
         void WriteHoldingRegister(string ip, int port, int address, int value);
     }
@@ -18,12 +19,43 @@ namespace HardwareAccess.Buses
 
         public int ReadHoldingRegister(string ip, int port, int address)
         {
-            return TryGetConnectedClient(ip, port)?.ReadHoldingRegisters(address, 1)[0] ?? int.MinValue;
+            try
+            {
+                return TryGetConnectedClient(ip, port)?.ReadHoldingRegisters(address, 1)[0] ?? int.MinValue;
+            }
+            catch (Exception exception)
+            {
+                Logger.Error("ModbusTcp read holding register error", exception);
+                RemoveDeadClient(ip, port);
+                return int.MinValue;
+            }
+        }
+
+        public int ReadInputRegister(string ip, int port, int address)
+        {
+            try
+            {
+                return TryGetConnectedClient(ip, port)?.ReadInputRegisters(address, 1)[0] ?? int.MinValue;
+            }
+            catch (Exception exception)
+            {
+                Logger.Error("ModbusTcp read input register error", exception);
+                RemoveDeadClient(ip, port);
+                return int.MinValue;
+            }
         }
 
         public void WriteHoldingRegister(string ip, int port, int address, int value)
         {
-            TryGetConnectedClient(ip, port)?.WriteSingleRegister(address, value);
+            try
+            {
+                TryGetConnectedClient(ip, port)?.WriteSingleRegister(address, value);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error("ModbusTcpwrite holding register error", exception);
+                RemoveDeadClient(ip, port);
+            }
         }
 
         private EasyModbus.ModbusClient TryGetConnectedClient(string ip, int port)
@@ -46,13 +78,27 @@ namespace HardwareAccess.Buses
                         client.Connect();
                     }
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Logger.Error("ModbusTcp connection error", exception);
+                    _modbusClientCache.Remove(modbusDescriptor);
                     return null;
                 }
 
                 return client;
+            }
+        }
+
+        private void RemoveDeadClient(string ip, int port)
+        {
+            lock (_clientLock)
+            {
+                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port);
+
+                if (_modbusClientCache.ContainsKey(modbusDescriptor))
+                {
+                    _modbusClientCache.Remove(modbusDescriptor);
+                }
             }
         }
 
