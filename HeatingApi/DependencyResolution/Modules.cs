@@ -10,6 +10,7 @@ using Storage.StorageDatabase;
 using HeatingControl.Application.DataAccess;
 using HardwareAccess.Devices.PowerOutputs;
 using HardwareAccess.Devices.DigitalInputs;
+using HardwareAccess.Devices.TemperatureInputs;
 
 namespace HeatingApi.DependencyResolution
 {
@@ -50,7 +51,7 @@ namespace HeatingApi.DependencyResolution
             // Devices
             builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
             builder.RegisterType<DigitalInputProvider>().As<IDigitalInputProvider>().SingleInstance();
-            builder.RegisterType<TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+            builder.RegisterType<TemperatureInputProvider>().As<ITemperatureInputProvider>().SingleInstance();
 
             // Devices/DigitalInputs
             builder.RegisterType<ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
@@ -59,6 +60,9 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
             builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
             builder.RegisterType<FlowairTBox>().As<IFlowairTBox>().SingleInstance();
+
+            // Devices/TemperatureInputs
+            builder.RegisterType<Ds1820>().As<IDs1820>().SingleInstance();
         }
 
         private static void RegisterDummyHardwareAccess(ContainerBuilder builder)
@@ -75,7 +79,7 @@ namespace HeatingApi.DependencyResolution
             // Devices
             builder.RegisterType<PowerOutputProvider>().As<IPowerOutputProvider>().SingleInstance();
             builder.RegisterType<DigitalInputProvider>().As<IDigitalInputProvider>().SingleInstance();
-            builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureSensor>().As<ITemperatureSensor>().SingleInstance();
+            builder.RegisterType<TemperatureInputProvider>().As<ITemperatureInputProvider>().SingleInstance();
 
             // Devices/DigitalInputs
             builder.RegisterType<HardwareAccess.Dummy.Devices.DigitalInputs.ShinyPowerState>().As<IShinyPowerState>().SingleInstance();
@@ -84,6 +88,9 @@ namespace HeatingApi.DependencyResolution
             builder.RegisterType<InvertedPcfOutput>().As<IInvertedPcfOutput>().SingleInstance();
             builder.RegisterType<ShinyMcpExpander>().As<IShinyMcpExpander>().SingleInstance();
             builder.RegisterType<FlowairTBox>().As<IFlowairTBox>().SingleInstance();
+
+            // Devices/TemperatureInputs
+            builder.RegisterType<HardwareAccess.Dummy.Devices.TemperatureInputs.Ds1820>().As<IDs1820>().SingleInstance();
         }
 
         private static void RegisterControl(ContainerBuilder builder)

@@ -51,7 +51,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public void SetState(object outputDescriptor, bool state)
         {
-            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+            var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 
             Logger.DebugWithData("New output state: ", new { output.DeviceId, output.OutputName, state });
 
@@ -65,7 +65,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public bool GetState(object outputDescriptor)
         {
-            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+            var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 
             if (!OUTPUT_NAME_TO_CHANNEL.TryGetValue(output.OutputName, out var channel))
             {
@@ -87,16 +87,6 @@ namespace HardwareAccess.Devices.PowerOutputs
             }
 
             return new int[0];
-        }
-
-        private OutputDescriptor CastOutputDescriptorOrThrow(object outputDescriptor)
-        {
-            if (outputDescriptor is OutputDescriptor)
-            {
-                return (OutputDescriptor)outputDescriptor;
-            }
-
-            throw new ArgumentException("Output descriptor -- protocol mismatch.");
         }
 
         private void SetChannelState(int deviceId, int channel, bool state)

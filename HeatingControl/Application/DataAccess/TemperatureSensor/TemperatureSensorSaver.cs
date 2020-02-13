@@ -11,7 +11,8 @@ namespace HeatingControl.Application.DataAccess.TemperatureSensor
     {
         public int? SensorId { get; set; }
         public string Name { get; set; }
-        public string DeviceId { get; set; }
+        public string ProtocolName { get; set; }
+        public string InputDescriptor { get;set;}
     }
 
     public class TemperatureSensorSaver : ITemperatureSensorSaver
@@ -47,7 +48,8 @@ namespace HeatingControl.Application.DataAccess.TemperatureSensor
                 }
 
                 temperatureSensor.Name = input.Name;
-                temperatureSensor.DeviceId = input.DeviceId;
+                temperatureSensor.ProtocolName = input.ProtocolName;
+                temperatureSensor.InputDescriptor = input.InputDescriptor;
 
                 c.SaveChanges();
 

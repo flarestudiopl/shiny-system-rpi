@@ -7,38 +7,36 @@ namespace HeatingControl.Application.Queries
 {
     public interface IConnectedTemperatureSensorsProvider
     {
-        ICollection<ConnectedTemperatureSensor> Provide(Building model);
+        ICollection<AvailableTemperatureInputProtocol> Provide(Building model);
     }
 
-    public class ConnectedTemperatureSensor
+    public class AvailableTemperatureInputProtocol
     {
-        public string DeviceId { get; set; }
-        public string AssignedTemperatureSensorName { get; set; }
+        public string ProtocolName { get; set; }
+        public object ConfigurationOptions { get; set; }
     }
 
     public class ConnectedTemperatureSensorsProvider : IConnectedTemperatureSensorsProvider
     {
-        private readonly ITemperatureSensor _temperatureSensor;
+        private readonly ITemperatureInputProvider _temperatureInputProvider;
 
-        public ConnectedTemperatureSensorsProvider(ITemperatureSensor temperatureSensor)
+        public ConnectedTemperatureSensorsProvider(ITemperatureInputProvider temperatureInputProvider)
         {
-            _temperatureSensor = temperatureSensor;
+            _temperatureInputProvider = temperatureInputProvider;
         }
 
-        public ICollection<ConnectedTemperatureSensor> Provide(Building model)
+        public ICollection<AvailableTemperatureInputProtocol> Provide(Building model)
         {
-            var allTemperatureSensors = _temperatureSensor.GetAvailableSensors();
-
-            return allTemperatureSensors.Select(x =>
+            return _temperatureInputProvider.GetAvailableProtocolNames()
+                                            .Select(x =>
                                                 {
-                                                    var modelSensor = model.TemperatureSensors?.FirstOrDefault(s => s.DeviceId == x);
-
-                                                    return new ConnectedTemperatureSensor
-                                                           {
-                                                               DeviceId = x,
-                                                               AssignedTemperatureSensorName = modelSensor?.Name
-                                                           };
-                                                }).ToList();
+                                                    return new AvailableTemperatureInputProtocol
+                                                    {
+                                                        ProtocolName = x,
+                                                        ConfigurationOptions = _temperatureInputProvider.Provide(x).ConfigurationOptions
+                                                    };
+                                                })
+                                            .ToList();
         }
     }
 }

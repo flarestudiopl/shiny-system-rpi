@@ -71,7 +71,7 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("connectedTemperatureSensors")]
-        public ICollection<ConnectedTemperatureSensor> GetConnectedTemperetureSensors()
+        public ICollection<AvailableTemperatureInputProtocol> GetConnectedTemperetureSensors()
         {
             return _connectedTemperatureSensorsProvider.Provide(_heatingControl.State.Model);
         }

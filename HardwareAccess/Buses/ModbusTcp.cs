@@ -1,4 +1,6 @@
-﻿using Commons.Extensions;
+﻿using Commons;
+using Commons.Extensions;
+using System;
 using System.Collections.Generic;
 
 namespace HardwareAccess.Buses
@@ -16,15 +18,15 @@ namespace HardwareAccess.Buses
 
         public int ReadHoldingRegister(string ip, int port, int address)
         {
-            return GetConnectedClient(ip, port).ReadHoldingRegisters(address, 1)[0];
+            return TryGetConnectedClient(ip, port)?.ReadHoldingRegisters(address, 1)[0] ?? int.MinValue;
         }
 
         public void WriteHoldingRegister(string ip, int port, int address, int value)
         {
-            GetConnectedClient(ip, port).WriteSingleRegister(address, value);
+            TryGetConnectedClient(ip, port)?.WriteSingleRegister(address, value);
         }
 
-        private EasyModbus.ModbusClient GetConnectedClient(string ip, int port)
+        private EasyModbus.ModbusClient TryGetConnectedClient(string ip, int port)
         {
             lock (_clientLock)
             {
@@ -37,9 +39,17 @@ namespace HardwareAccess.Buses
                     _modbusClientCache.Add(modbusDescriptor, client);
                 }
 
-                if (!client.Connected)
+                try
                 {
-                    client.Connect();
+                    if (!client.Connected)
+                    {
+                        client.Connect();
+                    }
+                }
+                catch(Exception exception)
+                {
+                    Logger.Error("ModbusTcp connection error", exception);
+                    return null;
                 }
 
                 return client;

@@ -1,22 +1,21 @@
-﻿using HeatingControl.Models;
+﻿using Commons.Extensions;
+using HeatingControl.Models;
 
 namespace HeatingControl.Application.Loops.Processing
 {
     public interface IZoneTemperatureProvider
     {
-        TemperatureData Provide(int zoneId, ControllerState state);
+        TemperatureSensorState Provide(int zoneId, ControllerState state);
     }
 
     public class ZoneTemperatureProvider : IZoneTemperatureProvider
     {
-        public TemperatureData Provide(int zoneId, ControllerState state)
+        public TemperatureSensorState Provide(int zoneId, ControllerState state)
         {
             var zone = state.ZoneIdToState[zoneId].Zone;
-            var temperatureSensorDeviceId = state.TemperatureSensorIdToDeviceId[zone.TemperatureControlledZone.TemperatureSensorId];
+            var temperatureSensorState = state.TemperatureSensorIdToState.GetValueOrDefault(zone.TemperatureControlledZone.TemperatureSensorId);
 
-            state.TemperatureDeviceIdToTemperatureData.TryGetValue(temperatureSensorDeviceId, out var temperatureData);
-
-            return temperatureData;
+            return temperatureSensorState;
         }
     }
 }

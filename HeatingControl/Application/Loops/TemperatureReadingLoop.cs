@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Commons;
 using Commons.Extensions;
 using Commons.Localization;
 using HardwareAccess.Devices;
+using HardwareAccess.Devices.TemperatureInputs;
 using HeatingControl.Models;
 
 namespace HeatingControl.Application.Loops
@@ -20,14 +20,13 @@ namespace HeatingControl.Application.Loops
     {
         private const int TempAvgQueueLength = 5;
         private const int TempHistoryMinutesModule = 2;
-
         private int _tempHistoryQueueLength = 200; //60 * 24 / TempHistoryMinutesModule;
 
-        private readonly ITemperatureSensor _temperatureSensor;
+        private readonly ITemperatureInputProvider _temperatureInputProvider;
 
-        public TemperatureReadingLoop(ITemperatureSensor temperatureSensor)
+        public TemperatureReadingLoop(ITemperatureInputProvider temperatureInputProvider)
         {
-            _temperatureSensor = temperatureSensor;
+            _temperatureInputProvider = temperatureInputProvider;
         }
 
         public void Start(ControllerState controllerState, CancellationToken cancellationToken)
@@ -40,68 +39,52 @@ namespace HeatingControl.Application.Loops
 
         private void ProcessReads(ControllerState controllerState)
         {
-            var availableDeviceIds = _temperatureSensor.GetAvailableSensors();
-            var lostDeviceIds = new HashSet<string>(controllerState.TemperatureDeviceIdToTemperatureData.Keys);
-
-            foreach (var availableDeviceId in availableDeviceIds)
-            {
-                if (!controllerState.TemperatureDeviceIdToTemperatureData.ContainsKey(availableDeviceId))
-                {
-                    controllerState.TemperatureDeviceIdToTemperatureData.Add(availableDeviceId, new TemperatureData());
-                }
-
-                lostDeviceIds.Remove(availableDeviceId);
-            }
-
-            foreach(var lostDeviceId in lostDeviceIds)
-            {
-                controllerState.TemperatureDeviceIdToTemperatureData.Remove(lostDeviceId);
-            }
-
-            Parallel.ForEach(controllerState.TemperatureDeviceIdToTemperatureData,
-                             zone =>
+            Parallel.ForEach(controllerState.TemperatureSensorIdToState,
+                             sensor =>
                              {
-                                 var sensorRead = _temperatureSensor.Read(zone.Key);
+                                 var sensorRead = _temperatureInputProvider.Provide(sensor.Value.TemperatureSensor.ProtocolName)
+                                                                           .GetValue(sensor.Value.TemperatureSensor.InputDescriptor);
+
                                  sensorRead.Wait();
 
                                  if (sensorRead.Result.CrcOk)
                                  {
-                                     var temperatureData = zone.Value;
+                                     var temperatureSensorState = sensor.Value;
 
-                                     ProcessCurrentRead(temperatureData, sensorRead);
-                                     ProcessHistory(temperatureData);
+                                     ProcessCurrentRead(temperatureSensorState, sensorRead);
+                                     ProcessHistory(temperatureSensorState);
                                  }
                                  else
                                  {
-                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(zone.Key));
+                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(sensor.Key));
                                  }
                              });
         }
 
-        private static void ProcessCurrentRead(TemperatureData temperatureData, Task<TemperatureSensorData> sensorRead)
+        private static void ProcessCurrentRead(TemperatureSensorState temperatureSensorState, Task<TemperatureSensorData> sensorRead)
         {
-            temperatureData.Readouts.Enqueue(sensorRead.Result.Value);
-            temperatureData.AverageTemperature = temperatureData.Readouts.Average(x => x);
-            temperatureData.LastRead = DateTime.UtcNow;
+            temperatureSensorState.Readouts.Enqueue(sensorRead.Result.Value);
+            temperatureSensorState.AverageTemperature = temperatureSensorState.Readouts.Average(x => x);
+            temperatureSensorState.LastRead = DateTime.UtcNow;
 
-            if (temperatureData.Readouts.Count > TempAvgQueueLength)
+            if (temperatureSensorState.Readouts.Count > TempAvgQueueLength)
             {
-                temperatureData.Readouts.Dequeue();
+                temperatureSensorState.Readouts.Dequeue();
             }
         }
 
-        private void ProcessHistory(TemperatureData temperatureData)
+        private void ProcessHistory(TemperatureSensorState temperatureSensorState)
         {
             var now = DateTime.UtcNow;
 
-            if (now.Minute % TempHistoryMinutesModule == 0 && temperatureData.HistoricalReads.LastOrDefault()?.Item1.Minute != now.Minute)
+            if (now.Minute % TempHistoryMinutesModule == 0 && temperatureSensorState.HistoricalReads.LastOrDefault()?.Item1.Minute != now.Minute)
             {
-                temperatureData.HistoricalReads.Enqueue(Tuple.Create(now, Math.Round(temperatureData.AverageTemperature, 1)));
+                temperatureSensorState.HistoricalReads.Enqueue(Tuple.Create(now, Math.Round(temperatureSensorState.AverageTemperature, 1)));
             }
 
-            if (temperatureData.HistoricalReads.Count > _tempHistoryQueueLength)
+            if (temperatureSensorState.HistoricalReads.Count > _tempHistoryQueueLength)
             {
-                temperatureData.HistoricalReads.Dequeue();
+                temperatureSensorState.HistoricalReads.Dequeue();
             }
         }
     }

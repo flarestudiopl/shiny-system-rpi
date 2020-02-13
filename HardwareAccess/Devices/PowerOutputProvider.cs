@@ -13,6 +13,9 @@ namespace HardwareAccess.Devices
 
     public class PowerOutputWrapper
     {
+        private static readonly object _outputDescriptorCacheLock = new object();
+        private static readonly IDictionary<string, object> _outputDescriptorCache = new Dictionary<string, object>();
+
         private readonly IPowerOutput _powerOutput;
 
         public PowerOutputWrapper(IPowerOutput powerOutput)
@@ -26,14 +29,28 @@ namespace HardwareAccess.Devices
 
         public bool GetState(string outputDescriptorJson)
         {
-            var outputDescriptor = Newtonsoft.Json.JsonConvert.DeserializeObject(outputDescriptorJson, OutputDescriptorType);
+            var outputDescriptor = GetOutputDescriptor(outputDescriptorJson);
             return _powerOutput.GetState(outputDescriptor);
         }
 
         public void SetState(string outputDescriptorJson, bool state)
         {
-            var outputDescriptor = Newtonsoft.Json.JsonConvert.DeserializeObject(outputDescriptorJson, OutputDescriptorType);
+            var outputDescriptor = GetOutputDescriptor(outputDescriptorJson);
             _powerOutput.SetState(outputDescriptor, state);
+        }
+
+        private object GetOutputDescriptor(string outputDescriptorJson)
+        {
+            lock (_outputDescriptorCacheLock)
+            {
+                if (!_outputDescriptorCache.TryGetValue(outputDescriptorJson, out var outputDescriptor))
+                {
+                    outputDescriptor = Newtonsoft.Json.JsonConvert.DeserializeObject(outputDescriptorJson, OutputDescriptorType);
+                    _outputDescriptorCache.Add(outputDescriptorJson, outputDescriptor);
+                }
+
+                return outputDescriptor;
+            }
         }
     }
 

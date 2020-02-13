@@ -41,7 +41,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public void SetState(object outputDescriptor, bool state)
         {
-            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+            var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
 
             _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 2 : 1);
@@ -49,21 +49,11 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         public bool GetState(object outputDescriptor)
         {
-            var output = CastOutputDescriptorOrThrow(outputDescriptor);
+            var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
             var registerValue = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, registerAddress);
 
             return registerValue != 1;
-        }
-
-        private OutputDescriptor CastOutputDescriptorOrThrow(object outputDescriptor)
-        {
-            if (outputDescriptor is OutputDescriptor)
-            {
-                return (OutputDescriptor)outputDescriptor;
-            }
-
-            throw new ArgumentException("Output descriptor -- protocol mismatch.");
         }
 
         private int GetOffset(byte driverAddress)

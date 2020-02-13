@@ -23,12 +23,12 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.NameCantBeEmpty);
             }
 
-            if (command.DeviceId.IsNullOrEmpty())
+            if (command.ProtocolName.IsNullOrEmpty())
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.DeviceIdCantBeEmpty);
+                return CommandResult.WithValidationError(Localization.ValidationMessage.ProtocolNameCannotBeEmpty);
             }
 
-            var existingTemperatureSensor = context.ControllerState.Model.TemperatureSensors?.FirstOrDefault(x => x.DeviceId == command.DeviceId);
+            var existingTemperatureSensor = context.ControllerState.Model.TemperatureSensors?.FirstOrDefault(x => x.InputDescriptor == command.InputDescriptor);
 
             if (existingTemperatureSensor != null)
             {
@@ -40,7 +40,7 @@ namespace HeatingControl.Application.Commands
 
             var temperatureSensor = _temperatureSensorSaver.Save(command, context.ControllerState.Model);
 
-            context.ControllerState.TemperatureSensorIdToDeviceId[temperatureSensor.TemperatureSensorId] = temperatureSensor.DeviceId;
+            context.ControllerState.TemperatureSensorIdToState.Add(temperatureSensor.TemperatureSensorId, new Models.TemperatureSensorState { TemperatureSensor = temperatureSensor });
 
             return CommandResult.Empty;
         }

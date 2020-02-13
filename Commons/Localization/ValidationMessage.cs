@@ -25,7 +25,7 @@
         string PowerZoneHeaterUnitMismatch { get; }
         string HeaterAlreadyInUseByAnotherPowerZone { get; }
         string PowerZoneTotalLimitLessThanTopHeaterUsage { get; }
-        string DeviceIdCantBeEmpty { get; }
+        string ProtocolNameCannotBeEmpty { get; }
         string DeviceIdAlreadyInUse { get; }
         string HeaterAlreadyInUseByAnotherZone { get; }
         string UsageCantBeNegative { get; }
@@ -61,7 +61,7 @@
         public string PowerZoneHeaterUnitMismatch => "Niezgodna jednostka zużycia dla ogrzewacza o identyfikatorze '{0}'.";
         public string HeaterAlreadyInUseByAnotherPowerZone => "Ogrzewacz o identyfikatorze '{0}' jest już przypisany do innej strefy zasilania.";
         public string PowerZoneTotalLimitLessThanTopHeaterUsage => "Nie można dodać strefy zasilania z limitem mniejszym niż największe zużycie spośród wybranych ogrzewaczy.";
-        public string DeviceIdCantBeEmpty => "Identyfikator urządzenia nie może być pusty.";
+        public string ProtocolNameCannotBeEmpty => "Nazwa protokołu nie może być pusta.";
         public string DeviceIdAlreadyInUse => "Identyfikator urządzenia jest już w użyciu.";
         public string HeaterAlreadyInUseByAnotherZone => "Ogrzewacz o identyfikatorze '{0}' jest już przypisany do innej strefy.";
         public string UsageCantBeNegative => "Zużycie nie może być ujemne.";
@@ -97,7 +97,7 @@
         public string PowerZoneHeaterUnitMismatch => "Power unit missmatch for heater of id '{0}' when creating new power zone.";
         public string HeaterAlreadyInUseByAnotherPowerZone => "Heater of id '{0}' is already in use by another power zone.";
         public string PowerZoneTotalLimitLessThanTopHeaterUsage => "Cannot add power zone with total limit less than highest usage from heaters.";
-        public string DeviceIdCantBeEmpty => "Device id can't be empty.";
+        public string ProtocolNameCannotBeEmpty => "Protocol name can't be empty.";
         public string DeviceIdAlreadyInUse => "Device id already in use.";
         public string HeaterAlreadyInUseByAnotherZone => "Heater of id '{0}' is already in use by another zone.";
         public string UsageCantBeNegative => "Usage can't be negative.";

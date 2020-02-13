@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using HardwareAccess.Buses;
-using HardwareAccess.Devices;
 using HeatingControl.Models;
 using HeatingControl.Application.DataAccess.Counter;
 using HeatingApi.Attributes;
 using Domain;
+using HardwareAccess.Devices.TemperatureInputs;
 
 namespace HeatingApi.Controllers
 {
@@ -16,19 +16,19 @@ namespace HeatingApi.Controllers
     public class TestController : Controller
     {
         private readonly IOneWire _oneWire;
-        private readonly ITemperatureSensor _temperatureSensor;
+        private readonly IDs1820 _ds1820;
         private readonly II2c _i2C;
         private readonly IHeatingControl _heatingControl;
         private readonly ICounterAccumulator _counterAccumulator;
 
         public TestController(IOneWire oneWire,
-                              ITemperatureSensor temperatureSensor,
+                              IDs1820 ds1820,
                               II2c i2c,
                               IHeatingControl heatingControl,
                               ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
-            _temperatureSensor = temperatureSensor;
+            _ds1820 = ds1820;
             _i2C = i2c;
             _heatingControl = heatingControl;
             _counterAccumulator = counterAccumulator;
@@ -53,7 +53,7 @@ namespace HeatingApi.Controllers
         [HttpGet("1w/{deviceId}/temp")]
         public async Task<TemperatureSensorData> Temperature(string deviceId)
         {
-            return await _temperatureSensor.Read(deviceId);
+            return await _ds1820.GetValue(new Ds1820.InputDescriptor { DeviceId = deviceId });
         }
 
         [HttpGet("i2c/devices")]
@@ -68,10 +68,10 @@ namespace HeatingApi.Controllers
             _i2C.WriteToDevice(device, value);
         }
 
-        [HttpGet("control/temp/{deviceId}")]
-        public TemperatureData ControlTemp(string deviceId)
+        [HttpGet("control/temp/{sensorId}")]
+        public TemperatureSensorState ControlTemp(int sensorId)
         {
-            _heatingControl.State.TemperatureDeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
+            _heatingControl.State.TemperatureSensorIdToState.TryGetValue(sensorId, out var tempData);
 
             return tempData;
         }
