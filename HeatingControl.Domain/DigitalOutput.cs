@@ -1,4 +1,6 @@
-﻿namespace Domain
+﻿using System;
+
+namespace Domain
 {
     public class DigitalOutput
     {
@@ -6,8 +8,9 @@
 
         public string ProtocolName { get; set; }
 
-        public int DeviceId { get; set; }
+        public string OutputDescriptor { get; set; }
 
-        public string OutputChannel { get; set; }
+        [Obsolete]
+        public int DeviceId { get; set; }
     }
 }

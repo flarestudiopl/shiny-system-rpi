@@ -1,11 +1,11 @@
 using HardwareAccess.Buses;
-using HardwareAccess.Devices;
+using HardwareAccess.Devices.TemperatureInputs;
 using NSubstitute;
 using Xunit;
 
-namespace HardwareAccess.Tests.Devices
+namespace HardwareAccess.Tests.Devices.TemperatureInputs
 {
-    public class TemperatureSensorTests
+    public class Ds1820Tests
     {
         private static TemperatureSensorData Act(string rawData)
         {
@@ -14,8 +14,8 @@ namespace HardwareAccess.Tests.Devices
             var oneWire = Substitute.For<IOneWire>();
             oneWire.GetDeviceData(null).ReturnsForAnyArgs(rawData);
 
-            var temperatureSensor = new TemperatureSensor(oneWire);
-            var result = temperatureSensor.Read(deviceId);
+            var temperatureSensor = new Ds1820(oneWire);
+            var result = temperatureSensor.GetValue(new Ds1820.InputDescriptor { DeviceId = deviceId });
 
             result.Wait();
             return result.Result;

@@ -100,14 +100,14 @@ namespace HeatingControl.Application.Queries
                                                       HighSetPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint,
                                                       LowSetPoint = zoneState.Zone.TemperatureControlledZone.LowSetPoint,
                                                       Temperature = _zoneTemperatureProvider.Provide(zoneState.Zone.ZoneId, state)?.AverageTemperature,
-                                                      ScheduleSetPoint = zoneState.ScheduleState.DesiredTemperature.Value
+                                                      ScheduleSetPoint = zoneState.ScheduleState.DesiredTemperature ?? 0
                                                   };
             }
             else
             {
                 zoneSnapshot.OnOffControl = new DashboardSnapshotProviderOutput.ZoneSnapshot.OnOffControlSnapshot
                                             {
-                                                ScheduleState = zoneState.ScheduleState.HeatingEnabled.Value
+                                                ScheduleState = zoneState.ScheduleState.HeatingEnabled ?? false
                                             };
             }
 

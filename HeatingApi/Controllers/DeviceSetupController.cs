@@ -71,7 +71,7 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("connectedTemperatureSensors")]
-        public ICollection<ConnectedTemperatureSensor> GetConnectedTemperetureSensors()
+        public ICollection<AvailableTemperatureInputProtocol> GetConnectedTemperetureSensors()
         {
             return _connectedTemperatureSensorsProvider.Provide(_heatingControl.State.Model);
         }
@@ -99,9 +99,9 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("heater/new")]
-        public async Task<NewHeaterOptionsProviderResult> GetNewHeaterOptions()
+        public NewHeaterOptionsProviderResult GetNewHeaterOptions()
         {
-            return await _newHeaterOptionsProvider.Provide();
+            return _newHeaterOptionsProvider.Provide();
         }
 
         [HttpGet("heater/{heaterId}")]

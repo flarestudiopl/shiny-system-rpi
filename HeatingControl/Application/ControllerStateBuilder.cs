@@ -32,7 +32,7 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredHeaters(Building buildingModel, ControllerState state)
         {
-            if(buildingModel.Heaters == null)
+            if (buildingModel.Heaters == null)
             {
                 return;
             }
@@ -62,7 +62,7 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredSensors(Building buildingModel, ControllerState state)
         {
-            if(buildingModel.TemperatureSensors == null)
+            if (buildingModel.TemperatureSensors == null)
             {
                 return;
             }
@@ -76,13 +76,17 @@ namespace HeatingControl.Application
                     continue;
                 }
 
-                state.TemperatureSensorIdToDeviceId.Add(sensor.TemperatureSensorId, sensor.DeviceId);
+                state.TemperatureSensorIdToState.Add(sensor.TemperatureSensorId,
+                                                     new TemperatureSensorState
+                                                     {
+                                                         TemperatureSensor = sensor
+                                                     });
             }
         }
 
         private void MapConfiguredZones(Building buildingModel, ControllerState state)
         {
-            if(buildingModel.Zones == null)
+            if (buildingModel.Zones == null)
             {
                 return;
             }
@@ -108,7 +112,7 @@ namespace HeatingControl.Application
 
         private static void MapConfiguredPowerZones(Building buildingModel, ControllerState state)
         {
-            if(buildingModel.PowerZones == null)
+            if (buildingModel.PowerZones == null)
             {
                 return;
             }

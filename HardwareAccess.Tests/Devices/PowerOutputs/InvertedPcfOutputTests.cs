@@ -7,6 +7,8 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
 {
     public class InvertedPcfOutputTests
     {
+        private object BuildOutputDescriptor(int deviceId, string outputName) => new InvertedPcfOutput.OutputDescriptor {  DeviceId = deviceId, OutputName = outputName};
+
         [Fact]
         public void can_enable_disable_specific_bit()
         {
@@ -20,10 +22,10 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new InvertedPcfOutput(i2c);
 
             // Act
-            powerOutput.SetState(1, "O1", true);  // 1111 1110
-            powerOutput.SetState(1, "O3", true);  // 1111 1010
-            powerOutput.SetState(1, "O6", true);  // 1101 1010
-            powerOutput.SetState(1, "O3", false); // 1101 1110 => 222
+            powerOutput.SetState(BuildOutputDescriptor(1, "O1"), true);  // 1111 1110
+            powerOutput.SetState(BuildOutputDescriptor(1, "O3"), true);  // 1111 1010
+            powerOutput.SetState(BuildOutputDescriptor(1, "O6"), true);  // 1101 1010
+            powerOutput.SetState(BuildOutputDescriptor(1, "O3"), false); // 1101 1110 => 222
 
             // Assert
             Assert.Equal(222, deviceState);
@@ -36,7 +38,7 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new InvertedPcfOutput(null);
 
             // Act
-            var state = powerOutput.GetState(1, "O1");
+            var state = powerOutput.GetState(BuildOutputDescriptor(1, "O1"));
 
             // Assert
             Assert.Equal(false, state);
@@ -55,13 +57,13 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new InvertedPcfOutput(i2c);
 
             // Act
-            powerOutput.SetState(1, "O3", true);  // 0000 0100
+            powerOutput.SetState(BuildOutputDescriptor(1, "O3"), true);  // 0000 0100
 
             // Assert
-            Assert.Equal(false, powerOutput.GetState(1, "O1"));
-            Assert.Equal(false, powerOutput.GetState(1, "O2"));
-            Assert.Equal(true, powerOutput.GetState(1, "O3"));
-            Assert.Equal(false, powerOutput.GetState(1, "O4"));
+            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(1, "O1")));
+            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(1, "O2")));
+            Assert.Equal(true, powerOutput.GetState(BuildOutputDescriptor(1, "O3")));
+            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(1, "O4")));
         }
     }
 }

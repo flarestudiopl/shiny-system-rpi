@@ -30,7 +30,7 @@
         public string SkippingPowerZoneWithoutName => "Pomijam strefę zasilania bez nazwy.";
         public string TemperatureValueTooOld => "Odczyt temperatury strefy '{0}' jest przedawniony. Proaktywne odłączenie zasilania.";
         public string NoTemperatureData => "Brak danych z czujnika '{0}' w strefie '{1}'. Proaktywne odłączenie zasilania.";
-        public string LoopFailed => "Awaria pętli '{0}'! Ponowna próba za {0} sekund.";
+        public string LoopFailed => "Awaria pętli '{0}'! Ponowna próba za {1} sekund.";
         public string SensorCrcError => "Błąd CRC czujnika '{0}'. Pomijam odczyt.";
         public string PowerOffRequested => "Rozpoczęto procedurę wyłączania sterownika...";
         public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Ogrzewacz '{0}' został odłączony od strefy zasilania z powodu zmiany jednostki zużycia.";
@@ -48,7 +48,7 @@
         public string SkippingPowerZoneWithoutName => "Skipping power zone without name.";
         public string TemperatureValueTooOld => "Temperature value for zone '{0}' is too old. Proactive power cutoff.";
         public string NoTemperatureData => "No temperature data for sensor '{0}' in zone '{1}'. Proactive power cutoff.";
-        public string LoopFailed => "{0} loop failed! Retrying in {0} seconds.";
+        public string LoopFailed => "{0} loop failed! Retrying in {1} seconds.";
         public string SensorCrcError => "Sensor '{0}' CRC error. Skipping readout.";
         public string PowerOffRequested => "Shutdown sequence started...";
         public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Heater '{0}' was removed from power zone due to usage unit change.";

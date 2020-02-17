@@ -34,7 +34,7 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.CantDeleteSensorAssignedToZone);
             }
 
-            context.ControllerState.TemperatureSensorIdToDeviceId.Remove(command.SensorId);
+            context.ControllerState.TemperatureSensorIdToState.Remove(command.SensorId);
 
             _temperatureSensorRepository.Delete(temperatureSensor, context.ControllerState.Model);
 

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.StorageDatabase;
 
 namespace Storage.Migrations
 {
     [DbContext(typeof(EfContext))]
-    partial class EfContextModelSnapshot : ModelSnapshot
+    [Migration("20200212154935_OutputDescriptor")]
+    partial class OutputDescriptor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,8 +141,6 @@ namespace Storage.Migrations
                     b.Property<int>("DigitalOutputId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("DeviceId");
-
                     b.Property<string>("OutputDescriptor");
 
                     b.Property<string>("ProtocolName");
@@ -262,13 +262,10 @@ namespace Storage.Migrations
 
                     b.Property<int>("BuildingId");
 
-                    b.Property<string>("InputDescriptor")
+                    b.Property<string>("DeviceId")
                         .IsRequired();
 
                     b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<string>("ProtocolName")
                         .IsRequired();
 
                     b.HasKey("TemperatureSensorId");

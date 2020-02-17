@@ -39,14 +39,12 @@ namespace HeatingControl.Application.Commands
 
                 if (existingHeater != null &&
                     (existingHeater.Heater.DigitalOutput.ProtocolName != command.PowerOutputProtocolName ||
-                     existingHeater.Heater.DigitalOutput.DeviceId != command.PowerOutputDeviceId ||
-                     existingHeater.Heater.DigitalOutput.OutputChannel != command.PowerOutputChannel))
+                     DescriptorsEqual(existingHeater.Heater.DigitalOutput.OutputDescriptor, command.PowerOutputDescriptor)))
                 {
                     outputToDisable = new DigitalOutput
                     {
                         ProtocolName = existingHeater.Heater.DigitalOutput.ProtocolName,
-                        DeviceId = existingHeater.Heater.DigitalOutput.DeviceId,
-                        OutputChannel = existingHeater.Heater.DigitalOutput.OutputChannel
+                        OutputDescriptor = existingHeater.Heater.DigitalOutput.OutputDescriptor
                     };
                 }
             }
@@ -69,7 +67,7 @@ namespace HeatingControl.Application.Commands
             if (outputToDisable != null)
             {
                 _powerOutputProvider.Provide(outputToDisable.ProtocolName)
-                                    .SetState(outputToDisable.DeviceId, outputToDisable.OutputChannel, false);
+                                    .SetState(outputToDisable.OutputDescriptor, false);
             }
 
             return CommandResult.Empty;
@@ -92,17 +90,25 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.MinimumStateChangeIntervalCantBeNegative);
             }
 
-            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.DeviceId == command.PowerOutputDeviceId &&
-                                                                                                 x.DigitalOutput.OutputChannel == command.PowerOutputChannel &&
-                                                                                                 x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName);
+            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName &&
+                                                                                                 DescriptorsEqual(x.DigitalOutput.OutputDescriptor, command.PowerOutputDescriptor));
 
             if (heaterWithSameOutput != null &&
                 (!command.HeaterId.HasValue || command.HeaterId.Value != heaterWithSameOutput.HeaterId))
             {
-                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDeviceId, command.PowerOutputChannel));
+                return CommandResult.WithValidationError(Localization.ValidationMessage.PowerOutputParametersAlreadyAssigned.FormatWith(command.PowerOutputDescriptor));
             }
 
             return null;
+        }
+
+        private static bool DescriptorsEqual(string serializedDescriptor, object jObject)
+        {
+            var descriptor = (Newtonsoft.Json.Linq.JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(serializedDescriptor);
+
+            var check = Newtonsoft.Json.Linq.JObject.DeepEquals(descriptor, (Newtonsoft.Json.Linq.JObject)jObject);
+
+            return check;
         }
     }
 }

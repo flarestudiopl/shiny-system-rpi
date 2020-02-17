@@ -11,7 +11,8 @@ namespace HeatingControl.Application.Queries
     public class TemperatureSensorSettings
     {
         public string Name { get; set; }
-        public string DeviceId { get; set; }
+        public string ProtocolName { get; set; }
+        public string InputDescriptor { get; set; }
     }
 
     public class TemperatureSensorSettingsProvider : ITemperatureSensorSettingsProvider
@@ -28,7 +29,8 @@ namespace HeatingControl.Application.Queries
             return new TemperatureSensorSettings
             {
                 Name = temperatureSensor.Name,
-                DeviceId = temperatureSensor.DeviceId
+                ProtocolName = temperatureSensor.ProtocolName,
+                InputDescriptor = temperatureSensor.InputDescriptor
             };
         }
     }

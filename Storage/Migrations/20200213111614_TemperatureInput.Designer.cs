@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.StorageDatabase;
 
 namespace Storage.Migrations
 {
     [DbContext(typeof(EfContext))]
-    partial class EfContextModelSnapshot : ModelSnapshot
+    [Migration("20200213111614_TemperatureInput")]
+    partial class TemperatureInput
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,8 +140,6 @@ namespace Storage.Migrations
                 {
                     b.Property<int>("DigitalOutputId")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DeviceId");
 
                     b.Property<string>("OutputDescriptor");
 

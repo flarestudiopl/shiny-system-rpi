@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using HardwareAccess.Buses;
-using HardwareAccess.Devices;
 using HeatingControl.Models;
 using HeatingControl.Application.DataAccess.Counter;
 using HeatingApi.Attributes;
 using Domain;
+using HardwareAccess.Devices.TemperatureInputs;
 
 namespace HeatingApi.Controllers
 {
@@ -16,23 +16,20 @@ namespace HeatingApi.Controllers
     public class TestController : Controller
     {
         private readonly IOneWire _oneWire;
-        private readonly ITemperatureSensor _temperatureSensor;
+        private readonly IDs1820 _ds1820;
         private readonly II2c _i2C;
-        private readonly IPowerOutputProvider _powerOutputProvider;
         private readonly IHeatingControl _heatingControl;
         private readonly ICounterAccumulator _counterAccumulator;
 
-        public TestController(IOneWire oneWire, 
-                              ITemperatureSensor temperatureSensor, 
+        public TestController(IOneWire oneWire,
+                              IDs1820 ds1820,
                               II2c i2c,
-                              IPowerOutputProvider powerOutputProvider,
                               IHeatingControl heatingControl,
                               ICounterAccumulator counterAccumulator)
         {
             _oneWire = oneWire;
-            _temperatureSensor = temperatureSensor;
+            _ds1820 = ds1820;
             _i2C = i2c;
-            _powerOutputProvider = powerOutputProvider;
             _heatingControl = heatingControl;
             _counterAccumulator = counterAccumulator;
         }
@@ -56,7 +53,7 @@ namespace HeatingApi.Controllers
         [HttpGet("1w/{deviceId}/temp")]
         public async Task<TemperatureSensorData> Temperature(string deviceId)
         {
-            return await _temperatureSensor.Read(deviceId);
+            return await _ds1820.GetValue(new Ds1820.InputDescriptor { DeviceId = deviceId });
         }
 
         [HttpGet("i2c/devices")]
@@ -71,16 +68,10 @@ namespace HeatingApi.Controllers
             _i2C.WriteToDevice(device, value);
         }
 
-        [HttpPost("i2c/power")]
-        public void SetPowerOutput(string protocolName, int deviceId, string channel, bool state)
+        [HttpGet("control/temp/{sensorId}")]
+        public TemperatureSensorState ControlTemp(int sensorId)
         {
-            _powerOutputProvider.Provide(protocolName).SetState(deviceId, channel, state);
-        }
-
-        [HttpGet("control/temp/{deviceId}")]
-        public TemperatureData ControlTemp(string deviceId)
-        {
-            _heatingControl.State.TemperatureDeviceIdToTemperatureData.TryGetValue(deviceId, out TemperatureData tempData);
+            _heatingControl.State.TemperatureSensorIdToState.TryGetValue(sensorId, out var tempData);
 
             return tempData;
         }
@@ -89,10 +80,10 @@ namespace HeatingApi.Controllers
         public void AccumulateCounter(int heaterId, int value)
         {
             _counterAccumulator.Accumulate(new CounterAccumulatorInput
-                                           {
-                                               HeaterId = heaterId,
-                                              SecondsToAccumulate = value
-                                           });
+            {
+                HeaterId = heaterId,
+                SecondsToAccumulate = value
+            });
         }
     }
 }

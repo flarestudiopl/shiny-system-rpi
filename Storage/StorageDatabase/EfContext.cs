@@ -137,7 +137,8 @@ namespace Storage.StorageDatabase
                 x.ToTable(nameof(TemperatureSensor));
 
                 x.Property(ts => ts.Name).IsRequired();
-                x.Property(ts => ts.DeviceId).IsRequired();
+                x.Property(ts => ts.ProtocolName).IsRequired();
+                x.Property(ts => ts.InputDescriptor).IsRequired().ValueGeneratedNever();
 
                 x.HasOne<Building>().WithMany(b => b.TemperatureSensors).HasForeignKey(ts => ts.BuildingId);
                 x.HasMany(ts => ts.TemperatureControlledZones).WithOne(tcz => tcz.TemperatureSensor).HasForeignKey(tcz => tcz.TemperatureSensorId);
