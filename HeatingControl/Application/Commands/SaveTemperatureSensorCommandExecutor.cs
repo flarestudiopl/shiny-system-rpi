@@ -28,7 +28,8 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.ProtocolNameCannotBeEmpty);
             }
 
-            var existingTemperatureSensor = context.ControllerState.Model.TemperatureSensors?.FirstOrDefault(x => x.InputDescriptor == command.InputDescriptor);
+            var existingTemperatureSensor = context.ControllerState.Model.TemperatureSensors?.FirstOrDefault(x => x.ProtocolName == command.ProtocolName &&
+                                                                                                                  DescriptorsEqual(x.InputDescriptor, command.InputDescriptor));
 
             if (existingTemperatureSensor != null)
             {
@@ -40,9 +41,25 @@ namespace HeatingControl.Application.Commands
 
             var temperatureSensor = _temperatureSensorSaver.Save(command, context.ControllerState.Model);
 
-            context.ControllerState.TemperatureSensorIdToState.Add(temperatureSensor.TemperatureSensorId, new Models.TemperatureSensorState { TemperatureSensor = temperatureSensor });
+            if (context.ControllerState.TemperatureSensorIdToState.ContainsKey(temperatureSensor.TemperatureSensorId))
+            {
+                context.ControllerState.TemperatureSensorIdToState[temperatureSensor.TemperatureSensorId].TemperatureSensor = temperatureSensor;
+            }
+            else
+            {
+                context.ControllerState.TemperatureSensorIdToState.Add(temperatureSensor.TemperatureSensorId, new Models.TemperatureSensorState { TemperatureSensor = temperatureSensor });
+            }
 
             return CommandResult.Empty;
+        }
+
+        private static bool DescriptorsEqual(string serializedDescriptor, object jObject)
+        {
+            var descriptor = (Newtonsoft.Json.Linq.JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(serializedDescriptor);
+
+            var check = Newtonsoft.Json.Linq.JObject.DeepEquals(descriptor, (Newtonsoft.Json.Linq.JObject)jObject);
+
+            return check;
         }
     }
 }

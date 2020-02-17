@@ -81,6 +81,7 @@ namespace HardwareAccess.Buses
                 catch (Exception exception)
                 {
                     Logger.Error("ModbusTcp connection error", exception);
+                    client.Disconnect();
                     _modbusClientCache.Remove(modbusDescriptor);
                     return null;
                 }
@@ -97,6 +98,7 @@ namespace HardwareAccess.Buses
 
                 if (_modbusClientCache.ContainsKey(modbusDescriptor))
                 {
+                    _modbusClientCache[modbusDescriptor].Disconnect();
                     _modbusClientCache.Remove(modbusDescriptor);
                 }
             }

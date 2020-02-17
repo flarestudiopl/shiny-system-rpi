@@ -39,7 +39,7 @@ namespace HeatingControl.Application.Commands
 
                 if (existingHeater != null &&
                     (existingHeater.Heater.DigitalOutput.ProtocolName != command.PowerOutputProtocolName ||
-                     existingHeater.Heater.DigitalOutput.OutputDescriptor != command.PowerOutputDescriptor)) // TODO - fix PowerOutputDescriptor comparison
+                     DescriptorsEqual(existingHeater.Heater.DigitalOutput.OutputDescriptor, command.PowerOutputDescriptor)))
                 {
                     outputToDisable = new DigitalOutput
                     {
@@ -90,8 +90,8 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.MinimumStateChangeIntervalCantBeNegative);
             }
 
-            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.OutputDescriptor == command.PowerOutputDescriptor && // TODO - fix PowerOutputDescriptor comparison
-                                                                                                 x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName);
+            var heaterWithSameOutput = context.ControllerState.Model.Heaters.FirstOrDefault(x => x.DigitalOutput.ProtocolName == command.PowerOutputProtocolName &&
+                                                                                                 DescriptorsEqual(x.DigitalOutput.OutputDescriptor, command.PowerOutputDescriptor));
 
             if (heaterWithSameOutput != null &&
                 (!command.HeaterId.HasValue || command.HeaterId.Value != heaterWithSameOutput.HeaterId))
@@ -100,6 +100,15 @@ namespace HeatingControl.Application.Commands
             }
 
             return null;
+        }
+
+        private static bool DescriptorsEqual(string serializedDescriptor, object jObject)
+        {
+            var descriptor = (Newtonsoft.Json.Linq.JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(serializedDescriptor);
+
+            var check = Newtonsoft.Json.Linq.JObject.DeepEquals(descriptor, (Newtonsoft.Json.Linq.JObject)jObject);
+
+            return check;
         }
     }
 }

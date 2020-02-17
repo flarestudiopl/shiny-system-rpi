@@ -15,8 +15,8 @@ namespace HeatingControl.Application.DataAccess.Heater
     {
         public int? HeaterId { get; set; }
         public string Name { get; set; }
-        public object PowerOutputDescriptor { get; set; }
         public string PowerOutputProtocolName { get; set; }
+        public object PowerOutputDescriptor { get; set; }
         public UsageUnit UsageUnit { get; set; }
         public decimal UsagePerHour { get; set; }
         public int MinimumStateChangeIntervalSeconds { get; set; }
@@ -66,8 +66,9 @@ namespace HeatingControl.Application.DataAccess.Heater
                 heater.UsageUnit = input.UsageUnit;
                 heater.UsagePerHour = input.UsagePerHour;
                 heater.MinimumStateChangeIntervalSeconds = input.MinimumStateChangeIntervalSeconds;
-                heater.DigitalOutput.OutputDescriptor = Newtonsoft.Json.JsonConvert.SerializeObject(input.PowerOutputDescriptor);
                 heater.DigitalOutput.ProtocolName = input.PowerOutputProtocolName;
+                heater.DigitalOutput.OutputDescriptor = Newtonsoft.Json.JsonConvert.SerializeObject(input.PowerOutputDescriptor);
+                heater.DigitalOutput.DeviceId = -1;
 
                 c.SaveChanges();
 

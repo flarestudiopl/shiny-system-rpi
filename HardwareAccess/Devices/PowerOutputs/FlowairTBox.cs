@@ -28,7 +28,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         private readonly IModbusTcp _modbusTcp;
 
-        public string ProtocolName => ProtocolNames.FlowairTBox;
+        public string ProtocolName => ProtocolNames.FlowairTBoxR;
 
         public object ConfigurationOptions => new { Drivers = DRIVER_ADDRESS_TO_REGISTER_OFFSET.Keys };
 
@@ -44,7 +44,7 @@ namespace HardwareAccess.Devices.PowerOutputs
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
 
-            _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 2 : 1);
+            _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 4 : 1);
         }
 
         public bool GetState(object outputDescriptor)

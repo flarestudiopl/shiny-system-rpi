@@ -12,7 +12,7 @@ namespace HardwareAccess.Dummy.Devices.TemperatureInputs
 
         public string ProtocolName => ProtocolNames.Ds1820;
 
-        public object ConfigurationOptions => new List<string> { "10-0008019e9d54", "28-000005964edc", "28-000005964aaa", "28-000005964bbb", "28-000005964ccc" };
+        public object ConfigurationOptions => new { AvailableSensors = new  List<string> { "10-0008019e9d54", "28-000005964edc", "28-000005964aaa", "28-000005964bbb", "28-000005964ccc" } };
 
         public Type InputDescriptorType => typeof(HardwareAccess.Devices.TemperatureInputs.Ds1820.InputDescriptor);
 

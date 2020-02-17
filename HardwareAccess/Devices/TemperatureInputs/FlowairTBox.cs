@@ -30,7 +30,7 @@ namespace HardwareAccess.Devices.TemperatureInputs
 
         private readonly IModbusTcp _modbusTcp;
 
-        public string ProtocolName => ProtocolNames.FlowairTBox;
+        public string ProtocolName => ProtocolNames.FlowairTBoxR;
 
         public object ConfigurationOptions => new { Drivers = DRIVER_ADDRESS_TO_REGISTER_OFFSET.Keys };
 
