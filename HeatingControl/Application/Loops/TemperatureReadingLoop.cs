@@ -56,7 +56,7 @@ namespace HeatingControl.Application.Loops
                                  }
                                  else
                                  {
-                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(sensor.Key));
+                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(sensor.Value.TemperatureSensor.Name));
                                  }
                              });
         }

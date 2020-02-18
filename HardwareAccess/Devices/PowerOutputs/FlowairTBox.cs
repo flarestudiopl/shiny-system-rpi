@@ -16,6 +16,9 @@ namespace HardwareAccess.Devices.PowerOutputs
             public byte DriverAddress { get; set; }
         }
 
+        private const int BMS_MODE_ADDRESS = 0x04;
+        private const int BMS_WM_RAW = 0x0001;
+
         private const int WORK_MODE_ADDRESS = 0x04;
 
         private readonly static IDictionary<byte, int> DRIVER_ADDRESS_TO_REGISTER_OFFSET = new Dictionary<byte, int>
@@ -42,9 +45,16 @@ namespace HardwareAccess.Devices.PowerOutputs
         public void SetState(object outputDescriptor, bool state)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
+            var bmsState = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS);
+
+            if(bmsState != BMS_WM_RAW)
+            {
+                _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS, BMS_WM_RAW);
+            }
+
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
 
-            _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 4 : 1);
+            _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 2 : 1);
         }
 
         public bool GetState(object outputDescriptor)
