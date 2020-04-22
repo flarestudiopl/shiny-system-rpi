@@ -10,6 +10,7 @@ namespace Storage.StorageDatabase
     public class EfContext : DbContext
     {
         private readonly string _connectionString;
+        private readonly bool _persistOnSave;
 
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Counter> Counters { get; set; }
@@ -27,9 +28,10 @@ namespace Storage.StorageDatabase
             _connectionString = "Filename=test.db";
         }
 
-        public EfContext(string connectionString)
+        public EfContext(string connectionString, bool persistOnSave)
         {
             _connectionString = connectionString;
+            _persistOnSave = persistOnSave;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -39,6 +41,11 @@ namespace Storage.StorageDatabase
 
         public override int SaveChanges()
         {
+            if (!_persistOnSave)
+            {
+                return 0;
+            }
+
             var result = base.SaveChanges(false);
 
             var auditLogs = GetAuditLogs().ToList();
