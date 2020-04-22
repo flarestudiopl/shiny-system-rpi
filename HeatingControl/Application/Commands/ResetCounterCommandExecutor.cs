@@ -40,10 +40,13 @@ namespace HeatingControl.Application.Commands
 
                 var counter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == heater.HeaterId && !x.ResetDate.HasValue);
 
-                counter.ResetDate = DateTime.UtcNow;
-                counter.ResettedByUserId = command.UserId;
+                if (counter != null)
+                {
+                    counter.ResetDate = DateTime.UtcNow;
+                    counter.ResettedByUserId = command.UserId;
 
-                _counterRepository.Update(counter, null);
+                    _counterRepository.Update(counter, null);
+                }
 
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
                 {

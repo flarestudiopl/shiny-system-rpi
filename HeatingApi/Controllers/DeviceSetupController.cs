@@ -12,7 +12,6 @@ namespace HeatingApi.Controllers
     /// Controller for settings views
     /// </summary>
     [Route("/api/setup/device")]
-    [RequiredPermission(Permission.Configuration_Devices)]
     public class DeviceSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
@@ -47,6 +46,7 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost("buildingName/{name?}")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult SetBuildingName(string name)
         {
             return _commandHandler.ExecuteCommand(new UpdateBuildingCommand
@@ -57,12 +57,14 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPost("controlState/{state}")]
+        [RequiredPermission(Permission.Configuration_PowerOptions)]
         public void SetControllerState(bool state)
         {
             _heatingControl.SetControlEnabled(state);
         }
 
         [HttpPost("powerOff")]
+        [RequiredPermission(Permission.Configuration_PowerOptions)]
         public IActionResult PowerOff()
         {
             _heatingControl.SetControlEnabled(false);
@@ -71,24 +73,28 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("connectedTemperatureSensors")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public ICollection<AvailableTemperatureInputProtocol> GetConnectedTemperetureSensors()
         {
             return _connectedTemperatureSensorsProvider.Provide(_heatingControl.State.Model);
         }
 
         [HttpGet("temperatureSensor/{temperatureSensorId}")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public TemperatureSensorSettings GetTemperatureSensor(int temperatureSensorId)
         {
             return _temperatureSensorSettingsProvider.Provide(temperatureSensorId, _heatingControl.State.Model);
         }
 
         [HttpPost("temperatureSensor")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult AddTemperatureSensor([FromBody] SaveTemperatureSensorCommand command)
         {
             return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpDelete("temperatureSensor/{temperatureSensorId}")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult RemoveTemperatureSensor(int temperatureSensorId)
         {
             return _commandHandler.ExecuteCommand(new RemoveTemperatureSensorCommand
@@ -99,24 +105,28 @@ namespace HeatingApi.Controllers
         }
 
         [HttpGet("heater/new")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public NewHeaterOptionsProviderResult GetNewHeaterOptions()
         {
             return _newHeaterOptionsProvider.Provide();
         }
 
         [HttpGet("heater/{heaterId}")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public HeaterSettings GetHeater(int heaterId)
         {
             return _heaterSettingsProvider.Provide(heaterId, _heatingControl.State);
         }
 
         [HttpPost("heater")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult AddHeater([FromBody] SaveHeaterCommand command)
         {
             return _commandHandler.ExecuteCommand(command, UserId);
         }
 
         [HttpDelete("heater/{heaterId}")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult RemoveHeater(int heaterId)
         {
             return _commandHandler.ExecuteCommand(new RemoveHeaterCommand
@@ -128,6 +138,7 @@ namespace HeatingApi.Controllers
         }
 
         [HttpPut("dateTime")]
+        [RequiredPermission(Permission.Configuration_Devices)]
         public IActionResult SetDateTime([FromBody] SetDateTimeCommand command)
         {
             return _commandHandler.ExecuteCommand(command, UserId);
