@@ -10,7 +10,7 @@ namespace HeatingApi.Controllers
     /// Controller for settings views
     /// </summary>
     [Route("/api/setup/zone")]
-    [RequiredPermission(Permission.Configuration_Users)]
+    [RequiredPermission(Permission.Configuration_Zones)]
     public class ZoneSetupController : BaseController
     {
         private readonly IHeatingControl _heatingControl;
