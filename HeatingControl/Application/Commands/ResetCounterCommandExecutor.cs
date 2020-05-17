@@ -34,15 +34,26 @@ namespace HeatingControl.Application.Commands
                 return CommandResult.WithValidationError(Localization.ValidationMessage.UnknownZoneId.FormatWith(command.ZoneId));
             }
 
+            var now = DateTime.UtcNow;
+
             foreach (var heater in zone.Zone.Heaters)
             {
-                context.ControllerState.HeaterIdToState[heater.HeaterId].LastCounterStart = DateTime.UtcNow;
+                var heaterState = context.ControllerState.HeaterIdToState[heater.HeaterId];
+                var currentCounterValue = heaterState.OutputState ? (int)(now - heaterState.LastCounterStart).TotalSeconds : 0;
+
+                _counterAccumulator.Accumulate(new CounterAccumulatorInput
+                {
+                    HeaterId = heater.HeaterId,
+                    SecondsToAccumulate = currentCounterValue
+                });
+
+                heaterState.LastCounterStart = now;
 
                 var counter = _counterRepository.ReadSingleOrDefault(x => x.HeaterId == heater.HeaterId && !x.ResetDate.HasValue);
 
                 if (counter != null)
                 {
-                    counter.ResetDate = DateTime.UtcNow;
+                    counter.ResetDate = now;
                     counter.ResettedByUserId = command.UserId;
 
                     _counterRepository.Update(counter, null);

@@ -9,12 +9,13 @@ namespace HardwareAccess.Dummy.Buses
         private readonly IDictionary<FakeRegisterDescriptor, int> _inputRegisters = new Dictionary<FakeRegisterDescriptor, int>();
         private readonly Random _random = new Random();
 
-        public int ReadHoldingRegister(string ip, int port, int address)
+        public int ReadInputRegister(string ip, int port, int address)
         {
             return _random.Next(150, 180);
+
         }
 
-        public int ReadInputRegister(string ip, int port, int address)
+        public int ReadHoldingRegister(string ip, int port, int address)
         {
             var registerDescriptor = new FakeRegisterDescriptor { IpAddress = ip, PortNumber = port, Address = address };
 

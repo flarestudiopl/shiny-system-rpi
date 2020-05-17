@@ -23,18 +23,16 @@ namespace HeatingControl.Application.Loops.Processing
         {
             var heater = heaterState.Heater;
 
-            if (heaterState.OutputState)
-            {
-                heaterState.LastCounterStart = DateTime.UtcNow;
-            }
-            else
+            if (!heaterState.OutputState)
             {
                 _counterAccumulator.Accumulate(new CounterAccumulatorInput
-                                               {
-                                                   HeaterId = heater.HeaterId,
-                                                   SecondsToAccumulate = (int)(DateTime.UtcNow - heaterState.LastCounterStart).TotalSeconds
-                                               });
+                {
+                    HeaterId = heater.HeaterId,
+                    SecondsToAccumulate = (int)(DateTime.UtcNow - heaterState.LastCounterStart).TotalSeconds
+                });
             }
+            
+            heaterState.LastCounterStart = DateTime.UtcNow;
 
             controllerState.InstantUsage = controllerState.HeaterIdToState
                                                           .Values

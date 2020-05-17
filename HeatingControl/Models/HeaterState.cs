@@ -9,7 +9,7 @@ namespace HeatingControl.Models
 
         public DateTime LastStateChange { get; set; }
 
-        public DateTime LastCounterStart { get; set; }
+        public DateTime LastCounterStart { get; set; } = DateTime.UtcNow;
 
         public bool OutputState { get; set; }
     }
