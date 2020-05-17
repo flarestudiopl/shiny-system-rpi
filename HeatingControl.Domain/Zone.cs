@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Domain
 {
@@ -9,6 +10,9 @@ namespace Domain
         public int BuildingId { get; set; }
 
         public string Name { get; set; }
+
+        [Obsolete("Temporary aproach")]
+        public string NameDashboardEn { get; set; } // TODO - remove; how about a separate table with name for each lang?
 
         public int? TemperatureControlledZoneId { get; set; }
 

@@ -18,6 +18,7 @@ namespace HeatingControl.Application.DataAccess.Zone
     {
         public int? ZoneId { get; set; }
         public string Name { get; set; }
+        public string NameDashboardEn { get; set; }
         public int? TemperatureSensorId { get; set; }
         public ICollection<int> HeaterIds { get; set; }
     }
@@ -53,6 +54,7 @@ namespace HeatingControl.Application.DataAccess.Zone
                 }
 
                 zone.Name = input.Name;
+                zone.NameDashboardEn = input.NameDashboardEn ?? input.Name;
 
                 MergeTemperatureControlledZone(input, c, zone);
                 MergeHeaters(input, c, zone);

@@ -14,6 +14,7 @@ namespace HeatingControl.Application.Queries
     public class ZoneSettingsProviderResult
     {
         public string Name { get; set; }
+        public string NameDashboardEn { get; set; }
         public int? TemperatureSensorId { get; set; }
         public ICollection<SensorData> TemperatureSensors { get; set; }
         public ICollection<int> HeaterIds { get; set; }
@@ -46,6 +47,7 @@ namespace HeatingControl.Application.Queries
             return new ZoneSettingsProviderResult
                    {
                        Name = zoneConfiguration.Name,
+                       NameDashboardEn = zoneConfiguration.NameDashboardEn,
                        TemperatureSensorId = zoneConfiguration.TemperatureControlledZone?.TemperatureSensorId,
                        TemperatureSensors = _availableTemperatureSensorsProvider.Provide(controllerState, building),
                        HeaterIds = zoneConfiguration.Heaters.Select(x => x.HeaterId).ToArray(),

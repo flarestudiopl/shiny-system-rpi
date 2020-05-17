@@ -29,6 +29,7 @@ namespace HeatingControl.Application.Queries
         {
             public int Id { get; set; }
             public string Name { get; set; }
+            public string NameDashboardEn { get; set; }
             public TemperatureControlSnapshot TemperatureControl { get; set; }
             public OnOffControlSnapshot OnOffControl { get; set; }
             public ZoneControlMode ControlMode { get; set; }
@@ -89,6 +90,7 @@ namespace HeatingControl.Application.Queries
                                {
                                    Id = zoneState.Zone.ZoneId,
                                    Name = zoneState.Zone.Name,
+                                   NameDashboardEn = zoneState.Zone.NameDashboardEn,
                                    ControlMode = zoneState.ControlMode,
                                    OutputState = zoneState.EnableOutputs
                                };
