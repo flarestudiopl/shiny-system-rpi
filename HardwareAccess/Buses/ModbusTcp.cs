@@ -2,6 +2,7 @@
 using Commons.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HardwareAccess.Buses
 {
@@ -14,6 +15,9 @@ namespace HardwareAccess.Buses
 
     public class ModbusTcp : IModbusTcp
     {
+        const int RETRY_ATTEMPTS_COUNT = 3;
+        const int RETRY_INTERVAL_MILLISECONDS = 250;
+
         private object _clientLock = new object();
         private readonly IDictionary<ModbusServerDescriptor, EasyModbus.ModbusClient> _modbusClientCache = new Dictionary<ModbusServerDescriptor, EasyModbus.ModbusClient>();
 
@@ -21,7 +25,7 @@ namespace HardwareAccess.Buses
         {
             try
             {
-                return TryGetConnectedClient(ip, port)?.ReadHoldingRegisters(address, 1)[0] ?? int.MinValue;
+                return Try(() => TryGetConnectedClient(ip, port).ReadHoldingRegisters(address, 3)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS, nameof(ReadHoldingRegister));
             }
             catch (Exception exception)
             {
@@ -35,7 +39,7 @@ namespace HardwareAccess.Buses
         {
             try
             {
-                return TryGetConnectedClient(ip, port)?.ReadInputRegisters(address, 1)[0] ?? int.MinValue;
+                return Try(() => TryGetConnectedClient(ip, port)?.ReadInputRegisters(address, 3)[0] ?? int.MinValue, RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS, nameof(ReadInputRegister));
             }
             catch (Exception exception)
             {
@@ -49,7 +53,7 @@ namespace HardwareAccess.Buses
         {
             try
             {
-                TryGetConnectedClient(ip, port)?.WriteSingleRegister(address, value);
+                Try(() => TryGetConnectedClient(ip, port)?.WriteSingleRegister(address, value), RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS, nameof(WriteHoldingRegister));
             }
             catch (Exception exception)
             {
@@ -83,7 +87,8 @@ namespace HardwareAccess.Buses
                     Logger.Error("ModbusTcp connection error", exception);
                     client.Disconnect();
                     _modbusClientCache.Remove(modbusDescriptor);
-                    return null;
+
+                    throw exception;
                 }
 
                 return client;
@@ -109,6 +114,36 @@ namespace HardwareAccess.Buses
             public string IpAddress { get; set; }
             public int PortNumber { get; set; }
             public static ModbusServerDescriptor Create(string ip, int port) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port };
+        }
+
+        private void Try(Action action, int attempts, int millisecondsDelay, string operation)
+        {
+            Try<object>(() => { action(); return null; }, attempts, millisecondsDelay, operation);
+        }
+
+        private T Try<T>(Func<T> func, int attempts, int millisecondsDelay, string operation)
+        {
+            var attemptNumber = 0;
+            Exception lastException = null;
+
+            while (attemptNumber < attempts)
+            {
+                attemptNumber++;
+
+                try
+                {
+                    Console.WriteLine($"ModbusTcp(Try) attempt no. {attemptNumber}/{attempts} for {operation}.");
+                    return func();
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
+
+                Task.Delay(millisecondsDelay).Wait();
+            }
+
+            throw lastException;
         }
     }
 }
