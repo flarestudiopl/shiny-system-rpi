@@ -45,7 +45,7 @@ namespace HardwareAccess.Tests.Devices.TemperatureInputs
 
             // Assert
             Assert.Equal(21.375f, result.Value);
-            Assert.False(result.CrcOk);
+            Assert.False(result.Success);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace HardwareAccess.Tests.Devices.TemperatureInputs
             var result = Act(rawData);
 
             // Assert
-            Assert.False(result.CrcOk);
+            Assert.False(result.Success);
         }
     }
 }

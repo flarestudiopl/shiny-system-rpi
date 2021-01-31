@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\HardwareAccess\HardwareAccess.csproj" />
     <ProjectReference Include="..\HeatingControl.Domain\Domain.csproj" />
     <ProjectReference Include="..\Storage\Storage.csproj" />

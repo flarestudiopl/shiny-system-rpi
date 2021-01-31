@@ -74,7 +74,7 @@ namespace HeatingApi.DependencyResolution
 
             // Buses
             builder.RegisterType<OneWire>().As<IOneWire>().SingleInstance();
-            builder.RegisterType<HardwareAccess.Dummy.Buses.ModbusTcp>().As<IModbusTcp>().SingleInstance();
+            builder.RegisterType<HardwareAccess.Buses.ModbusTcp>().As<IModbusTcp>().SingleInstance();
             builder.RegisterType<HardwareAccess.Dummy.Buses.I2c>().As<II2c>().SingleInstance();
 
             // Devices

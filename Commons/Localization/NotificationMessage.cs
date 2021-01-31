@@ -13,7 +13,8 @@
         string TemperatureValueTooOld { get; }
         string NoTemperatureData { get; }
         string LoopFailed { get; }
-        string SensorCrcError { get; }
+        string TemperatureSensorReadError { get; }
+        string OutputWriteFailed { get; }
         string PowerOffRequested { get; }
         string HeaterRemovedFromPowerZoneDueToUsageUnitChange { get; }
     }
@@ -31,7 +32,8 @@
         public string TemperatureValueTooOld => "Odczyt temperatury strefy '{0}' jest przedawniony. Proaktywne odłączenie zasilania.";
         public string NoTemperatureData => "Brak danych z czujnika '{0}' w strefie '{1}'. Proaktywne odłączenie zasilania.";
         public string LoopFailed => "Awaria pętli '{0}'! Ponowna próba za {1} sekund.";
-        public string SensorCrcError => "Błąd CRC czujnika '{0}'. Pomijam odczyt.";
+        public string TemperatureSensorReadError => "Błąd odczytu czujnika '{0}'.";
+        public string OutputWriteFailed => "Nie można ustawić stanu wyjścia '{0}'.";
         public string PowerOffRequested => "Rozpoczęto procedurę wyłączania sterownika...";
         public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Ogrzewacz '{0}' został odłączony od strefy zasilania z powodu zmiany jednostki zużycia.";
     }
@@ -49,7 +51,8 @@
         public string TemperatureValueTooOld => "Temperature value for zone '{0}' is too old. Proactive power cutoff.";
         public string NoTemperatureData => "No temperature data for sensor '{0}' in zone '{1}'. Proactive power cutoff.";
         public string LoopFailed => "{0} loop failed! Retrying in {1} seconds.";
-        public string SensorCrcError => "Sensor '{0}' CRC error. Skipping readout.";
+        public string TemperatureSensorReadError => "Sensor '{0}' read error.";
+        public string OutputWriteFailed => "Cannot set output '{0}' state.";
         public string PowerOffRequested => "Shutdown sequence started...";
         public string HeaterRemovedFromPowerZoneDueToUsageUnitChange => "Heater '{0}' was removed from power zone due to usage unit change.";
     }

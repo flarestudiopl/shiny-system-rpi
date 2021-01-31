@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Commons;
+using Domain;
 using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace HardwareAccess.Devices.PowerOutputs
         private const int BMS_MODE_ADDRESS = 0x04;
         private const int BMS_WM_RAW = 0x0001;
 
-        private const int WORK_MODE_ADDRESS = 0x04;
+        private const int WORK_MODE_ADDRESS = 0x04; // TODO - CHECK IN DOCS
 
         private readonly static IDictionary<byte, int> DRIVER_ADDRESS_TO_REGISTER_OFFSET = new Dictionary<byte, int>
         {
@@ -42,28 +43,56 @@ namespace HardwareAccess.Devices.PowerOutputs
             _modbusTcp = modbusTcp;
         }
 
-        public void SetState(object outputDescriptor, bool state)
+        public bool TrySetState(object outputDescriptor, bool state)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var bmsState = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS);
 
-            if(bmsState != BMS_WM_RAW)
+            if (!bmsState.Success)
             {
-                _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS, BMS_WM_RAW);
+                Logger.DebugWithData("Cannot read BMS state", bmsState.Exception?.ToString());
+                return false;
+            }
+
+            if (bmsState.Value != BMS_WM_RAW)
+            {
+                var writeBmsState = _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS, BMS_WM_RAW);
+                if (!writeBmsState.Success)
+                {
+                    Logger.DebugWithData("Cannot write BMS state", writeBmsState.Exception?.ToString());
+                    return false;
+                }
             }
 
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
+            var writeResult = _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 2 : 1); // TODO - check states & move to const
 
-            _modbusTcp.WriteHoldingRegister(output.IpAddress, output.PortNumber, registerAddress, state ? 2 : 1);
+            if (!writeResult.Success)
+            {
+                Logger.DebugWithData("Cannot write to output", writeResult.Exception?.ToString());
+                return false;
+            }
+
+            return writeResult.Success;
         }
 
-        public bool GetState(object outputDescriptor)
+        public bool? TryGetState(object outputDescriptor)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var registerAddress = WORK_MODE_ADDRESS + GetOffset(output.DriverAddress);
-            var registerValue = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, registerAddress);
+            var registerRead = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, registerAddress);
 
-            return registerValue != 1;
+            if (registerRead.Success)
+            {
+                return registerRead.Value != 1;
+            }
+
+            if (registerRead.Exception != null)
+            {
+                Logger.DebugWithData("Register read exception", registerRead.Exception.ToString());
+            }
+
+            return null;
         }
 
         private int GetOffset(byte driverAddress)

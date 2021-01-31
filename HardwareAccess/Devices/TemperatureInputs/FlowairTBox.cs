@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Commons;
+using Domain;
 using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
@@ -46,10 +47,15 @@ namespace HardwareAccess.Devices.TemperatureInputs
             var input = DescriptorHelper.CastHardwareDescriptorOrThrow<InputDescriptor>(inputDescriptor);
             var temperatureReadout = _modbusTcp.ReadInputRegister(input.IpAddress, input.PortNumber, GetOffset(input.DriverAddress) + input.InputRegisterAddress);
 
+            if (temperatureReadout.Exception != null)
+            {
+                Logger.DebugWithData("Modbus Exception", temperatureReadout.Exception.ToString());
+            }
+
             return Task.FromResult(new TemperatureSensorData
             {
-                Value = temperatureReadout * input.ValueMultiplier + input.ValueOffset,
-                CrcOk = temperatureReadout != 1024 && temperatureReadout != int.MinValue
+                Value = temperatureReadout.Value * input.ValueMultiplier + input.ValueOffset,
+                Success = temperatureReadout.Success
             });
         }
 

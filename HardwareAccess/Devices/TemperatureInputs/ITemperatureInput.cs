@@ -18,6 +18,6 @@ namespace HardwareAccess.Devices.TemperatureInputs
     {
         public double Value { get; set; }
 
-        public bool CrcOk { get; set; }
+        public bool Success { get; set; }
     }
 }

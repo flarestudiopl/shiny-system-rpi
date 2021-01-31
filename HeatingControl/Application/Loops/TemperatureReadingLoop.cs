@@ -47,16 +47,17 @@ namespace HeatingControl.Application.Loops
 
                                  sensorRead.Wait();
 
-                                 if (sensorRead.Result.CrcOk)
-                                 {
-                                     var temperatureSensorState = sensor.Value;
+                                 var temperatureSensorState = sensor.Value;
 
+                                 if (sensorRead.Result.Success)
+                                 {
                                      ProcessCurrentRead(temperatureSensorState, sensorRead);
                                      ProcessHistory(temperatureSensorState);
                                  }
-                                 else
+                                 else if(DateTime.UtcNow - temperatureSensorState.LastRead > TimeSpan.FromSeconds(30))
                                  {
-                                     Logger.Warning(Localization.NotificationMessage.SensorCrcError.FormatWith(sensor.Value.TemperatureSensor.Name));
+                                     Logger.Warning(Localization.NotificationMessage.TemperatureSensorReadError.FormatWith(sensor.Value.TemperatureSensor.Name));
+                                     temperatureSensorState.LastRead = DateTime.UtcNow;
                                  }
                              });
         }

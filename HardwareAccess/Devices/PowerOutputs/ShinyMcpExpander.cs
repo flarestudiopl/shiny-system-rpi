@@ -4,7 +4,6 @@ using HardwareAccess.Buses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace HardwareAccess.Devices.PowerOutputs
 {
@@ -58,7 +57,7 @@ namespace HardwareAccess.Devices.PowerOutputs
             _i2c = i2c;
         }
 
-        public void SetState(object outputDescriptor, bool newState)
+        public bool TrySetState(object outputDescriptor, bool newState)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 
@@ -95,9 +94,11 @@ namespace HardwareAccess.Devices.PowerOutputs
 
                 _i2c.WriteToDevice(output.DeviceId, (byte)channel.Bank, (byte)currentState);
             }
+
+            return true;
         }
 
-        public bool GetState(object outputDescriptor)
+        public bool? TryGetState(object outputDescriptor)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 

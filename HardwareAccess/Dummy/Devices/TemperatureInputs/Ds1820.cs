@@ -21,7 +21,7 @@ namespace HardwareAccess.Dummy.Devices.TemperatureInputs
             return Task.Delay(750)
                        .ContinueWith(_ => new TemperatureSensorData
                        {
-                           CrcOk = _random.Next(0, 100) < 98,
+                           Success = _random.Next(0, 100) < 98,
                            Value = _random.NextDouble() + 20d
                        });
         }

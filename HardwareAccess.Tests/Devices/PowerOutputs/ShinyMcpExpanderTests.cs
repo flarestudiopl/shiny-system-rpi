@@ -23,10 +23,10 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new ShinyMcpExpander(i2c);
 
             // Act
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "O1"), true);  // 1000 0000
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "O3"), true);  // 1010 0000
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "O6"), true);  // 1010 0100
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "O3"), false); // 1000 0100 => 132
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "O1"), true);  // 1000 0000
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "O3"), true);  // 1010 0000
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "O6"), true);  // 1010 0100
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "O3"), false); // 1000 0100 => 132
 
             // Assert
             Assert.Equal(132, deviceState);
@@ -40,7 +40,7 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new ShinyMcpExpander(null);
 
             // Act
-            var state = powerOutput.GetState(BuildOutputDescriptor(32, "O1"));
+            var state = powerOutput.TryGetState(BuildOutputDescriptor(32, "O1"));
 
             // Assert
             Assert.Equal(false, state);
@@ -55,13 +55,13 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new ShinyMcpExpander(i2c);
 
             // Act
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "O3"), true);  // 0000 0100
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "O3"), true);  // 0000 0100
 
             // Assert
-            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(deviceId, "O1")));
-            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(deviceId, "O2")));
-            Assert.Equal(true, powerOutput.GetState(BuildOutputDescriptor(deviceId, "O3")));
-            Assert.Equal(false, powerOutput.GetState(BuildOutputDescriptor(deviceId, "O4")));
+            Assert.Equal(false, powerOutput.TryGetState(BuildOutputDescriptor(deviceId, "O1")));
+            Assert.Equal(false, powerOutput.TryGetState(BuildOutputDescriptor(deviceId, "O2")));
+            Assert.Equal(true, powerOutput.TryGetState(BuildOutputDescriptor(deviceId, "O3")));
+            Assert.Equal(false, powerOutput.TryGetState(BuildOutputDescriptor(deviceId, "O4")));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace HardwareAccess.Tests.Devices.PowerOutputs
             var powerOutput = new ShinyMcpExpander(i2c);
 
             // Act
-            powerOutput.SetState(BuildOutputDescriptor(deviceId, "N1"), true);
+            powerOutput.TrySetState(BuildOutputDescriptor(deviceId, "N1"), true);
 
             // Assert
             i2c.Received().WriteToDevice(deviceId, 0x00, 0x00);

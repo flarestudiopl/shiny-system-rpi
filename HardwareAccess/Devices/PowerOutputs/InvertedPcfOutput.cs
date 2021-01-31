@@ -49,7 +49,7 @@ namespace HardwareAccess.Devices.PowerOutputs
             _i2c = i2c;
         }
 
-        public void SetState(object outputDescriptor, bool state)
+        public bool TrySetState(object outputDescriptor, bool state)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 
@@ -61,9 +61,11 @@ namespace HardwareAccess.Devices.PowerOutputs
             }
 
             SetChannelState(output.DeviceId, channel, state);
+
+            return true;
         }
 
-        public bool GetState(object outputDescriptor)
+        public bool? TryGetState(object outputDescriptor)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
 

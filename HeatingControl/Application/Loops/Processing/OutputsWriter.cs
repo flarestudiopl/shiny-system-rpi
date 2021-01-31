@@ -1,4 +1,7 @@
 ﻿using System;
+using Commons;
+using Commons.Extensions;
+using Commons.Localization;
 using HardwareAccess.Devices;
 using HeatingControl.Models;
 
@@ -37,16 +40,30 @@ namespace HeatingControl.Application.Loops.Processing
                 if (CanSwitchState(now, heater, heaterPowerZoneState, forceImmidiateAction) &&
                     StateShouldBeUpdated(heater))
                 {
-                    _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
-                                        .SetState(heater.Heater.DigitalOutput.OutputDescriptor, heater.OutputState);
+                    var setStateSuccess = _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
+                                                              .TrySetState(heater.Heater.DigitalOutput.OutputDescriptor, heater.OutputState);
 
-                    _usageCollector.Collect(heater, controllerState);
-
-                    heater.LastStateChange = now;
-
-                    if (heaterPowerZoneState != null)
+                    if (setStateSuccess)
                     {
-                        heaterPowerZoneState.LastOutputStateChange = now;
+                        _usageCollector.Collect(heater, controllerState);
+
+                        heater.StateChangeFailureSince = null;
+                        heater.LastStateChange = now;
+
+                        if (heaterPowerZoneState != null)
+                        {
+                            heaterPowerZoneState.LastOutputStateChange = now;
+                        }
+                    }
+                    else
+                    {
+                        heater.StateChangeFailureSince = heater.StateChangeFailureSince ?? now;
+
+                        if (now - heater.StateChangeFailureSince > TimeSpan.FromSeconds(30))
+                        {
+                            Logger.Warning(Localization.NotificationMessage.OutputWriteFailed.FormatWith(heater.Heater.Name));
+                            heater.StateChangeFailureSince = now;
+                        }
                     }
                 }
             }
@@ -65,8 +82,10 @@ namespace HeatingControl.Application.Loops.Processing
 
         private bool StateShouldBeUpdated(HeaterState heater)
         {
-            return heater.OutputState != _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
-                                                             .GetState(heater.Heater.DigitalOutput.OutputDescriptor);
+            var currentState = _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
+                                                   .TryGetState(heater.Heater.DigitalOutput.OutputDescriptor);
+
+            return !currentState.HasValue || heater.OutputState != currentState.Value;
         }
     }
 }

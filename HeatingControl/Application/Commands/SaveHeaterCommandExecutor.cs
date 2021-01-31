@@ -67,7 +67,7 @@ namespace HeatingControl.Application.Commands
             if (outputToDisable != null)
             {
                 _powerOutputProvider.Provide(outputToDisable.ProtocolName)
-                                    .SetState(outputToDisable.OutputDescriptor, false);
+                                    .TrySetState(outputToDisable.OutputDescriptor, false);
             }
 
             return CommandResult.Empty;

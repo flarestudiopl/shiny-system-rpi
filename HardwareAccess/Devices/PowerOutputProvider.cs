@@ -27,16 +27,16 @@ namespace HardwareAccess.Devices
         public object ConfigurationOptions => _powerOutput.ConfigurationOptions;
         public Type OutputDescriptorType => _powerOutput.OutputDescriptorType;
 
-        public bool GetState(string outputDescriptorJson)
+        public bool? TryGetState(string outputDescriptorJson)
         {
             var outputDescriptor = GetOutputDescriptor(outputDescriptorJson);
-            return _powerOutput.GetState(outputDescriptor);
+            return _powerOutput.TryGetState(outputDescriptor);
         }
 
-        public void SetState(string outputDescriptorJson, bool state)
+        public bool TrySetState(string outputDescriptorJson, bool state)
         {
             var outputDescriptor = GetOutputDescriptor(outputDescriptorJson);
-            _powerOutput.SetState(outputDescriptor, state);
+            return _powerOutput.TrySetState(outputDescriptor, state);
         }
 
         private object GetOutputDescriptor(string outputDescriptorJson)
