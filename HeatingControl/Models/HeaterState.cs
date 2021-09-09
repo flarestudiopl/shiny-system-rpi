@@ -14,5 +14,7 @@ namespace HeatingControl.Models
         public DateTime LastCounterStart { get; set; } = DateTime.UtcNow;
 
         public bool OutputState { get; set; }
+
+        public float? SetPoint { get; set; }
     }
 }

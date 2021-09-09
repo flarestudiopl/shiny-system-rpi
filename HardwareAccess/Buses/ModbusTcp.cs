@@ -210,7 +210,7 @@ namespace HardwareAccess.Buses
             public string IpAddress { get; set; }
             public int PortNumber { get; set; }
             public byte Purpose { get; set; }
-            public static ModbusServerDescriptor Create(string ip, int port, byte purpose) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port, Purpose = purpose };
+            public static ModbusServerDescriptor Create(string ip, int port, byte purpose) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port, Purpose = 0 };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace HardwareAccess.Devices.PowerOutputs
 
         Type OutputDescriptorType { get; }
 
-        bool TrySetState(object outputDescriptor, bool state);
+        bool TrySetState(object outputDescriptor, bool state, float? setPoint);
 
         bool? TryGetState(object outputDescriptor);
     }

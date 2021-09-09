@@ -41,7 +41,7 @@ namespace HeatingControl.Application.Loops.Processing
                     StateShouldBeUpdated(heater))
                 {
                     var setStateSuccess = _powerOutputProvider.Provide(heater.Heater.DigitalOutput.ProtocolName)
-                                                              .TrySetState(heater.Heater.DigitalOutput.OutputDescriptor, heater.OutputState);
+                                                              .TrySetState(heater.Heater.DigitalOutput.OutputDescriptor, heater.OutputState, heater.SetPoint);
 
                     if (setStateSuccess)
                     {

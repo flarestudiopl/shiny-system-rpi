@@ -10,6 +10,8 @@ namespace HeatingControl.Models
 
         public bool EnableOutputs { get; set; }
 
+        public float? SetPoint { get; set; }
+
         public ScheduleState ScheduleState { get; set; } = new ScheduleState();
     }
 

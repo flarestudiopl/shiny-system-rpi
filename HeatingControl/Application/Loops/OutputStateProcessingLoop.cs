@@ -53,14 +53,39 @@ namespace HeatingControl.Application.Loops
         {
             foreach (var zoneState in controllerState.ZoneIdToState.Values)
             {
+                float? setPoint = null;
+
                 zoneState.EnableOutputs = zoneState.Zone.IsTemperatureControlled()
-                                              ? ProcessTemperatureBasedOutput(controllerState, zoneState)
+                                              ? ProcessTemperatureBasedOutput(controllerState, zoneState, out setPoint)
                                               : ProcessOnOffBasedOutput(zoneState);
+
+                zoneState.SetPoint = setPoint ?? zoneState.SetPoint;
             }
         }
 
-        private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState)
+        private bool ProcessTemperatureBasedOutput(ControllerState controllerState, ZoneState zoneState, out float? setPoint)
         {
+            var outputState = zoneState.EnableOutputs;
+
+            setPoint = 0f;
+
+            switch (zoneState.ControlMode)
+            {
+                case ZoneControlMode.LowOrDisabled:
+                    setPoint = zoneState.Zone.TemperatureControlledZone.LowSetPoint;
+                    break;
+                case ZoneControlMode.HighOrEnabled:
+                    setPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint;
+                    break;
+                case ZoneControlMode.Schedule:
+                    if (zoneState.ScheduleState.DesiredTemperature.HasValue)
+                    {
+                        setPoint = zoneState.ScheduleState.DesiredTemperature.Value;
+                    }
+
+                    break;
+            }
+
             var temperatureData = _zoneTemperatureProvider.Provide(zoneState.Zone.ZoneId, controllerState);
 
             if (temperatureData == null)
@@ -70,32 +95,11 @@ namespace HeatingControl.Application.Loops
                 return false;
             }
 
-            var outputState = zoneState.EnableOutputs;
-
             if (DateTime.UtcNow - temperatureData.LastRead < TimeSpan.FromMinutes(5))
             {
-                var setPoint = 0f;
-
-                switch (zoneState.ControlMode)
-                {
-                    case ZoneControlMode.LowOrDisabled:
-                        setPoint = zoneState.Zone.TemperatureControlledZone.LowSetPoint;
-                        break;
-                    case ZoneControlMode.HighOrEnabled:
-                        setPoint = zoneState.Zone.TemperatureControlledZone.HighSetPoint;
-                        break;
-                    case ZoneControlMode.Schedule:
-                        if (zoneState.ScheduleState.DesiredTemperature.HasValue)
-                        {
-                            setPoint = zoneState.ScheduleState.DesiredTemperature.Value;
-                        }
-
-                        break;
-                }
-
                 outputState = _hysteresisProcessor.Process(temperatureData.AverageTemperature,
                                                            outputState,
-                                                           setPoint,
+                                                           setPoint.Value,
                                                            zoneState.Zone.TemperatureControlledZone.Hysteresis);
             }
             else
@@ -139,6 +143,7 @@ namespace HeatingControl.Application.Loops
                 foreach (var heater in zone.Zone.Heaters.Select(x => x.HeaterId))
                 {
                     controllerState.HeaterIdToState[heater].OutputState = zone.EnableOutputs;
+                    controllerState.HeaterIdToState[heater].SetPoint = zone.SetPoint;
                 }
             }
         }

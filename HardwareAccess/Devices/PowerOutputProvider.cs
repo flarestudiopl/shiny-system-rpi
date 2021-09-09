@@ -33,10 +33,10 @@ namespace HardwareAccess.Devices
             return _powerOutput.TryGetState(outputDescriptor);
         }
 
-        public bool TrySetState(string outputDescriptorJson, bool state)
+        public bool TrySetState(string outputDescriptorJson, bool state, float? setPoint = null)
         {
             var outputDescriptor = GetOutputDescriptor(outputDescriptorJson);
-            return _powerOutput.TrySetState(outputDescriptor, state);
+            return _powerOutput.TrySetState(outputDescriptor, state, setPoint);
         }
 
         private object GetOutputDescriptor(string outputDescriptorJson)
@@ -60,11 +60,13 @@ namespace HardwareAccess.Devices
 
         public PowerOutputProvider(IInvertedPcfOutput invertedPcfOutput,
                                    IShinyMcpExpander shinyMcpExpander,
-                                   IFlowairTBox flowairTBox)
+                                   IFlowairTBox flowairTBox,
+                                   IFlowairTBox2 flowairTBox2)
         {
             _availablePowerOutputs.Add(invertedPcfOutput.ProtocolName, invertedPcfOutput);
             _availablePowerOutputs.Add(shinyMcpExpander.ProtocolName, shinyMcpExpander);
             _availablePowerOutputs.Add(flowairTBox.ProtocolName, flowairTBox);
+            _availablePowerOutputs.Add(flowairTBox2.ProtocolName, flowairTBox2);
         }
 
         public ICollection<string> GetAvailableProtocolNames()

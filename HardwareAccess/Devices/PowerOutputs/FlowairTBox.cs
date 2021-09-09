@@ -43,7 +43,7 @@ namespace HardwareAccess.Devices.PowerOutputs
             _modbusTcp = modbusTcp;
         }
 
-        public bool TrySetState(object outputDescriptor, bool state)
+        public bool TrySetState(object outputDescriptor, bool state, float? setPoint)
         {
             var output = DescriptorHelper.CastHardwareDescriptorOrThrow<OutputDescriptor>(outputDescriptor);
             var bmsState = _modbusTcp.ReadHoldingRegister(output.IpAddress, output.PortNumber, BMS_MODE_ADDRESS);
