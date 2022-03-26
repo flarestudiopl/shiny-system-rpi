@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyModbusTCP" Version="5.5.0" />
+    <PackageReference Include="NModbus" Version="3.0.72" />
     <PackageReference Include="System.IO.Ports" Version="4.7.0" />
   </ItemGroup>
 

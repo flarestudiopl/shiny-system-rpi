@@ -1,7 +1,9 @@
 ﻿using Commons;
 using Commons.Extensions;
+using NModbus;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace HardwareAccess.Buses
@@ -28,17 +30,15 @@ namespace HardwareAccess.Buses
 
     public class ModbusTcp : IModbusTcp
     {
-        const int RETRY_ATTEMPTS_COUNT = 5;
+        const int RETRY_ATTEMPTS_COUNT = 3;
         const int RETRY_INTERVAL_MILLISECONDS = 100;
 
         private object _clientLock = new object();
-        private readonly IDictionary<ModbusServerDescriptor, EasyModbus.ModbusClient> _modbusClientCache = new Dictionary<ModbusServerDescriptor, EasyModbus.ModbusClient>();
+        private readonly IDictionary<ModbusServerDescriptor, IModbusMaster> _modbusClientCache = new Dictionary<ModbusServerDescriptor, IModbusMaster>();
 
         public ModbusTcpReadResult ReadHoldingRegister(string ip, int port, int address)
         {
-            const byte CLIENT_PURPOSE = 3;
-
-            var getClientResult = TryGetConnectedClient(ip, port, CLIENT_PURPOSE);
+            var getClientResult = TryGetConnectedClient(ip, port);
 
             if (getClientResult.Exception != null)
             {
@@ -52,12 +52,12 @@ namespace HardwareAccess.Buses
 
             lock (getClientResult.Client)
             {
-                var tryResult = Try(() => getClientResult.Client.ReadHoldingRegisters(address, 3)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
+                var tryResult = Try(() => getClientResult.Client.ReadHoldingRegisters(1, (ushort)address, 1)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
 
                 if (tryResult.Exception != null)
                 {
                     Console.WriteLine($"ModbusTcp - Read HR {address}@{ip}:{port} failed.");
-                    RemoveDeadClient(ip, port, CLIENT_PURPOSE);
+                    RemoveDeadClient(ip, port);
 
                     return new ModbusTcpReadResult { Success = false, Exception = tryResult.Exception };
                 }
@@ -68,9 +68,7 @@ namespace HardwareAccess.Buses
 
         public ModbusTcpReadResult ReadInputRegister(string ip, int port, int address)
         {
-            const byte CLIENT_PURPOSE = 2;
-
-            var getClientResult = TryGetConnectedClient(ip, port, CLIENT_PURPOSE);
+            var getClientResult = TryGetConnectedClient(ip, port);
 
             if (getClientResult.Exception != null)
             {
@@ -84,12 +82,12 @@ namespace HardwareAccess.Buses
 
             lock (getClientResult.Client)
             {
-                var tryResult = Try(() => getClientResult.Client.ReadInputRegisters(address, 3)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
+                var tryResult = Try(() => getClientResult.Client.ReadInputRegisters(1, (ushort)address, 1)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
 
                 if (tryResult.Exception != null)
                 {
                     Console.WriteLine($"ModbusTcp - Read IR {address}@{ip}:{port} failed.");
-                    RemoveDeadClient(ip, port, CLIENT_PURPOSE);
+                    RemoveDeadClient(ip, port);
 
                     return new ModbusTcpReadResult { Success = false, Exception = tryResult.Exception };
                 }
@@ -100,9 +98,7 @@ namespace HardwareAccess.Buses
 
         public ModbusTcpWriteResult WriteHoldingRegister(string ip, int port, int address, int value)
         {
-            const byte CLIENT_PURPOSE = 1;
-
-            var getClientResult = TryGetConnectedClient(ip, port, CLIENT_PURPOSE);
+            var getClientResult = TryGetConnectedClient(ip, port);
 
             if (getClientResult.Exception != null)
             {
@@ -116,12 +112,12 @@ namespace HardwareAccess.Buses
 
             lock (getClientResult.Client)
             {
-                var tryResult = Try(() => getClientResult.Client.WriteSingleRegister(address, value), RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
+                var tryResult = Try(() => getClientResult.Client.WriteSingleRegister(1, (ushort)address, (ushort)value), RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
 
                 if (tryResult != null)
                 {
                     Console.WriteLine($"ModbusTcp - Write HR {address}@{ip}:{port} failed.");
-                    RemoveDeadClient(ip, port, CLIENT_PURPOSE);
+                    RemoveDeadClient(ip, port);
 
                     return new ModbusTcpWriteResult { Success = false, Exception = tryResult };
                 }
@@ -130,30 +126,37 @@ namespace HardwareAccess.Buses
             }
         }
 
-        private (EasyModbus.ModbusClient Client, Exception Exception) TryGetConnectedClient(string ip, int port, byte p)
+        private (IModbusMaster Client, Exception Exception) TryGetConnectedClient(string ip, int port)
         {
             lock (_clientLock)
             {
-                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port, p);
+                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port);
                 var client = _modbusClientCache.GetValueOrDefault(modbusDescriptor);
+                TcpClient tcpClient = null;
 
                 try
                 {
                     if (client == null)
                     {
-                        client = new EasyModbus.ModbusClient(ip, port);
-                        _modbusClientCache.Add(modbusDescriptor, client);
-                    }
+                        Logger.DebugWithData("Trying to create new ModbusMaster", new { ip, port });
 
-                    if (!client.Connected)
-                    {
-                        client.Connect();
+                        tcpClient = new TcpClient(ip, port)
+                        {
+                            ReceiveTimeout = 500,
+                            SendTimeout = 500
+                        };
+
+                        var modbusFactory = new ModbusFactory();
+
+                        client = modbusFactory.CreateMaster(tcpClient);
+                        _modbusClientCache.Add(modbusDescriptor, client);
                     }
                 }
                 catch (Exception exception)
                 {
                     Logger.DebugWithData("ModbusTcp connection error", exception.ToString());
-                    client.Disconnect();
+                    tcpClient?.Dispose();
+                    client?.Dispose();
                     _modbusClientCache.Remove(modbusDescriptor);
 
                     return (null, exception);
@@ -163,15 +166,15 @@ namespace HardwareAccess.Buses
             }
         }
 
-        private void RemoveDeadClient(string ip, int port, byte p)
+        private void RemoveDeadClient(string ip, int port)
         {
             lock (_clientLock)
             {
-                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port, p);
+                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port);
 
                 if (_modbusClientCache.TryGetValue(modbusDescriptor, out var client))
                 {
-                    _modbusClientCache[modbusDescriptor].Disconnect();
+                    _modbusClientCache[modbusDescriptor].Dispose();
                     _modbusClientCache.Remove(modbusDescriptor);
                 }
             }
@@ -190,7 +193,6 @@ namespace HardwareAccess.Buses
             while (attemptNumber < attempts)
             {
                 attemptNumber++;
-                Task.Delay(millisecondsDelay).Wait();
 
                 try
                 {
@@ -199,6 +201,10 @@ namespace HardwareAccess.Buses
                 catch (Exception e)
                 {
                     lastException = e;
+                }
+                finally
+                {
+                    Task.Delay(millisecondsDelay).Wait();
                 }
             }
 
@@ -209,8 +215,7 @@ namespace HardwareAccess.Buses
         {
             public string IpAddress { get; set; }
             public int PortNumber { get; set; }
-            public byte Purpose { get; set; }
-            public static ModbusServerDescriptor Create(string ip, int port, byte purpose) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port, Purpose = 0 };
+            public static ModbusServerDescriptor Create(string ip, int port) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port };
         }
     }
 }
