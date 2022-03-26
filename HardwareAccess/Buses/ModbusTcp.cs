@@ -1,11 +1,7 @@
-﻿using Commons;
-using Commons.Extensions;
-using NModbus;
+﻿using NModbus;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace HardwareAccess.Buses
 {
@@ -31,194 +27,84 @@ namespace HardwareAccess.Buses
 
     public class ModbusTcp : IModbusTcp
     {
-        const int RETRY_ATTEMPTS_COUNT = 3;
-        const int RETRY_INTERVAL_MILLISECONDS = 100;
-
-        private object _clientLock = new object();
-        private readonly IDictionary<ModbusServerDescriptor, IModbusMaster> _modbusClientCache = new Dictionary<ModbusServerDescriptor, IModbusMaster>();
-
         private AutoResetEvent _autoResetEvent = new AutoResetEvent(true);
 
         public ModbusTcpReadResult ReadHoldingRegister(string ip, int port, int address)
         {
-            var getClientResult = TryGetConnectedClient(ip, port);
+            _autoResetEvent.WaitOne();
 
-            if (getClientResult.Exception != null)
+            try
             {
-                return new ModbusTcpReadResult { Success = false, Exception = getClientResult.Exception };
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 500, SendTimeout = 500 })
+                {
+                    var factory = new ModbusFactory();
+                    using (var master = factory.CreateMaster(client))
+                    {
+                        var value = master.ReadHoldingRegisters(1, (ushort)address, 1)[0];
+                        return new ModbusTcpReadResult { Value = value, Success = true };
+                    }
+                }
             }
-
-            if (getClientResult.Client == null)
+            catch (Exception exception)
             {
-                return new ModbusTcpReadResult { Success = false, Exception = new Exception("Client cannot be null.") };
+                return new ModbusTcpReadResult { Success = false, Exception = exception };
             }
-
-            var tryResult = Try(() => getClientResult.Client.ReadHoldingRegisters(1, (ushort)address, 1)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
-
-            if (tryResult.Exception != null)
+            finally
             {
-                Console.WriteLine($"ModbusTcp - Read HR {address}@{ip}:{port} failed.");
-                RemoveDeadClient(ip, port);
-
-                return new ModbusTcpReadResult { Success = false, Exception = tryResult.Exception };
+                _autoResetEvent.Set();
             }
-
-            return new ModbusTcpReadResult { Success = true, Value = tryResult.Result.Value };
-
         }
 
         public ModbusTcpReadResult ReadInputRegister(string ip, int port, int address)
         {
-            var getClientResult = TryGetConnectedClient(ip, port);
+            _autoResetEvent.WaitOne();
 
-            if (getClientResult.Exception != null)
+            try
             {
-                return new ModbusTcpReadResult { Success = false, Exception = getClientResult.Exception };
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 500, SendTimeout = 500 })
+                {
+                    var factory = new ModbusFactory();
+                    using (var master = factory.CreateMaster(client))
+                    {
+                        var value = master.ReadInputRegisters(1, (ushort)address, 1)[0];
+                        return new ModbusTcpReadResult { Value = value, Success = true };
+                    }
+                }
             }
-
-            if (getClientResult.Client == null)
+            catch (Exception exception)
             {
-                return new ModbusTcpReadResult { Success = false, Exception = new Exception("Client cannot be null.") };
+                return new ModbusTcpReadResult { Success = false, Exception = exception };
             }
-
-            var tryResult = Try(() => getClientResult.Client.ReadInputRegisters(1, (ushort)address, 1)[0], RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
-
-            if (tryResult.Exception != null)
+            finally
             {
-                Console.WriteLine($"ModbusTcp - Read IR {address}@{ip}:{port} failed.");
-                RemoveDeadClient(ip, port);
-
-                return new ModbusTcpReadResult { Success = false, Exception = tryResult.Exception };
+                _autoResetEvent.Set();
             }
-
-            return new ModbusTcpReadResult { Success = true, Value = tryResult.Result.Value };
-
         }
 
         public ModbusTcpWriteResult WriteHoldingRegister(string ip, int port, int address, int value)
         {
-            var getClientResult = TryGetConnectedClient(ip, port);
+            _autoResetEvent.WaitOne();
 
-            if (getClientResult.Exception != null)
+            try
             {
-                return new ModbusTcpWriteResult { Success = false, Exception = getClientResult.Exception };
-            }
-
-            if (getClientResult.Client == null)
-            {
-                return new ModbusTcpWriteResult { Success = false, Exception = new Exception("Client cannot be null.") };
-            }
-
-            var tryResult = Try(() => getClientResult.Client.WriteSingleRegister(1, (ushort)address, (ushort)value), RETRY_ATTEMPTS_COUNT, RETRY_INTERVAL_MILLISECONDS);
-
-            if (tryResult != null)
-            {
-                Console.WriteLine($"ModbusTcp - Write HR {address}@{ip}:{port} failed.");
-                RemoveDeadClient(ip, port);
-
-                return new ModbusTcpWriteResult { Success = false, Exception = tryResult };
-            }
-
-            return new ModbusTcpWriteResult { Success = true };
-
-        }
-
-        private (IModbusMaster Client, Exception Exception) TryGetConnectedClient(string ip, int port)
-        {
-            lock (_clientLock)
-            {
-                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port);
-                var client = _modbusClientCache.GetValueOrDefault(modbusDescriptor);
-                TcpClient tcpClient = null;
-
-                try
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 500, SendTimeout = 500 })
                 {
-                    if (client == null)
+                    var factory = new ModbusFactory();
+                    using (var master = factory.CreateMaster(client))
                     {
-                        Logger.DebugWithData("Trying to create new ModbusMaster", new { ip, port });
-
-                        tcpClient = new TcpClient(ip, port)
-                        {
-                            ReceiveTimeout = 500,
-                            SendTimeout = 500
-                        };
-
-                        var modbusFactory = new ModbusFactory();
-
-                        client = modbusFactory.CreateMaster(tcpClient);
-                        _modbusClientCache.Add(modbusDescriptor, client);
+                        master.WriteSingleRegister(1, (ushort)address, (ushort)value);
+                        return new ModbusTcpWriteResult { Success = true };
                     }
                 }
-                catch (Exception exception)
-                {
-                    Logger.DebugWithData("ModbusTcp connection error", exception.ToString());
-                    tcpClient?.Dispose();
-                    client?.Dispose();
-                    _modbusClientCache.Remove(modbusDescriptor);
-
-                    return (null, exception);
-                }
-
-                return (client, null);
             }
-        }
-
-        private void RemoveDeadClient(string ip, int port)
-        {
-            lock (_clientLock)
+            catch (Exception exception)
             {
-                var modbusDescriptor = ModbusServerDescriptor.Create(ip, port);
-
-                if (_modbusClientCache.TryGetValue(modbusDescriptor, out var client))
-                {
-                    _modbusClientCache[modbusDescriptor].Dispose();
-                    _modbusClientCache.Remove(modbusDescriptor);
-                }
+                return new ModbusTcpWriteResult { Success = false, Exception = exception };
             }
-        }
-
-        private Exception Try(Action action, int attempts, int millisecondsDelay)
-        {
-            return Try(() => { action(); return 0; }, attempts, millisecondsDelay).Exception;
-        }
-
-        private (T? Result, Exception Exception) Try<T>(Func<T> func, int attempts, int millisecondsDelay) where T : struct
-        {
-            var attemptNumber = 0;
-            Exception lastException = null;
-
-            while (attemptNumber < attempts)
+            finally
             {
-                attemptNumber++;
-                T result;
-
-                _autoResetEvent.WaitOne();
-
-                try
-                {
-                    result = func();
-
-                    return (result, null);
-                }
-                catch (Exception e)
-                {
-                    lastException = e;
-                }
-                finally
-                {
-                    _autoResetEvent.Set();
-                    Task.Delay(millisecondsDelay).Wait();
-                }
+                _autoResetEvent.Set();
             }
-
-            return (null, lastException);
-        }
-
-        private struct ModbusServerDescriptor
-        {
-            public string IpAddress { get; set; }
-            public int PortNumber { get; set; }
-            public static ModbusServerDescriptor Create(string ip, int port) => new ModbusServerDescriptor { IpAddress = ip, PortNumber = port };
         }
     }
 }
