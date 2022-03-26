@@ -190,12 +190,13 @@ namespace HardwareAccess.Buses
             while (attemptNumber < attempts)
             {
                 attemptNumber++;
+                T result;
+
+                _autoResetEvent.WaitOne();
 
                 try
                 {
-                    _autoResetEvent.WaitOne();
-                    var result = func();
-                    _autoResetEvent.Set();
+                    result = func();
 
                     return (result, null);
                 }
@@ -205,6 +206,7 @@ namespace HardwareAccess.Buses
                 }
                 finally
                 {
+                    _autoResetEvent.Set();
                     Task.Delay(millisecondsDelay).Wait();
                 }
             }
