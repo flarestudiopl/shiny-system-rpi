@@ -35,7 +35,7 @@ namespace HardwareAccess.Buses
 
             try
             {
-                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 1000, SendTimeout = 1000 })
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 2000, SendTimeout = 2000 })
                 {
                     var factory = new ModbusFactory();
                     using (var master = factory.CreateMaster(client))
@@ -61,7 +61,7 @@ namespace HardwareAccess.Buses
 
             try
             {
-                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 1000, SendTimeout = 1000 })
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 2000, SendTimeout = 2000 })
                 {
                     var factory = new ModbusFactory();
                     using (var master = factory.CreateMaster(client))
@@ -87,7 +87,7 @@ namespace HardwareAccess.Buses
 
             try
             {
-                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 1000, SendTimeout = 1000 })
+                using (TcpClient client = new TcpClient(ip, port) { ReceiveTimeout = 2000, SendTimeout = 2000 })
                 {
                     var factory = new ModbusFactory();
                     using (var master = factory.CreateMaster(client))
